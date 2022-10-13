@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { Music } from "../../../models/interfaces";
+import { MdOutlineLibraryAdd } from "react-icons/md";
 
 interface BasicInfo {
   infoProps?: {
@@ -22,6 +23,9 @@ interface BasicInfo {
     token: string;
     selectedMusics: Music[];
     setSelectedMusics: (data: Music[]) => void;
+    setStep: (data: number) => void;
+    musics: Music[];
+    setMusics: (data: Music[]) => void;
   };
 }
 
@@ -105,7 +109,7 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
   return (
     <div className="font-kanit">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-primary text-6xl font-semibold">
+        <h1 className="text-primary text-5xl font-semibold">
           Gêneros favoritos
         </h1>
         <h2 className="text-primary text-lg font-light">
@@ -121,8 +125,8 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
           {genres.map((genre, index) => (
             <p
               key={index}
-              className={`badge cursor-pointer duration-200 hover:badge-accent uppercase ${
-                hasSelected(genre) && "badge-accent"
+              className={`badge cursor-pointer duration-200 hover:badge-info uppercase ${
+                hasSelected(genre) && "badge-info"
               } ${isEqual(genre) ? "badge" : "badge-ghost"} `}
               onClick={() => addGenre(genre)}
             >
@@ -143,7 +147,7 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
         <button
           className="btn btn-outline btn-secondary"
           onClick={() => {
-            selected.length > 3 && setStep(3);
+            selected.length >= 3 && setStep(3);
           }}
         >
           CONTINUAR
@@ -154,10 +158,22 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
 };
 
 export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
-  const { token, selectedMusics, setSelectedMusics } = musicProps!;
+  const {
+    token,
+    setStep,
+    selectedMusics,
+    setSelectedMusics,
+    musics,
+    setMusics,
+  } = musicProps!;
   const [search, setSearch] = useState("");
 
   const handleSearch = async (text: string) => {
+    if (!text) {
+      setSearch("");
+      setMusics([]);
+      return;
+    }
     setSearch(text);
     const parameters = {
       method: "GET",
@@ -177,37 +193,78 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
     let musics: Music[] = [];
     data.tracks.items.forEach((item: any) => {
       let artists: string[] = [];
-      item.artists.forEach((artist: any) => artists.push(artist.name));
-      const music = {
-        id: item.id,
-        name: item.name,
-        artist: artists,
-        cover: item.album.images[2].url,
-      };
 
-      musics.push(music);
+      try {
+        item.artists.forEach((artist: any) => artists.push(artist.name));
+        const music = {
+          id: item.id,
+          name: item.name,
+          artist: artists,
+          cover: item.album.images[2].url,
+        };
+
+        musics.push(music);
+        setMusics(musics);
+      } catch (error) {}
     });
-
-    setSelectedMusics(musics);
 
     console.log(data);
   };
 
   return (
-    <div>
-      <input
-        value={search}
-        onChange={(e) => handleSearch(e.target.value)}
-        placeholder="Procurar"
-        className="input input-primary w-1/3 mt-2"
-      />
-      <div>
-        {selectedMusics.map((item) => (
-          <div className="flex items-center gap-4">
-            <img src={item.cover}></img>
-            <p>{item.name}</p>
-          </div>
-        ))}
+    <div className="font-kanit">
+      <div className="flex flex-col items-center">
+        <h1 className="text-5xl font-semibold">
+          Não consigo parar de ouvir estas músicas
+        </h1>
+        <input
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Procurar"
+          className="input input-primary w-1/3 mt-2"
+        />
+      </div>
+      <div className="w-1/3 m-auto mt-4 h-[32rem] overflow-y-auto scroll-smooth">
+        <div className="flex flex-col gap-3">
+          {musics.map((item, index) => (
+            <div className="flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg">
+              <div className="flex items-center gap-4 " key={index}>
+                <img src={item.cover} className="rounded-full"></img>
+                <div className="flex flex-col">
+                  <p className="text-lg">{item.name}</p>
+                  <p className="font-thin text-gray-400">
+                    {item.artist.map((obj, i, arr) => {
+                      return i == arr.length - 1 ? obj : obj + ", ";
+                    })}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <button className="text-info text-2xl">
+                  <MdOutlineLibraryAdd />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="w-1/2 m-auto flex justify-between items-center">
+        <button
+          className="btn btn-outline"
+          onClick={() => {
+            setStep(2);
+          }}
+        >
+          VOLTAR
+        </button>
+        <button
+          className="btn btn-outline btn-secondary"
+          onClick={() => {
+            selectedMusics.length == 5 && setStep(4);
+          }}
+        >
+          CONTINUAR
+        </button>
       </div>
     </div>
   );

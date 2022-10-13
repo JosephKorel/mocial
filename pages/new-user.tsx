@@ -17,6 +17,7 @@ export default function NewUser({ token }: { token: string }) {
   const [imgUrl, setImgUrl] = useState("");
   const [step, setStep] = useState(1);
   const [selectedMusics, setSelectedMusics] = useState<Music[]>([]);
+  const [musics, setMusics] = useState<Music[]>([]);
 
   const router = useRouter();
 
@@ -50,7 +51,14 @@ export default function NewUser({ token }: { token: string }) {
       case 3:
         return (
           <MusicSelect
-            musicProps={{ token, selectedMusics, setSelectedMusics }}
+            musicProps={{
+              token,
+              selectedMusics,
+              setSelectedMusics,
+              setStep,
+              musics,
+              setMusics,
+            }}
           />
         );
     }
@@ -146,7 +154,7 @@ export default function NewUser({ token }: { token: string }) {
   return (
     <div className="font-kanit">
       <main className="">
-        <section className="mt-4 h-[42rem]">{renderComponent()}</section>
+        <section className="mt-4 h-[45rem]">{renderComponent()}</section>
         <section className="text-center">
           <ul className="steps steps-horizontal">
             <li className={`step step-accent mx-2`} onClick={() => setStep(1)}>
@@ -158,8 +166,8 @@ export default function NewUser({ token }: { token: string }) {
             >
               Gêneros
             </li>
-            <li className="step">Músicas</li>
-            <li className="step">Álbuns</li>
+            <li className={`step ${step >= 3 && "step-accent"}`}>Músicas</li>
+            <li className={`step ${step == 4 && "step-accent"}`}>Álbuns</li>
           </ul>
         </section>
       </main>
