@@ -19,8 +19,11 @@ export default function Auth() {
   };
 
   return (
-    <div className="">
-      <div className="">
+    <main className="py-2">
+      <header className="w-2/3 m-auto">
+        <h1 className="text-warning font-extrabold text-6xl">Mocial</h1>
+      </header>
+      <section className="w-1/2 m-auto flex flex-col items-center p-2 border border-warning rounded-md bg-base-300">
         <h1 className="">Supabase + Next.js</h1>
         <p className="">Sign in via magic link with your email below</p>
         <div>
@@ -44,7 +47,7 @@ export default function Auth() {
             <span>{loading ? "Loading" : "Send magic link"}</span>
           </button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

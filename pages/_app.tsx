@@ -67,9 +67,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           rel="stylesheet"
         />
       </Head>
-      <nav className="prose">
+      {/*  <nav className="prose">
         {authenticaded ? <h1>Autenticado</h1> : <h1>Não Autenticado</h1>}
-      </nav>
+      </nav> */}
       <Component {...pageProps} />
     </>
   );
