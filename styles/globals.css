@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+::-webkit-scrollbar {
+  visibility: hidden;
+  width: 0rem;
+}
+
+.scrollbar {
+  scrollbar-width: 2rem;
+  scrollbar-color: red;
+}

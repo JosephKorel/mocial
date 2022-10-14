@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Music } from "../models/interfaces";
 import {
+  AlbumSelect,
   BasicInfo,
   GenreSelect,
   MusicSelect,
@@ -17,7 +18,7 @@ export default function NewUser({ token }: { token: string }) {
   const [imgUrl, setImgUrl] = useState("");
   const [step, setStep] = useState(1);
   const [selectedMusics, setSelectedMusics] = useState<Music[]>([]);
-  const [musics, setMusics] = useState<Music[]>([]);
+  const [selectedAlbums, setSelectedAlbums] = useState<Music[]>([]);
 
   const router = useRouter();
 
@@ -56,8 +57,18 @@ export default function NewUser({ token }: { token: string }) {
               selectedMusics,
               setSelectedMusics,
               setStep,
-              musics,
-              setMusics,
+            }}
+          />
+        );
+
+      case 4:
+        return (
+          <AlbumSelect
+            albumProps={{
+              token,
+              setStep,
+              selectedAlbums,
+              setSelectedAlbums,
             }}
           />
         );
@@ -171,14 +182,6 @@ export default function NewUser({ token }: { token: string }) {
           </ul>
         </section>
       </main>
-      {/* <div>
-        <button
-          className="btn btn-warning"
-          onClick={() => supabase.auth.signOut()}
-        >
-          SAIR
-        </button>
-      </div> */}
     </div>
   );
 }

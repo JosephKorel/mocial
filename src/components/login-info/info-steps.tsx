@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { Music } from "../../../models/interfaces";
 import { MdOutlineLibraryAdd } from "react-icons/md";
+import { CgPlayListRemove } from "react-icons/cg";
 
 interface BasicInfo {
   infoProps?: {
@@ -24,8 +25,12 @@ interface BasicInfo {
     selectedMusics: Music[];
     setSelectedMusics: (data: Music[]) => void;
     setStep: (data: number) => void;
-    musics: Music[];
-    setMusics: (data: Music[]) => void;
+  };
+  albumProps?: {
+    token: string;
+    selectedAlbums: Music[];
+    setSelectedAlbums: (data: Music[]) => void;
+    setStep: (data: number) => void;
   };
 }
 
@@ -104,6 +109,7 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
   };
 
   const isEqual = (item: string) => {
+    if (selected.includes(item)) return true;
     return item.includes(search.toLowerCase()) ? true : false;
   };
   return (
@@ -112,21 +118,18 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
         <h1 className="text-primary text-5xl font-semibold">
           Gêneros favoritos
         </h1>
-        <h2 className="text-primary text-lg font-light">
-          Escolha até cinco gêneros
-        </h2>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Procurar"
           className="input input-primary w-1/3 mt-2"
         />
-        <div className="w-1/2 flex justify-start gap-2 items-center flex-wrap mt-6">
+        <div className="w-1/2 h-[32rem] flex justify-start gap-2 items-center flex-wrap mt-4">
           {genres.map((genre, index) => (
             <p
               key={index}
-              className={`badge cursor-pointer duration-200 hover:badge-info uppercase ${
-                hasSelected(genre) && "badge-info"
+              className={`badge badge-lg cursor-pointer duration-200 hover:badge-warning uppercase ${
+                hasSelected(genre) && "badge-warning"
               } ${isEqual(genre) ? "badge" : "badge-ghost"} `}
               onClick={() => addGenre(genre)}
             >
@@ -135,7 +138,7 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
           ))}
         </div>
       </div>
-      <div className="w-1/2 m-auto flex justify-between items-center mt-6">
+      <div className="w-1/2 m-auto flex justify-between items-center mt-1">
         <button
           className="btn btn-outline"
           onClick={() => {
@@ -145,12 +148,13 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary"
+          className="btn btn-outline btn-secondary w-32"
           onClick={() => {
             selected.length >= 3 && setStep(3);
           }}
+          disabled={selected.length < 3 ? true : false}
         >
-          CONTINUAR
+          {selected.length >= 3 ? "CONTINUAR" : selected.length + "/3"}
         </button>
       </div>
     </div>
@@ -158,15 +162,9 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
 };
 
 export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
-  const {
-    token,
-    setStep,
-    selectedMusics,
-    setSelectedMusics,
-    musics,
-    setMusics,
-  } = musicProps!;
+  const { token, setStep, selectedMusics, setSelectedMusics } = musicProps!;
   const [search, setSearch] = useState("");
+  const [musics, setMusics] = useState<Music[]>([]);
 
   const handleSearch = async (text: string) => {
     if (!text) {
@@ -183,18 +181,17 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
       },
     };
 
-    const onFetch = await fetch(
-      `https://api.spotify.com/v1/search?q=${text}&type=track&limit=10`,
-      parameters
-    );
+    try {
+      const onFetch = await fetch(
+        `https://api.spotify.com/v1/search?q=${text}&type=track&limit=10`,
+        parameters
+      );
 
-    const data = await onFetch.json();
+      const data = await onFetch.json();
+      let musics: Music[] = [];
+      data.tracks.items.forEach((item: any) => {
+        let artists: string[] = [];
 
-    let musics: Music[] = [];
-    data.tracks.items.forEach((item: any) => {
-      let artists: string[] = [];
-
-      try {
         item.artists.forEach((artist: any) => artists.push(artist.name));
         const music = {
           id: item.id,
@@ -204,51 +201,101 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
         };
 
         musics.push(music);
-        setMusics(musics);
-      } catch (error) {}
-    });
+      });
+      setMusics(musics);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    console.log(data);
+  const handleChoice = (music: Music) => {
+    const onFilter = selectedMusics.filter((item) => item.id != music.id);
+
+    if (selectedMusics.length == 10) {
+      const isSelected = selectedMusics.filter((item) => item.id == music.id);
+      isSelected.length && setSelectedMusics(onFilter);
+      return;
+    }
+    selectedMusics.filter((item) => item.id == music.id).length
+      ? setSelectedMusics(onFilter)
+      : setSelectedMusics([...selectedMusics, music]);
   };
 
   return (
     <div className="font-kanit">
       <div className="flex flex-col items-center">
-        <h1 className="text-5xl font-semibold">
+        <h1 className="text-5xl font-light">
           Não consigo parar de ouvir estas músicas
         </h1>
-        <input
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Procurar"
-          className="input input-primary w-1/3 mt-2"
-        />
-      </div>
-      <div className="w-1/3 m-auto mt-4 h-[32rem] overflow-y-auto scroll-smooth">
-        <div className="flex flex-col gap-3">
-          {musics.map((item, index) => (
-            <div className="flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg">
-              <div className="flex items-center gap-4 " key={index}>
-                <img src={item.cover} className="rounded-full"></img>
-                <div className="flex flex-col">
-                  <p className="text-lg">{item.name}</p>
-                  <p className="font-thin text-gray-400">
-                    {item.artist.map((obj, i, arr) => {
-                      return i == arr.length - 1 ? obj : obj + ", ";
-                    })}
-                  </p>
-                </div>
-              </div>
-              <div>
-                <button className="text-info text-2xl">
-                  <MdOutlineLibraryAdd />
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="w-full flex justify-center items-end relative">
+          <p className="absolute left-5">Escolha até dez músicas</p>
+          <input
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Procurar"
+            className="input input-primary w-1/2 mt-2"
+          />
         </div>
       </div>
-      <div className="w-1/2 m-auto flex justify-between items-center">
+      <div className="mt-4 h-[32rem] flex flex-col gap-3 overflow-y-auto scroll-smooth scrollbar relative">
+        <div className="fixed left-5 w-full flex flex-col gap-2">
+          <div className="flex flex-col h-[32rem] overflow-y-auto gap-2">
+            {selectedMusics.map((item, index) => (
+              <div
+                key={index}
+                className="w-[20%] flex justify-between text-warning border border-warning items-center p-1 px-2 rounded-lg"
+              >
+                <div className="flex items-center gap-4 ">
+                  <img src={item.cover} className="rounded-full"></img>
+                  <div className="flex flex-col">
+                    <p className="">{item.name}</p>
+                    <p className="font-thin text-sm text-gray-400">
+                      {item.artist.map((obj, i, arr) => {
+                        return i == arr.length - 1 ? obj : obj + ", ";
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  className="text-2xl text-warning duration-200 hover:text-error"
+                  onClick={() => handleChoice(item)}
+                >
+                  <CgPlayListRemove />
+                </button>
+              </div>
+            ))}
+          </div>
+          <p>
+            {selectedMusics.length > 0 &&
+              selectedMusics.length + "/10" + " selecionadas"}
+          </p>
+        </div>
+        {musics.map((item, index) => (
+          <div
+            key={index}
+            onClick={() => handleChoice(item)}
+            className="w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
+          >
+            <div className="flex items-center gap-4 ">
+              <img src={item.cover} className="rounded-full"></img>
+              <div className="flex flex-col">
+                <p className="text-lg">{item.name}</p>
+                <p className="font-thin text-gray-400">
+                  {item.artist.map((obj, i, arr) => {
+                    return i == arr.length - 1 ? obj : obj + ", ";
+                  })}
+                </p>
+              </div>
+            </div>
+            <div>
+              <button className="text-warning text-2xl duration-200 hover:text-led-700">
+                <MdOutlineLibraryAdd />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="w-1/2 m-auto flex justify-between items-center mt-1 relative z-10">
         <button
           className="btn btn-outline"
           onClick={() => {
@@ -258,12 +305,171 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary"
+          className="btn btn-outline btn-secondary w-32"
+          disabled={selectedMusics.length >= 5 ? false : true}
           onClick={() => {
-            selectedMusics.length == 5 && setStep(4);
+            selectedMusics.length >= 5 && setStep(4);
           }}
         >
-          CONTINUAR
+          {selectedMusics.length >= 5
+            ? "CONTINUAR"
+            : selectedMusics.length + "/5"}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
+  const [search, setSearch] = useState("");
+  const [albums, setAlbums] = useState<Music[]>([]);
+
+  const { token, setStep, selectedAlbums, setSelectedAlbums } = albumProps!;
+  const handleSearch = async (text: string) => {
+    if (!text) {
+      setSearch("");
+      setAlbums([]);
+      return;
+    }
+    setSearch(text);
+    const parameters = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    };
+
+    try {
+      const onFetch = await fetch(
+        `https://api.spotify.com/v1/search?q=${text}&type=album&limit=10`,
+        parameters
+      );
+
+      const data = await onFetch.json();
+
+      let albums: Music[] = [];
+      data.albums.items.forEach((item: any) => {
+        let artists: string[] = [];
+
+        item.artists.forEach((artist: any) => artists.push(artist.name));
+        const album = {
+          id: item.id,
+          name: item.name,
+          artist: artists,
+          cover: item.images[2].url,
+        };
+
+        albums.push(album);
+      });
+
+      setAlbums(albums);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleChoice = (album: Music) => {
+    const onFilter = selectedAlbums.filter((item) => item.id != album.id);
+    if (selectedAlbums.length == 5) {
+      const isSelected = selectedAlbums.filter((item) => item.id == album.id);
+      isSelected.length && setSelectedAlbums(onFilter);
+      return;
+    }
+
+    selectedAlbums.filter((item) => item.id == album.id).length
+      ? setSelectedAlbums(onFilter)
+      : setSelectedAlbums([...selectedAlbums, album]);
+  };
+
+  return (
+    <div>
+      <div className="flex flex-col items-center">
+        <h1 className="text-5xl font-light">
+          Estes àlbuns vão comigo para a cova
+        </h1>
+        <input
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Procurar"
+          className="input input-primary w-1/2 mt-2"
+        />
+      </div>
+      <div className="mt-4 h-[32rem] flex flex-col gap-3 overflow-y-auto scroll-smooth scrollbar relative">
+        <div className="fixed left-5 w-full flex flex-col gap-2">
+          <div className="flex flex-col gap-2 h-[32rem]">
+            {selectedAlbums.map((item, index) => (
+              <div
+                key={index}
+                className="w-[20%] flex justify-between text-warning border border-warning items-center p-1 px-2 rounded-lg"
+              >
+                <div className="flex items-center gap-4 ">
+                  <img src={item.cover} className="rounded-full"></img>
+                  <div className="flex flex-col">
+                    <p className="text-lg">{item.name}</p>
+                    <p className="font-thin text-gray-400">
+                      {item.artist.map((obj, i, arr) => {
+                        return i == arr.length - 1 ? obj : obj + ", ";
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  className="text-2xl text-warning duration-200 hover:text-error"
+                  onClick={() => handleChoice(item)}
+                >
+                  <CgPlayListRemove />
+                </button>
+              </div>
+            ))}
+          </div>
+          <p>
+            {selectedAlbums.length > 0 &&
+              selectedAlbums.length + "/5" + " selecionados"}
+          </p>
+        </div>
+        {albums.map((item, index) => (
+          <div
+            key={index}
+            onClick={() => handleChoice(item)}
+            className="w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
+          >
+            <div className="flex items-center gap-4 ">
+              <img src={item.cover} className="rounded-full"></img>
+              <div className="flex flex-col">
+                <p className="text-lg">{item.name}</p>
+                <p className="font-thin text-gray-400">
+                  {item.artist.map((obj, i, arr) => {
+                    return i == arr.length - 1 ? obj : obj + ", ";
+                  })}
+                </p>
+              </div>
+            </div>
+            <div>
+              <button className="text-warning text-2xl duration-200 hover:text-led-700">
+                <MdOutlineLibraryAdd />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="w-1/2 m-auto flex justify-between items-center relative z-10 mt-1">
+        <button
+          className="btn btn-outline"
+          onClick={() => {
+            setStep(3);
+          }}
+        >
+          VOLTAR
+        </button>
+        <button
+          className="btn btn-outline btn-secondary w-32"
+          disabled={selectedAlbums.length == 5 ? false : true}
+          onClick={() => {}}
+        >
+          {selectedAlbums.length == 5
+            ? "CONTINUAR"
+            : selectedAlbums.length + "/5"}
         </button>
       </div>
     </div>
