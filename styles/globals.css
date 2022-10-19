@@ -11,3 +11,34 @@
   scrollbar-width: 2rem;
   scrollbar-color: red;
 }
+
+.fadein {
+  animation: fadein;
+  animation-timing-function: ease-in-out;
+  animation-duration: 400ms;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+
+@keyframes fadein {
+  from {
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* .fadeout {
+  animation: fadeout;
+  animation-timing-function: ease-in-out;
+  animation-duration: 400ms;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeout {
+  from {
+  }
+  to {
+    @apply hidden;
+  }
+} */

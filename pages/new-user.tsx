@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Music } from "../models/interfaces";
+import { Alert } from "../src/components/alert";
 import {
   AlbumSelect,
   BasicInfo,
@@ -19,12 +20,21 @@ export default function NewUser({ token }: { token: string }) {
   const [step, setStep] = useState(1);
   const [selectedMusics, setSelectedMusics] = useState<Music[]>([]);
   const [selectedAlbums, setSelectedAlbums] = useState<Music[]>([]);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const router = useRouter();
 
   useEffect(() => {
     getGenres(token);
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setSuccess("");
+      setError("");
+    }, 3000);
+  }, [success, error]);
 
   const renderComponent = (): JSX.Element => {
     switch (step) {
@@ -39,6 +49,7 @@ export default function NewUser({ token }: { token: string }) {
               displayImg,
               imgUrl,
             }}
+            setError={setError}
           />
         );
 
@@ -46,6 +57,7 @@ export default function NewUser({ token }: { token: string }) {
         return (
           <GenreSelect
             genreProps={{ genres, selected, setSelected, setStep }}
+            setError={setError}
           />
         );
 
@@ -58,6 +70,7 @@ export default function NewUser({ token }: { token: string }) {
               setSelectedMusics,
               setStep,
             }}
+            setError={setError}
           />
         );
 
@@ -69,7 +82,9 @@ export default function NewUser({ token }: { token: string }) {
               setStep,
               selectedAlbums,
               setSelectedAlbums,
+              updateProfile,
             }}
+            setError={setError}
           />
         );
     }
@@ -107,7 +122,7 @@ export default function NewUser({ token }: { token: string }) {
   async function uploadAvatar(file: any): Promise<string | void> {
     try {
       if (img == null) {
-        throw new Error("You must select an image to upload.");
+        return "";
       }
 
       const fileExt = file.name.split(".").pop();
@@ -140,8 +155,12 @@ export default function NewUser({ token }: { token: string }) {
       const updates = {
         id: user!.id,
         username,
-        avatar: avatar,
+        avatar_url: avatar,
         genres: selected,
+        musics: selectedMusics,
+        albums: selectedAlbums,
+        following: [],
+        followers: [],
         updated_at: new Date(),
       };
 
@@ -182,6 +201,7 @@ export default function NewUser({ token }: { token: string }) {
           </ul>
         </section>
       </main>
+      <Alert success={success} error={error} />
     </div>
   );
 }

@@ -1,20 +1,27 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Alert } from "../src/components/alert";
 import { supabase } from "../utils/supabaseClient";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async (email: string) => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOtp({ email });
       if (error) throw error;
-      alert("Check your email for the login link!");
+      setSuccess("Você receberá um email com um link de acesso");
     } catch (error: any) {
       alert(error.error_description || error.message);
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        setSuccess("");
+      }, 3000);
     }
   };
 
@@ -23,12 +30,11 @@ export default function Auth() {
       <header className="w-2/3 m-auto">
         <h1 className="text-warning font-extrabold text-6xl">Mocial</h1>
       </header>
-      <section className="w-1/2 m-auto flex flex-col items-center p-2 border border-warning rounded-md bg-base-300">
-        <h1 className="">Supabase + Next.js</h1>
-        <p className="">Sign in via magic link with your email below</p>
-        <div>
+      <section className="w-1/2 m-auto flex flex-col items-center p-2 rounded-md">
+        <p className="">Digite seu email</p>
+        <div className="w-full text-center">
           <input
-            className="bg-gray-100 rounded-md p-2 border border-accent active:ring-0 focus:ring-0 active:border-accent-focus outline-none"
+            className="bg-inherit w-2/3 text-warning rounded-md p-2 border border-warning active:ring-0 focus:ring-0 active:border-warning-focus outline-none"
             type="email"
             placeholder="Your email"
             value={email}
@@ -48,6 +54,7 @@ export default function Auth() {
           </button>
         </div>
       </section>
+      <Alert success={success} error={error} />
     </main>
   );
 }

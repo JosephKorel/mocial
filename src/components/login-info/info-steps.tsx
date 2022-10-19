@@ -5,6 +5,7 @@ import { MdOutlineLibraryAdd } from "react-icons/md";
 import { CgPlayListRemove } from "react-icons/cg";
 
 interface BasicInfo {
+  setError: (data: string) => void;
   infoProps?: {
     username: string;
     setUsername: (data: string) => void;
@@ -31,12 +32,20 @@ interface BasicInfo {
     selectedAlbums: Music[];
     setSelectedAlbums: (data: Music[]) => void;
     setStep: (data: number) => void;
+    updateProfile: () => Promise<void>;
   };
 }
 
-export const BasicInfo = ({ infoProps }: BasicInfo): JSX.Element => {
-  const { imgUrl, username, setUsername, displayImg, step, setStep } =
-    infoProps!;
+export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
+  const { imgUrl, username, setUsername, displayImg, setStep } = infoProps!;
+
+  const handleSubmit = () => {
+    if (username.length < 3) {
+      setError("Seu nome deve ter no mínimo três caracteres");
+      return;
+    }
+    setStep(2);
+  };
   return (
     <div className="flex flex-col items-center gap-2">
       {imgUrl ? (
@@ -78,9 +87,7 @@ export const BasicInfo = ({ infoProps }: BasicInfo): JSX.Element => {
           />
           <button
             className="btn btn-outline btn-secondary float-right mt-4"
-            onClick={() => {
-              username.length > 3 && setStep(2);
-            }}
+            onClick={handleSubmit}
           >
             CONTINUAR
           </button>
@@ -90,18 +97,22 @@ export const BasicInfo = ({ infoProps }: BasicInfo): JSX.Element => {
   );
 };
 
-export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
+export const GenreSelect = ({
+  genreProps,
+  setError,
+}: BasicInfo): JSX.Element => {
   const [search, setSearch] = useState("");
   const { genres, selected, setSelected, setStep } = genreProps!;
-  const addGenre = (item: string) => {
-    if (selected.includes(item)) {
-      //@ts-ignore
-      setSelected((prev) => prev.filter((obj) => obj != item));
-      return;
-    }
 
-    setSelected([...selected, item]);
-    return;
+  const addGenre = (item: string) => {
+    if (selected.length == 5) {
+      hasSelected(item)
+        ? setSelected(selected.filter((obj) => obj != item))
+        : setError("Você só pode selecionar até cinco gêneros");
+    } else
+      selected.includes(item)
+        ? setSelected(selected.filter((obj) => obj != item))
+        : setSelected([...selected, item]);
   };
 
   const hasSelected = (item: string) => {
@@ -130,7 +141,9 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
               key={index}
               className={`badge badge-lg cursor-pointer duration-200 hover:badge-warning uppercase ${
                 hasSelected(genre) && "badge-warning"
-              } ${isEqual(genre) ? "badge" : "badge-ghost"} `}
+              } ${isEqual(genre) ? "badge" : "badge-ghost"} ${
+                selected.length == 5 && !hasSelected(genre) && "badge-ghost"
+              }`}
               onClick={() => addGenre(genre)}
             >
               {genre}
@@ -138,7 +151,7 @@ export const GenreSelect = ({ genreProps }: BasicInfo): JSX.Element => {
           ))}
         </div>
       </div>
-      <div className="w-1/2 m-auto flex justify-between items-center mt-1">
+      <div className="w-1/2 m-auto flex justify-between items-center mt-4">
         <button
           className="btn btn-outline"
           onClick={() => {
@@ -295,7 +308,7 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
           </div>
         ))}
       </div>
-      <div className="w-1/2 m-auto flex justify-between items-center mt-1 relative z-10">
+      <div className="w-1/2 m-auto flex justify-between items-center mt-4 relative z-10">
         <button
           className="btn btn-outline"
           onClick={() => {
@@ -324,7 +337,8 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
   const [search, setSearch] = useState("");
   const [albums, setAlbums] = useState<Music[]>([]);
 
-  const { token, setStep, selectedAlbums, setSelectedAlbums } = albumProps!;
+  const { token, setStep, selectedAlbums, setSelectedAlbums, updateProfile } =
+    albumProps!;
   const handleSearch = async (text: string) => {
     if (!text) {
       setSearch("");
@@ -453,7 +467,7 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
           </div>
         ))}
       </div>
-      <div className="w-1/2 m-auto flex justify-between items-center relative z-10 mt-1">
+      <div className="w-1/2 m-auto flex justify-between items-center relative z-10 mt-4">
         <button
           className="btn btn-outline"
           onClick={() => {
@@ -465,7 +479,7 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
         <button
           className="btn btn-outline btn-secondary w-32"
           disabled={selectedAlbums.length == 5 ? false : true}
-          onClick={() => {}}
+          onClick={updateProfile}
         >
           {selectedAlbums.length == 5
             ? "CONTINUAR"
