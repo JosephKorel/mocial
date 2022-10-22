@@ -22,7 +22,12 @@ function MyApp({ Component, pageProps }: AppProps) {
           setAuthenticaded(true);
           const id = session?.user.id;
           const hasDocument = (await checkUser(id!)) ? true : false;
-          hasDocument ? router.push("/account") : router.push("/new-user");
+          hasDocument
+            ? router.push({
+                pathname: "/[id]",
+                query: { id: id },
+              })
+            : router.push("/new-user");
         } else router.push("/login");
       }
     }
@@ -36,7 +41,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         setAuthenticaded(true);
         const id = session?.user.id;
         const hasDocument = (await checkUser(id!)) ? true : false;
-        hasDocument ? router.push("/account") : router.push("/new-user");
+        hasDocument
+          ? router.push({
+              pathname: "/[id]",
+              query: { id: id },
+            })
+          : router.push("/new-user");
       } else {
         setAuthenticaded(false);
         router.push("/login");

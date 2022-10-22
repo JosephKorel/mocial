@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
-import { Music } from "../../../models/interfaces";
+import { Albums, CoverImg, Music } from "../../../models/interfaces";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { CgPlayListRemove } from "react-icons/cg";
 
@@ -29,8 +29,8 @@ interface BasicInfo {
   };
   albumProps?: {
     token: string;
-    selectedAlbums: Music[];
-    setSelectedAlbums: (data: Music[]) => void;
+    selectedAlbums: Albums[];
+    setSelectedAlbums: (data: Albums[]) => void;
     setStep: (data: number) => void;
     updateProfile: () => Promise<void>;
   };
@@ -204,13 +204,18 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
       let musics: Music[] = [];
       data.tracks.items.forEach((item: any) => {
         let artists: string[] = [];
+        const coverImg: CoverImg = {
+          sm: item.album.images[2].url,
+          md: item.album.images[1].url,
+          lg: item.album.images[0].url,
+        };
 
         item.artists.forEach((artist: any) => artists.push(artist.name));
         const music = {
           id: item.id,
           name: item.name,
           artist: artists,
-          cover: item.album.images[2].url,
+          cover: coverImg,
         };
 
         musics.push(music);
@@ -259,7 +264,7 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
                 className="w-[20%] flex justify-between text-warning border border-warning items-center p-1 px-2 rounded-lg"
               >
                 <div className="flex items-center gap-4 ">
-                  <img src={item.cover} className="rounded-full"></img>
+                  <img src={item.cover.sm} className="rounded-full"></img>
                   <div className="flex flex-col">
                     <p className="">{item.name}</p>
                     <p className="font-thin text-sm text-gray-400">
@@ -290,7 +295,7 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
             className="w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
           >
             <div className="flex items-center gap-4 ">
-              <img src={item.cover} className="rounded-full"></img>
+              <img src={item.cover.sm} className="rounded-full"></img>
               <div className="flex flex-col">
                 <p className="text-lg">{item.name}</p>
                 <p className="font-thin text-gray-400">
@@ -335,7 +340,7 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
 
 export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
   const [search, setSearch] = useState("");
-  const [albums, setAlbums] = useState<Music[]>([]);
+  const [albums, setAlbums] = useState<Albums[]>([]);
 
   const { token, setStep, selectedAlbums, setSelectedAlbums, updateProfile } =
     albumProps!;
@@ -362,20 +367,28 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
 
       const data = await onFetch.json();
 
-      let albums: Music[] = [];
+      let albums: Albums[] = [];
       data.albums.items.forEach((item: any) => {
         let artists: string[] = [];
+        const coverImg: CoverImg = {
+          sm: item.images[2].url,
+          md: item.images[1].url,
+          lg: item.images[0].url,
+        };
 
         item.artists.forEach((artist: any) => artists.push(artist.name));
+
         const album = {
           id: item.id,
           name: item.name,
           artist: artists,
-          cover: item.images[2].url,
+          cover: coverImg,
         };
 
         albums.push(album);
       });
+
+      console.log(data);
 
       setAlbums(albums);
     } catch (error) {
@@ -383,7 +396,7 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
     }
   };
 
-  const handleChoice = (album: Music) => {
+  const handleChoice = (album: Albums) => {
     const onFilter = selectedAlbums.filter((item) => item.id != album.id);
     if (selectedAlbums.length == 5) {
       const isSelected = selectedAlbums.filter((item) => item.id == album.id);
@@ -418,7 +431,7 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
                 className="w-[20%] flex justify-between text-warning border border-warning items-center p-1 px-2 rounded-lg"
               >
                 <div className="flex items-center gap-4 ">
-                  <img src={item.cover} className="rounded-full"></img>
+                  <img src={item.cover.sm} className="rounded-full"></img>
                   <div className="flex flex-col">
                     <p className="text-lg">{item.name}</p>
                     <p className="font-thin text-gray-400">
@@ -449,7 +462,7 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
             className="w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
           >
             <div className="flex items-center gap-4 ">
-              <img src={item.cover} className="rounded-full"></img>
+              <img src={item.cover.sm} className="rounded-full"></img>
               <div className="flex flex-col">
                 <p className="text-lg">{item.name}</p>
                 <p className="font-thin text-gray-400">

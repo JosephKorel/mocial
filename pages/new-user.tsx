@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Music } from "../models/interfaces";
+import { Albums, Music } from "../models/interfaces";
 import { Alert } from "../src/components/alert";
 import {
   AlbumSelect,
@@ -19,7 +19,7 @@ export default function NewUser({ token }: { token: string }) {
   const [imgUrl, setImgUrl] = useState("");
   const [step, setStep] = useState(1);
   const [selectedMusics, setSelectedMusics] = useState<Music[]>([]);
-  const [selectedAlbums, setSelectedAlbums] = useState<Music[]>([]);
+  const [selectedAlbums, setSelectedAlbums] = useState<Albums[]>([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
@@ -171,8 +171,8 @@ export default function NewUser({ token }: { token: string }) {
       }
 
       router.push({
-        pathname: "/[account]",
-        query: { account: user!.id },
+        pathname: "/[id]",
+        query: { id: user!.id },
       });
     } catch (error: any) {
       alert(error.message);
