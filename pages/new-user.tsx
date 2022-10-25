@@ -137,7 +137,9 @@ export default function NewUser({ token }: { token: string }) {
         throw uploadError;
       }
 
-      return filePath;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
+
+      return data.publicUrl;
     } catch (error: any) {
       alert(error.message);
     } finally {

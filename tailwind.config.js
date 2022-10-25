@@ -12,7 +12,7 @@ module.exports = {
 
           neutral: "#6272a4",
 
-          "base-100": "#1b1b1b",
+          "base-100": "#181818",
 
           info: "#20A4F3",
 
@@ -33,6 +33,7 @@ module.exports = {
     extend: {
       fontFamily: {
         kanit: ["Kanit", "sans-serif"],
+        cinzel: ["Cinzel", "serif"],
       },
       colors: {
         led: {
@@ -56,7 +57,7 @@ module.exports = {
           300: "#444444",
           400: "#2F2F2F",
           500: "#1B1B1B",
-          600: "#000000",
+          600: "#181818",
           700: "#000000",
           800: "#000000",
           900: "#000000",

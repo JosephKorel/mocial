@@ -1,20 +1,19 @@
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { Profile } from "../models/interfaces";
+import { AccountProps, Profile } from "../models/interfaces";
+import { useAuthContext } from "../src/context/index";
 import { supabase } from "../utils/supabaseClient";
 
-type AccountProps = {
-  profile: Profile;
-};
-
 const Account: NextPage<AccountProps> = ({ profile }) => {
+  const { user, setUser } = useAuthContext();
   const [avatarUrl, setAvatarUrl] = useState("");
 
   const router = useRouter();
 
   useEffect(() => {
     downloadImage(profile.avatar_url);
+    setUser(profile);
   }, []);
 
   const downloadImage = (path: string) => {
@@ -43,24 +42,52 @@ const Account: NextPage<AccountProps> = ({ profile }) => {
         </div>
       </header>
       <main className="mt-10 px-5">
-        <section className="py-2 px-5">
-          <h1 className="text-3xl text-gray-100 font-light">Meus àlbuns</h1>
-          <article className="flex justify-between items-center">
-            {profile.albums.map((album) => (
-              <div className="card card-compact bg-dark shadow-xl border border-warning">
-                <figure>
-                  <img
-                    src={album.cover.md}
-                    alt={album.name}
-                    className="h-64"
-                  ></img>
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title text-warning">{album.name}</h2>
-                  <p>{album.artist.map((artist) => artist)}</p>
-                </div>
-              </div>
-            ))}
+        <section>
+          <h1 className="text-3xl text-warning font-cinzel">álbuns</h1>
+          <article className="py-7 px-5 bg-dark rounded-md">
+            <ul className="flex items-center justify-between">
+              {profile.albums.map((album) => (
+                <li className="bg-dark-600 shadow-md shadow-dark-600 p-4 rounded-md flex flex-col items-center">
+                  <figure>
+                    <img
+                      src={album.cover.md}
+                      alt={album.name}
+                      className="h-52 rounded-md"
+                    ></img>
+                  </figure>
+                  <div className="self-start">
+                    <h2 className="text-warning">{album.name}</h2>
+                    <p className="text-sm">
+                      {album.artist.map((artist) => artist)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </section>
+        <section className="mt-10">
+          <h1 className="text-3xl text-warning font-cinzel">MÚSICAS</h1>
+          <article className="py-7 px-5 bg-dark rounded-md">
+            <ul className="flex items-center justify-between">
+              {profile.musics.map((music) => (
+                <li className="bg-dark-600 shadow-md shadow-dark-600 p-4 rounded-md flex flex-col items-center">
+                  <figure>
+                    <img
+                      src={music.cover.md}
+                      alt={music.name}
+                      className="h-52 rounded-md"
+                    ></img>
+                  </figure>
+                  <div className="self-start">
+                    <h2 className="text-warning">{music.name}</h2>
+                    <p className="text-sm">
+                      {music.artist.map((artist) => artist)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </article>
         </section>
       </main>

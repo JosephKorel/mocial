@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../utils/supabaseClient";
 import Head from "next/head";
+import ContextProvider from "../src/context";
+import { useAuthContext } from "../src/context/index";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { user, setUser } = useAuthContext();
   const [authenticaded, setAuthenticaded] = useState(false);
   const router = useRouter();
 
@@ -24,7 +27,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           const hasDocument = (await checkUser(id!)) ? true : false;
           hasDocument
             ? router.push({
-                pathname: "/[id]",
+                pathname: "/home",
                 query: { id: id },
               })
             : router.push("/new-user");
@@ -43,7 +46,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         const hasDocument = (await checkUser(id!)) ? true : false;
         hasDocument
           ? router.push({
-              pathname: "/[id]",
+              pathname: "/home",
               query: { id: id },
             })
           : router.push("/new-user");
@@ -63,24 +66,30 @@ function MyApp({ Component, pageProps }: AppProps) {
   const checkUser = async (id: string) => {
     let { data, error, status } = await supabase
       .from("profiles")
-      .select(`username`)
+      .select()
       .eq("id", id)
       .single();
-    return data ? true : false;
+
+    if (data) {
+      setUser(data);
+      return true;
+    } else return false;
   };
 
   return (
     <>
       <Head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
           rel="stylesheet"
         />
       </Head>
       {/*  <nav className="prose">
         {authenticaded ? <h1>Autenticado</h1> : <h1>Não Autenticado</h1>}
       </nav> */}
-      <Component {...pageProps} />
+      <ContextProvider>
+        <Component {...pageProps} />
+      </ContextProvider>
     </>
   );
 }

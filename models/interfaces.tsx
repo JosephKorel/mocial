@@ -1,3 +1,7 @@
+export type AccountProps = {
+  profile: Profile;
+};
+
 export interface Profile {
   id: string;
   username: string;
