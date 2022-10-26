@@ -1,5 +1,5 @@
-export type AccountProps = {
-  profile: Profile;
+export type HomePageProps = {
+  profiles: Profile[];
 };
 
 export interface Profile {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { Alert } from "../src/components/alert";
+import { Alert } from "../src/components/Alert";
 import { supabase } from "../utils/supabaseClient";
 
 export default function Auth() {

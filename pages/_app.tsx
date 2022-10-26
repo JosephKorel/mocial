@@ -1,81 +1,9 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { supabase } from "../utils/supabaseClient";
 import Head from "next/head";
 import ContextProvider from "../src/context";
-import { useAuthContext } from "../src/context/index";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const { user, setUser } = useAuthContext();
-  const [authenticaded, setAuthenticaded] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function getInitialSession() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (mounted) {
-        if (session) {
-          setAuthenticaded(true);
-          const id = session?.user.id;
-          const hasDocument = (await checkUser(id!)) ? true : false;
-          hasDocument
-            ? router.push({
-                pathname: "/home",
-                query: { id: id },
-              })
-            : router.push("/new-user");
-        } else router.push("/login");
-      }
-    }
-
-    getInitialSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (_event == "SIGNED_IN") {
-        setAuthenticaded(true);
-        const id = session?.user.id;
-        const hasDocument = (await checkUser(id!)) ? true : false;
-        hasDocument
-          ? router.push({
-              pathname: "/home",
-              query: { id: id },
-            })
-          : router.push("/new-user");
-      } else {
-        setAuthenticaded(false);
-        router.push("/login");
-      }
-    });
-
-    return () => {
-      mounted = false;
-
-      subscription?.unsubscribe();
-    };
-  }, []);
-
-  const checkUser = async (id: string) => {
-    let { data, error, status } = await supabase
-      .from("profiles")
-      .select()
-      .eq("id", id)
-      .single();
-
-    if (data) {
-      setUser(data);
-      return true;
-    } else return false;
-  };
-
   return (
     <>
       <Head>

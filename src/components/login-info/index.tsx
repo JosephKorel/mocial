@@ -388,8 +388,6 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
         albums.push(album);
       });
 
-      console.log(data);
-
       setAlbums(albums);
     } catch (error) {
       console.log(error);

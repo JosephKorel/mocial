@@ -1,57 +1,93 @@
 import { Session } from "@supabase/supabase-js";
-import type { GetServerSideProps, NextPage } from "next";
-import Head from "next/head";
-import { useEffect, useState } from "react";
-import { supabase } from "../utils/supabaseClient";
-import Account from "./new-user";
-import Auth from "./login";
-import NewUser from "./new-user";
+import type { NextPage } from "next";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthContext } from "../src/context";
-import { AccountProps, Profile } from "../models/interfaces";
+import { HomePageProps, Profile } from "../models/interfaces";
+import UserProfile from "../src/components/Profile";
 
-const Home: NextPage<AccountProps> = ({ profile }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [session, setSession] = useState<null | Session>(null);
+const Home: NextPage<HomePageProps> = () => {
   const router = useRouter();
-  const { user, setUser } = useAuthContext();
-
-  useEffect(() => {
-    setUser(profile);
-  }, []);
+  const { user, profiles } = useAuthContext();
+  const [seeUser, setSeeUser] = useState<Profile | null>(null);
+  const users = profiles.filter((item) => item.id != user?.id);
 
   return (
-    <div>
+    <div className="font-kanit">
       <header>
-        <nav>
-          <div className="flex justify-end items-center">
-            <img src={user?.avatar_url} className="rounded-full w-20"></img>
-            <p>{user?.username}</p>
+        <nav className="p-2 px-4">
+          <div className="flex justify-end items-center gap-4">
+            <p
+              onClick={() => router.push("/profile")}
+              className="text-gray-100 duration-200 hover:text-warning cursor-pointer text-lg"
+            >
+              {user?.username}
+            </p>
+            <div className="avatar">
+              <div className="w-10 rounded-full cursor-pointer">
+                <img
+                  src={user?.avatar_url}
+                  onClick={() => router.push("/profile")}
+                ></img>
+              </div>
+            </div>
           </div>
         </nav>
       </header>
-      <main className="prose"></main>
+      <main className="">
+        <section>
+          <article className="px-2">
+            <ul className="flex items-center">
+              {users.map((user, index) => (
+                <li
+                  key={index}
+                  className="avatar"
+                  onClick={() => setSeeUser(user)}
+                >
+                  <div className="w-14 rounded-full">
+                    <img src={user.avatar_url}></img>
+                  </div>
+                  <label
+                    htmlFor="my-modal"
+                    className="modal-button absolute z-10 w-14 opacity-0 h-14 rounded-full"
+                  >
+                    open
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </section>
+        <input type="checkbox" id="my-modal" className="modal-toggle" />
+        <div className="modal">
+          <div className="modal-box px-2">
+            <UserProfile user={seeUser} />
+            <div className="modal-action">
+              <label htmlFor="my-modal" className="btn">
+                Yay!
+              </label>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+/* export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query as { id: string };
 
-  const getUser = async () => {
-    let { data, error, status } = await supabase
-      .from("profiles")
-      .select()
-      .eq("id", id)
-      .single();
-    return data as Profile;
+  const getProfiles = async () => {
+    let { data, error, status } = await supabase.from("profiles").select();
+
+    return data as Profile[];
   };
 
-  const data = await getUser();
+  const profiles = await getProfiles();
 
   return {
-    props: { profile: data },
+    props: { profiles, uid: id },
   };
-};
+}; */

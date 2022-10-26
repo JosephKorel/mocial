@@ -1,13 +1,13 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Albums, Music } from "../models/interfaces";
-import { Alert } from "../src/components/alert";
+import { Alert } from "../src/components/Alert";
 import {
   AlbumSelect,
   BasicInfo,
   GenreSelect,
   MusicSelect,
-} from "../src/components/login-info/info-steps";
+} from "../src/components/login-info";
 import { supabase } from "../utils/supabaseClient";
 
 export default function NewUser({ token }: { token: string }) {
