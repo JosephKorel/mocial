@@ -1,6 +1,6 @@
 import { Session } from "@supabase/supabase-js";
 import type { NextPage } from "next";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthContext } from "../src/context";
 import { HomePageProps, Profile } from "../models/interfaces";
@@ -11,6 +11,16 @@ const Home: NextPage<HomePageProps> = () => {
   const { user, profiles } = useAuthContext();
   const [seeUser, setSeeUser] = useState<Profile | null>(null);
   const users = profiles.filter((item) => item.id != user?.id);
+
+  const UserModal = (): JSX.Element => {
+    return (
+      <div className="modal">
+        <div className="modal-box pt-2 px-2">
+          <UserProfile target={seeUser} />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="font-kanit">
@@ -59,16 +69,7 @@ const Home: NextPage<HomePageProps> = () => {
           </article>
         </section>
         <input type="checkbox" id="my-modal" className="modal-toggle" />
-        <div className="modal">
-          <div className="modal-box px-2">
-            <UserProfile user={seeUser} />
-            <div className="modal-action">
-              <label htmlFor="my-modal" className="btn">
-                Yay!
-              </label>
-            </div>
-          </div>
-        </div>
+        <UserModal />
       </main>
     </div>
   );
