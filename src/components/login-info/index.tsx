@@ -49,30 +49,33 @@ export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
   return (
     <div className="flex flex-col items-center gap-2">
       {imgUrl ? (
-        <img src={imgUrl} className="w-32 h-32 rounded-full"></img>
+        <img
+          src={imgUrl}
+          className="w-20 h-20 lg:w-28 lg:h-28 rounded-full"
+        ></img>
       ) : (
         <div>
           <button
             onClick={() => {
               document.getElementById("avatar_input")?.click();
             }}
-            className="w-28 h-28 rounded-full border border-secondary text-secondary duration-200 hover:bg-secondary hover:text-primary cursor-pointer flex flex-col items-center justify-center"
+            className="w-20 h-20 lg:w-28 lg:h-28 rounded-full border border-secondary text-secondary duration-200 hover:bg-secondary hover:text-primary cursor-pointer flex flex-col items-center justify-center"
           >
             <AiOutlinePlus className="text-4xl" />
           </button>
         </div>
       )}
-      <div className="w-1/4 flex justify-center">
+      <div className="w-5/6 lg:w-1/4 flex justify-center">
         <div className="w-full">
           <h2
-            className={`text-3xl font-thin font-kanit ${
+            className={`text-xl lg:text-3xl font-thin font-kanit ${
               username ? "text-secondary" : "text-primary"
             }`}
           >
             {username ? username : "Eu me chamo..."}
           </h2>
           <input
-            className="input input-bordered input-primary w-full mt-4"
+            className="input input-bordered input-primary w-full mt-1 lg:mt-4"
             id="username"
             type="text"
             placeholder="Nome"
@@ -86,7 +89,7 @@ export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
             className="hidden"
           />
           <button
-            className="btn btn-outline btn-secondary float-right mt-4"
+            className="btn btn-outline btn-secondary btn-sm lg:btn-lg float-right mt-4"
             onClick={handleSubmit}
           >
             CONTINUAR
