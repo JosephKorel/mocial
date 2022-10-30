@@ -46,8 +46,11 @@ const Account: NextPage = () => {
           </h1>
           <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md w-full">
             <ul className="carousel gap-2">
-              {user?.albums.map((album) => (
-                <li className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32">
+              {user?.albums.map((album, index) => (
+                <li
+                  key={index}
+                  className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32"
+                >
                   <figure className="">
                     <img
                       src={album.cover.md}
@@ -64,7 +67,9 @@ const Account: NextPage = () => {
                       {album.name}
                     </h2>
                     <p className="text-sm">
-                      {album.artist.map((artist) => artist)}
+                      {album.artist.map((artist, index) => (
+                        <span key={index}>{artist}</span>
+                      ))}
                     </p>
                   </div>
                 </li>
@@ -78,8 +83,11 @@ const Account: NextPage = () => {
           </h1>
           <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md">
             <ul className="carousel gap-2">
-              {user?.musics.map((music) => (
-                <li className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32">
+              {user?.musics.map((music, index) => (
+                <li
+                  key={index}
+                  className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32"
+                >
                   <figure>
                     <img
                       src={music.cover.md}
@@ -100,7 +108,9 @@ const Account: NextPage = () => {
                         music.artist.length > 1 && "text-xs"
                       }`}
                     >
-                      {music.artist.map((artist) => artist)}
+                      {music.artist.map((artist, index) => (
+                        <span key={index}>{artist}</span>
+                      ))}
                     </p>
                   </div>
                 </li>
