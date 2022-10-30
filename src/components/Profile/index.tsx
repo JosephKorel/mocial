@@ -3,6 +3,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { AiOutlineCheck, AiOutlineUserAdd } from "react-icons/ai";
 import { useAuthContext } from "../../context";
+import { supabase } from "../../../utils/supabaseClient";
 
 interface UserProfileProps {
   target: Profile | null;
@@ -10,15 +11,58 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ target }) => {
   const { user, setUser } = useAuthContext();
-  const isFollowing = user!.following.includes(target!.id);
-  const handleFollow = () => {
+  const isFollowing = target?.id ? user!.following.includes(target.id) : false;
+  const handleFollow = async () => {
+    //Info do usuário
     let following = user!.following;
+    const isFollowing = user!.following.includes(target!.id);
+
+    //Info do visitado
+    let targetFollowers = target?.followers;
+
     if (isFollowing) {
       const onFilter = following.filter((item) => item != target!.id);
-      setUser({ ...user!, following: onFilter });
+      const onFollowerFilter = targetFollowers?.filter(
+        (item) => item != user?.id
+      );
+      try {
+        //Atualiza no perfil do usuário
+        await supabase
+          .from("profiles")
+          .update({ following: onFilter })
+          .eq("id", user?.id);
+
+        //Atualiza no perfil do visitado
+        await supabase
+          .from("profiles")
+          .update({ followers: onFollowerFilter })
+          .eq("id", target!.id);
+
+        setUser({ ...user!, following: onFilter });
+      } catch (error: any) {
+        alert(error.error_description || error.message);
+      }
     } else {
       following.push(target!.id);
-      setUser({ ...user!, following });
+      targetFollowers?.push(user!.id);
+
+      try {
+        //Atualiza o perfil do usuário
+        await supabase
+          .from("profiles")
+          .update({ following })
+          .eq("id", user?.id);
+
+        //Atualiza no perfil do visitado
+        await supabase
+          .from("profiles")
+          .update({ followers: targetFollowers })
+          .eq("id", target!.id);
+
+        setUser({ ...user!, following });
+      } catch (error: any) {
+        console.log(error);
+      }
     }
   };
   return (
