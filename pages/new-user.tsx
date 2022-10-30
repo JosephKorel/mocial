@@ -186,9 +186,11 @@ export default function NewUser({ token }: { token: string }) {
   return (
     <div className="font-kanit">
       <main className="">
-        <section className="mt-4 h-[45rem]">{renderComponent()}</section>
-        <section className="text-center">
-          <ul className="steps steps-horizontal">
+        <section className="mt-4 h-[34rem] lg:h-[45rem]">
+          {renderComponent()}
+        </section>
+        <section className="text-center mt-4">
+          <ul className="steps steps-horizontal text-sm">
             <li className={`step step-accent mx-2`} onClick={() => setStep(1)}>
               Sobre você
             </li>

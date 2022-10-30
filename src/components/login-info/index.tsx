@@ -129,23 +129,23 @@ export const GenreSelect = ({
   return (
     <div className="font-kanit">
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-primary text-5xl font-semibold">
+        <h1 className="text-primary text-2xl lg:text-5xl font-semibold">
           Gêneros favoritos
         </h1>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Procurar"
-          className="input input-primary w-1/3 mt-2"
+          className="input input-primary w-5/6 input-sm lg:input-lg lg:w-1/3 mt-2"
         />
-        <div className="w-1/2 h-[32rem] flex justify-start gap-2 items-center flex-wrap mt-4">
+        <div className="w-11/12 lg:w-1/2 h-[26rem] overflow-auto lg:h-[32rem] flex justify-start gap-2 items-center flex-wrap mt-4">
           {genres.map((genre, index) => (
             <p
               key={index}
-              className={`badge badge-lg cursor-pointer duration-200 hover:badge-warning uppercase ${
-                hasSelected(genre) && "badge-warning"
+              className={`badge lg:badge-lg cursor-pointer duration-200 lg:hover:badge-warning uppercase ${
+                hasSelected(genre) ? "badge-warning" : ""
               } ${isEqual(genre) ? "badge" : "badge-ghost"} ${
-                selected.length == 5 && !hasSelected(genre) && "badge-ghost"
+                selected.length == 5 && !hasSelected(genre) ? "badge-ghost" : ""
               }`}
               onClick={() => addGenre(genre)}
             >
@@ -154,9 +154,9 @@ export const GenreSelect = ({
           ))}
         </div>
       </div>
-      <div className="w-1/2 m-auto flex justify-between items-center mt-4">
+      <div className="w-11/12 lg:w-1/2 m-auto flex justify-between items-center mt-4">
         <button
-          className="btn btn-outline"
+          className="btn btn-outline btn-sm lg:btn-lg"
           onClick={() => {
             setStep(1);
           }}
@@ -164,7 +164,7 @@ export const GenreSelect = ({
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary w-32"
+          className="btn btn-outline btn-secondary btn-sm lg:btn-lg w-32"
           onClick={() => {
             selected.length >= 3 && setStep(3);
           }}
@@ -181,6 +181,7 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
   const { token, setStep, selectedMusics, setSelectedMusics } = musicProps!;
   const [search, setSearch] = useState("");
   const [musics, setMusics] = useState<Music[]>([]);
+  const [tab, setTab] = useState(1);
 
   const handleSearch = async (text: string) => {
     if (!text) {
@@ -244,22 +245,38 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
 
   return (
     <div className="font-kanit">
-      <div className="flex flex-col items-center">
-        <h1 className="text-5xl font-light">
-          Não consigo parar de ouvir estas músicas
-        </h1>
+      <div className="w-11/12 m-auto lg:w-auto flex flex-col items-center">
+        <h1 className="text-xl lg:text-5xl font-semibold">Músicas favoritas</h1>
         <div className="w-full flex justify-center items-end relative">
-          <p className="absolute left-5">Escolha até dez músicas</p>
+          {/*   <p className="absolute left-5">Escolha até dez músicas</p> */}
           <input
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Procurar"
-            className="input input-primary w-1/2 mt-2"
+            className="input input-primary w-5/6 input-sm lg:input-lg lg:w-1/2 mt-2"
           />
         </div>
       </div>
-      <div className="mt-4 h-[32rem] flex flex-col gap-3 overflow-y-auto scroll-smooth scrollbar relative">
-        <div className="fixed left-5 w-full flex flex-col gap-2">
+      <div className="mt-4 h-[26rem] lg:h-[32rem] flex flex-col gap-3 overflow-y-auto scroll-smooth scrollbar relative">
+        <div className="tabs">
+          <a
+            className={`tab tab-lifted bg-dark-400 ${
+              tab == 1 && "tab-active bg-dark"
+            }`}
+            onClick={() => setTab(1)}
+          >
+            Músicas
+          </a>
+          <a
+            className={`tab tab-lifted bg-dark-400 ${
+              tab == 2 && "tab-active bg-dark"
+            }`}
+            onClick={() => setTab(2)}
+          >
+            Escolhidas
+          </a>
+        </div>
+        {/* <div className="fixed left-5 w-full flex flex-col gap-2">
           <div className="flex flex-col h-[32rem] overflow-y-auto gap-2">
             {selectedMusics.map((item, index) => (
               <div
@@ -290,35 +307,72 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
             {selectedMusics.length > 0 &&
               selectedMusics.length + "/10" + " selecionadas"}
           </p>
-        </div>
-        {musics.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => handleChoice(item)}
-            className="w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
-          >
-            <div className="flex items-center gap-4 ">
-              <img src={item.cover.sm} className="rounded-full"></img>
-              <div className="flex flex-col">
-                <p className="text-lg">{item.name}</p>
-                <p className="font-thin text-gray-400">
-                  {item.artist.map((obj, i, arr) => {
-                    return i == arr.length - 1 ? obj : obj + ", ";
-                  })}
-                </p>
+        </div> */}
+        {tab == 1 ? (
+          <>
+            {musics.map((item, index) => (
+              <div
+                key={index}
+                onClick={() => handleChoice(item)}
+                className="w-11/12 lg:w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={item.cover.sm}
+                    className="rounded-full w-12 lg:w-auto"
+                  ></img>
+                  <div className="flex flex-col self-start">
+                    <p className="lg:text-lg">{item.name}</p>
+                    <p className="font-thin text-gray-400 text-sm">
+                      {item.artist.map((obj, i, arr) => {
+                        return i == arr.length - 1 ? obj : obj + ", ";
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <button className="text-warning text-2xl duration-200 hover:text-led-700">
+                    <MdOutlineLibraryAdd />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div>
-              <button className="text-warning text-2xl duration-200 hover:text-led-700">
-                <MdOutlineLibraryAdd />
-              </button>
-            </div>
-          </div>
-        ))}
+            ))}
+          </>
+        ) : (
+          <>
+            {selectedMusics.map((item, index) => (
+              <div
+                key={index}
+                className="w-11/12 lg:w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={item.cover.sm}
+                    className="rounded-full w-12 lg:w-auto"
+                  ></img>
+                  <div className="flex flex-col self-start">
+                    <p className="lg:text-lg">{item.name}</p>
+                    <p className="font-thin text-sm text-gray-400">
+                      {item.artist.map((obj, i, arr) => {
+                        return i == arr.length - 1 ? obj : obj + ", ";
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  className="text-2xl text-warning duration-200 hover:text-error"
+                  onClick={() => handleChoice(item)}
+                >
+                  <CgPlayListRemove />
+                </button>
+              </div>
+            ))}
+          </>
+        )}
       </div>
-      <div className="w-1/2 m-auto flex justify-between items-center mt-4 relative z-10">
+      <div className="w-11/12 lg:w-1/2 m-auto flex justify-between items-center mt-4 relative z-10">
         <button
-          className="btn btn-outline"
+          className="btn btn-outline btn-sm lg:btn-lg"
           onClick={() => {
             setStep(2);
           }}
@@ -326,7 +380,7 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary w-32"
+          className="btn btn-outline btn-secondary w-32 btn-sm lg:btn-lg"
           disabled={selectedMusics.length >= 5 ? false : true}
           onClick={() => {
             selectedMusics.length >= 5 && setStep(4);
