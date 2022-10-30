@@ -189,8 +189,8 @@ export default function NewUser({ token }: { token: string }) {
         <section className="mt-4 h-[34rem] lg:h-[45rem]">
           {renderComponent()}
         </section>
-        <section className="text-center mt-4">
-          <ul className="steps steps-horizontal text-sm">
+        <section className="text-center mt-8 lg:mt-4">
+          <ul className="steps steps-horizontal text-xs">
             <li className={`step step-accent mx-2`} onClick={() => setStep(1)}>
               Sobre você
             </li>

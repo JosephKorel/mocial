@@ -89,7 +89,7 @@ export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
             className="hidden"
           />
           <button
-            className="btn btn-outline btn-secondary btn-sm lg:btn-lg float-right mt-4"
+            className="btn btn-outline btn-secondary btn-sm lg:btn-md float-right mt-4"
             onClick={handleSubmit}
           >
             CONTINUAR
@@ -136,7 +136,7 @@ export const GenreSelect = ({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Procurar"
-          className="input input-primary w-5/6 input-sm lg:input-lg lg:w-1/3 mt-2"
+          className="input input-primary w-5/6 input-sm lg:input-md lg:w-1/3 mt-2"
         />
         <div className="w-11/12 lg:w-1/2 h-[26rem] overflow-auto lg:h-[32rem] flex justify-start gap-2 items-center flex-wrap mt-4">
           {genres.map((genre, index) => (
@@ -156,7 +156,7 @@ export const GenreSelect = ({
       </div>
       <div className="w-11/12 lg:w-1/2 m-auto flex justify-between items-center mt-4">
         <button
-          className="btn btn-outline btn-sm lg:btn-lg"
+          className="btn btn-outline btn-sm lg:btn-md"
           onClick={() => {
             setStep(1);
           }}
@@ -164,7 +164,7 @@ export const GenreSelect = ({
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary btn-sm lg:btn-lg w-32"
+          className="btn btn-outline btn-secondary btn-sm lg:btn-md w-32"
           onClick={() => {
             selected.length >= 3 && setStep(3);
           }}
@@ -177,7 +177,10 @@ export const GenreSelect = ({
   );
 };
 
-export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
+export const MusicSelect = ({
+  musicProps,
+  setError,
+}: BasicInfo): JSX.Element => {
   const { token, setStep, selectedMusics, setSelectedMusics } = musicProps!;
   const [search, setSearch] = useState("");
   const [musics, setMusics] = useState<Music[]>([]);
@@ -235,7 +238,9 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
 
     if (selectedMusics.length == 10) {
       const isSelected = selectedMusics.filter((item) => item.id == music.id);
-      isSelected.length && setSelectedMusics(onFilter);
+      isSelected.length
+        ? setSelectedMusics(onFilter)
+        : setError("Escolha no máximo dez músicas");
       return;
     }
     selectedMusics.filter((item) => item.id == music.id).length
@@ -245,76 +250,39 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
 
   return (
     <div className="font-kanit">
-      <div className="w-11/12 m-auto lg:w-auto flex flex-col items-center">
+      <div className="flex flex-col items-center">
         <h1 className="text-xl lg:text-5xl font-semibold">Músicas favoritas</h1>
         <div className="w-full flex justify-center items-end relative">
-          {/*   <p className="absolute left-5">Escolha até dez músicas</p> */}
           <input
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Procurar"
-            className="input input-primary w-5/6 input-sm lg:input-lg lg:w-1/2 mt-2"
+            className="input input-primary w-5/6 input-sm lg:input-md lg:w-1/2 mt-2"
           />
         </div>
       </div>
-      <div className="mt-4 h-[26rem] lg:h-[32rem] flex flex-col gap-3 overflow-y-auto scroll-smooth scrollbar relative">
+      <div className="w-11/12 lg:w-1/2 mx-auto px-1 lg:px-2 rounded-md mt-4 h-[26rem] lg:h-[32rem] flex flex-col gap-1 scroll-smooth scrollbar relative bg-dark">
         <div className="tabs">
           <a
-            className={`tab tab-lifted bg-dark-400 ${
-              tab == 1 && "tab-active bg-dark"
-            }`}
+            className={`tab tab-bordered ${tab == 1 ? "tab-active " : ""}`}
             onClick={() => setTab(1)}
           >
             Músicas
           </a>
           <a
-            className={`tab tab-lifted bg-dark-400 ${
-              tab == 2 && "tab-active bg-dark"
-            }`}
+            className={`tab tab-bordered ${tab == 2 && "tab-active "}`}
             onClick={() => setTab(2)}
           >
-            Escolhidas
+            Escolhidas {selectedMusics.length + "/10"}
           </a>
         </div>
-        {/* <div className="fixed left-5 w-full flex flex-col gap-2">
-          <div className="flex flex-col h-[32rem] overflow-y-auto gap-2">
-            {selectedMusics.map((item, index) => (
-              <div
-                key={index}
-                className="w-[20%] flex justify-between text-warning border border-warning items-center p-1 px-2 rounded-lg"
-              >
-                <div className="flex items-center gap-4 ">
-                  <img src={item.cover.sm} className="rounded-full"></img>
-                  <div className="flex flex-col">
-                    <p className="">{item.name}</p>
-                    <p className="font-thin text-sm text-gray-400">
-                      {item.artist.map((obj, i, arr) => {
-                        return i == arr.length - 1 ? obj : obj + ", ";
-                      })}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  className="text-2xl text-warning duration-200 hover:text-error"
-                  onClick={() => handleChoice(item)}
-                >
-                  <CgPlayListRemove />
-                </button>
-              </div>
-            ))}
-          </div>
-          <p>
-            {selectedMusics.length > 0 &&
-              selectedMusics.length + "/10" + " selecionadas"}
-          </p>
-        </div> */}
         {tab == 1 ? (
-          <>
+          <div className="overflow-auto flex flex-col gap-3">
             {musics.map((item, index) => (
               <div
                 key={index}
                 onClick={() => handleChoice(item)}
-                className="w-11/12 lg:w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
+                className="w-full m-auto relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -330,20 +298,20 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
                     </p>
                   </div>
                 </div>
-                <div>
-                  <button className="text-warning text-2xl duration-200 hover:text-led-700">
+                <div className="self-start">
+                  <button className="text-warning text-xl lg:text-2xl duration-200 lg:hover:text-led-700">
                     <MdOutlineLibraryAdd />
                   </button>
                 </div>
               </div>
             ))}
-          </>
+          </div>
         ) : (
-          <>
+          <div className="overflow-auto flex flex-col gap-3">
             {selectedMusics.map((item, index) => (
               <div
                 key={index}
-                className="w-11/12 lg:w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
+                className="relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -360,19 +328,19 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
                   </div>
                 </div>
                 <button
-                  className="text-2xl text-warning duration-200 hover:text-error"
+                  className="text-2xl self-start text-warning duration-200 lg:hover:text-error"
                   onClick={() => handleChoice(item)}
                 >
                   <CgPlayListRemove />
                 </button>
               </div>
             ))}
-          </>
+          </div>
         )}
       </div>
       <div className="w-11/12 lg:w-1/2 m-auto flex justify-between items-center mt-4 relative z-10">
         <button
-          className="btn btn-outline btn-sm lg:btn-lg"
+          className="btn btn-outline btn-sm lg:btn-md"
           onClick={() => {
             setStep(2);
           }}
@@ -380,7 +348,7 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary w-32 btn-sm lg:btn-lg"
+          className="btn btn-outline btn-secondary w-32 btn-sm lg:btn-md"
           disabled={selectedMusics.length >= 5 ? false : true}
           onClick={() => {
             selectedMusics.length >= 5 && setStep(4);
@@ -395,9 +363,13 @@ export const MusicSelect = ({ musicProps }: BasicInfo): JSX.Element => {
   );
 };
 
-export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
+export const AlbumSelect = ({
+  albumProps,
+  setError,
+}: BasicInfo): JSX.Element => {
   const [search, setSearch] = useState("");
   const [albums, setAlbums] = useState<Albums[]>([]);
+  const [tab, setTab] = useState(1);
 
   const { token, setStep, selectedAlbums, setSelectedAlbums, updateProfile } =
     albumProps!;
@@ -455,7 +427,9 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
     const onFilter = selectedAlbums.filter((item) => item.id != album.id);
     if (selectedAlbums.length == 5) {
       const isSelected = selectedAlbums.filter((item) => item.id == album.id);
-      isSelected.length && setSelectedAlbums(onFilter);
+      isSelected.length
+        ? setSelectedAlbums(onFilter)
+        : setError("Escolha no máximo cinco àlbuns");
       return;
     }
 
@@ -467,77 +441,94 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
   return (
     <div>
       <div className="flex flex-col items-center">
-        <h1 className="text-5xl font-light">
-          Estes àlbuns vão comigo para a cova
-        </h1>
+        <h1 className="text-xl lg:text-5xl font-semibold">Àlbuns favoritos</h1>
         <input
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="Procurar"
-          className="input input-primary w-1/2 mt-2"
+          className="input input-primary input-sm lg:input-md w-5/6 lg:w-1/2 mt-2"
         />
       </div>
-      <div className="mt-4 h-[32rem] flex flex-col gap-3 overflow-y-auto scroll-smooth scrollbar relative">
-        <div className="fixed left-5 w-full flex flex-col gap-2">
-          <div className="flex flex-col gap-2 h-[32rem]">
-            {selectedAlbums.map((item, index) => (
+      <div className="w-11/12 lg:w-1/2 px-1 lg:px-2 mx-auto mt-4 h-[26rem] lg:h-[32rem] flex flex-col gap-1 scroll-smooth scrollbar relative bg-dark rounded-md">
+        <div className="tabs">
+          <a
+            className={`tab tab-bordered ${tab == 1 && "tab-active "}`}
+            onClick={() => setTab(1)}
+          >
+            Àlbuns
+          </a>
+          <a
+            className={`tab tab-bordered ${tab == 2 && "tab-active "}`}
+            onClick={() => setTab(2)}
+          >
+            Escolhidos {selectedAlbums.length + "/5"}
+          </a>
+        </div>
+        {tab == 1 ? (
+          <div className="flex flex-col gap-3 overflow-auto">
+            {albums.map((item, index) => (
               <div
                 key={index}
-                className="w-[20%] flex justify-between text-warning border border-warning items-center p-1 px-2 rounded-lg"
+                onClick={() => handleChoice(item)}
+                className="w-full relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
               >
                 <div className="flex items-center gap-4 ">
-                  <img src={item.cover.sm} className="rounded-full"></img>
-                  <div className="flex flex-col">
-                    <p className="text-lg">{item.name}</p>
-                    <p className="font-thin text-gray-400">
+                  <img
+                    src={item.cover.sm}
+                    className="rounded-full w-12 lg:w-auto"
+                  ></img>
+                  <div className="flex flex-col self-start">
+                    <p className="lg:text-lg">{item.name}</p>
+                    <p className="font-thin text-sm text-gray-400">
                       {item.artist.map((obj, i, arr) => {
                         return i == arr.length - 1 ? obj : obj + ", ";
                       })}
                     </p>
                   </div>
                 </div>
-                <button
-                  className="text-2xl text-warning duration-200 hover:text-error"
-                  onClick={() => handleChoice(item)}
-                >
-                  <CgPlayListRemove />
-                </button>
+                <div className="self-start">
+                  <button className="text-warning text-xl lg:text-2xl duration-200 lg:hover:text-led-700">
+                    <MdOutlineLibraryAdd />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-          <p>
-            {selectedAlbums.length > 0 &&
-              selectedAlbums.length + "/5" + " selecionados"}
-          </p>
-        </div>
-        {albums.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => handleChoice(item)}
-            className="w-1/2 m-auto relative z-10 cursor-pointer flex justify-between items-center bg-base-200 duration-200 hover:bg-base-300 p-1 px-2 rounded-lg"
-          >
-            <div className="flex items-center gap-4 ">
-              <img src={item.cover.sm} className="rounded-full"></img>
-              <div className="flex flex-col">
-                <p className="text-lg">{item.name}</p>
-                <p className="font-thin text-gray-400">
-                  {item.artist.map((obj, i, arr) => {
-                    return i == arr.length - 1 ? obj : obj + ", ";
-                  })}
-                </p>
+        ) : (
+          <div className="flex flex-col gap-3 overflow-auto">
+            {selectedAlbums.map((item, index) => (
+              <div
+                key={index}
+                onClick={() => handleChoice(item)}
+                className="relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
+              >
+                <div className="flex items-center gap-4 ">
+                  <img
+                    src={item.cover.sm}
+                    className="rounded-full w-12 lg:w-auto"
+                  ></img>
+                  <div className="flex flex-col self-start">
+                    <p className="lg:text-lg">{item.name}</p>
+                    <p className="font-thin text-sm text-gray-400">
+                      {item.artist.map((obj, i, arr) => {
+                        return i == arr.length - 1 ? obj : obj + ", ";
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <div className="self-start">
+                  <button className="text-warning text-2xl duration-200 lg:hover:text-led-700">
+                    <CgPlayListRemove />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div>
-              <button className="text-warning text-2xl duration-200 hover:text-led-700">
-                <MdOutlineLibraryAdd />
-              </button>
-            </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
-      <div className="w-1/2 m-auto flex justify-between items-center relative z-10 mt-4">
+      <div className="w-11/12 lg:w-1/2 m-auto flex justify-between items-center relative z-10 mt-4">
         <button
-          className="btn btn-outline"
+          className="btn btn-outline btn-sm lg:btn-md"
           onClick={() => {
             setStep(3);
           }}
@@ -545,7 +536,7 @@ export const AlbumSelect = ({ albumProps }: BasicInfo): JSX.Element => {
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary w-32"
+          className="btn btn-outline btn-secondary btn-sm lg:btn-md w-32"
           disabled={selectedAlbums.length == 5 ? false : true}
           onClick={updateProfile}
         >
