@@ -50,7 +50,7 @@ export default function Auth() {
             className="btn btn-accent text-white"
             disabled={loading}
           >
-            <span>{loading ? "Loading" : "Send magic link"}</span>
+            <span>{loading ? "Aguarde" : "Me mande o link mágico!"}</span>
           </button>
         </div>
       </section>

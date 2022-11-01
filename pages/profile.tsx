@@ -1,9 +1,10 @@
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { CgArrowLeft } from "react-icons/cg";
+import { IoLocationOutline } from "react-icons/io5";
+import { GiBrazilFlag } from "react-icons/gi";
 import { MdArrowBackIos } from "react-icons/md";
-import { Profile } from "../models/interfaces";
+import { VscSignOut } from "react-icons/vsc";
 import { useAuthContext } from "../src/context/index";
 import { supabase } from "../utils/supabaseClient";
 
@@ -14,15 +15,25 @@ const Account: NextPage = () => {
   const router = useRouter();
 
   return (
-    <div className="font-kanit">
+    <div className="font-kanit pb-14">
       <header className="w-full">
-        <div className="py-2 px-5">
+        <div className="pl-4 flex justify-between items-center">
           <button
             onClick={() => router.back()}
             className="text-gray-100 duration-200 hover:text-warning flex items-center justify-center"
           >
             <MdArrowBackIos className="lg:text-xl" />
             <p className="font-thin">VOLTAR</p>
+          </button>
+          <button
+            className="btn btn-ghost text-red-400 lg:btn-md gap-2"
+            onClick={() => {
+              supabase.auth.signOut();
+              router.push("/login");
+            }}
+          >
+            SAIR
+            <VscSignOut className="" />
           </button>
         </div>
         <div className="flex flex-col items-center gap-0">
@@ -38,6 +49,17 @@ const Account: NextPage = () => {
           </div>
           <h2 className="text-gray-100 text-lg font-light">{user?.username}</h2>
         </div>
+        <article className="w-2/3 m-auto">
+          <ul className="flex justify-between items-center">
+            <li className="w-fit font-thin p-1 text-xs rounded-md">
+              {user?.followers.length} SEGUIDORES
+            </li>
+            <li className="divider divider-horizontal"></li>
+            <li className="w-fit font-thin p-1 text-xs rounded-md">
+              SEGUINDO {user?.following.length}
+            </li>
+          </ul>
+        </article>
       </header>
       <main className="mt-5 px-1 lg:mt-10 lg:px-5 w-full">
         <section>
@@ -119,14 +141,7 @@ const Account: NextPage = () => {
           </article>
         </section>
       </main>
-      <div>
-        <button
-          className="btn btn-warning"
-          onClick={() => supabase.auth.signOut()}
-        >
-          SAIR
-        </button>
-      </div>
+      <div className=""></div>
     </div>
   );
 };

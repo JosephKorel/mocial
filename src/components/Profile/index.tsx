@@ -113,7 +113,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ target }) => {
             álbuns
           </h1>
           <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md w-full">
-            <ul className="carousel gap-2">
+            <ul className="carousel gap-4">
               {target?.albums.map((album, index) => (
                 <li
                   key={index}
@@ -150,7 +150,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ target }) => {
             músicas
           </h1>
           <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md">
-            <ul className="carousel gap-2">
+            <ul className="carousel gap-4">
               {target?.musics.map((music, index) => (
                 <li
                   key={index}

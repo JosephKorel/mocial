@@ -25,7 +25,7 @@ const Home: NextPage<HomePageProps> = () => {
   return (
     <div className="font-kanit">
       <header>
-        <nav className="p-2 px-4">
+        {/* <nav className="p-2 px-4">
           <div className="flex justify-end items-center gap-4">
             <p
               onClick={() => router.push("/profile")}
@@ -42,9 +42,9 @@ const Home: NextPage<HomePageProps> = () => {
               </div>
             </div>
           </div>
-        </nav>
+        </nav> */}
       </header>
-      <main className="">
+      <main className="mt-2">
         <section>
           <article className="px-2">
             <ul className="flex items-center">

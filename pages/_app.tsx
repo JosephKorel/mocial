@@ -2,6 +2,7 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import ContextProvider from "../src/context";
+import { BottomNav } from "../src/components/BottomNav";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -18,6 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ContextProvider>
         <Component {...pageProps} />
       </ContextProvider>
+      <BottomNav />
     </>
   );
 }
