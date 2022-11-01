@@ -25,6 +25,8 @@ export default function NewUser({ token }: { token: string }) {
 
   const router = useRouter();
 
+  //This is a test comment
+
   useEffect(() => {
     getGenres(token);
   }, []);
