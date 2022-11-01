@@ -7,7 +7,7 @@ import {
   BasicInfo,
   GenreSelect,
   MusicSelect,
-} from "../src/components/Login-Info";
+} from "../src/components/Login-Info/index";
 import { supabase } from "../utils/supabaseClient";
 
 export default function NewUser({ token }: { token: string }) {
