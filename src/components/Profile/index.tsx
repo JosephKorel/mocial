@@ -106,6 +106,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ target }) => {
             )}
           </button>
         </div>
+        <article className="w-2/3 m-auto">
+          <ul className="flex justify-between items-center">
+            <li className="w-fit font-thin p-1 text-xs rounded-md">
+              {user?.followers.length} SEGUIDORES
+            </li>
+            <li className="divider divider-horizontal"></li>
+            <li className="w-fit font-thin p-1 text-xs rounded-md">
+              SEGUINDO {user?.following.length}
+            </li>
+          </ul>
+        </article>
       </header>
       <main className="mt-5 lg:mt-10 lg:px-5 w-full">
         <section>

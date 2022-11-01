@@ -26,17 +26,22 @@ export default function Auth() {
   };
 
   return (
-    <main className="py-2">
-      <header className="w-2/3 m-auto">
-        <h1 className="text-warning font-extrabold text-6xl">Mocial</h1>
+    <div className="py-2 flex flex-col items-center justify-center h-screen font-kanit">
+      <header className="w-full lg:w-2/3 m-auto absolute top-4">
+        <h1 className="text-warning font-cinzel font-thin text-4xl text-center">
+          <span className="font-kanit font-bold text-6xl text-secondary">
+            M
+          </span>
+          ocial
+        </h1>
       </header>
-      <section className="w-1/2 m-auto flex flex-col items-center p-2 rounded-md">
-        <p className="">Digite seu email</p>
+      <main className="w-11/12 lg:w-1/2 m-auto flex flex-col items-center justify-between p-2 py-5 rounded-md bg-dark h-96">
         <div className="w-full text-center">
+          <p className="text-gray-100 text-xl font-light">Digite seu email</p>
           <input
-            className="bg-inherit w-2/3 text-warning rounded-md p-2 border border-warning active:ring-0 focus:ring-0 active:border-warning-focus outline-none"
+            className="bg-inherit w-full mt-2 lg:w-2/3 text-primary rounded-md p-2 border border-primary active:ring-0 focus:ring-0 active:border-warning-focus outline-none"
             type="email"
-            placeholder="Your email"
+            placeholder="E-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -47,14 +52,14 @@ export default function Auth() {
               e.preventDefault();
               handleLogin(email);
             }}
-            className="btn btn-accent text-white"
+            className="btn btn-secondary btn-outline text-white"
             disabled={loading}
           >
             <span>{loading ? "Aguarde" : "Me mande o link mágico!"}</span>
           </button>
         </div>
-      </section>
+      </main>
       <Alert success={success} error={error} />
-    </main>
+    </div>
   );
 }

@@ -1,11 +1,6 @@
-import { Session } from "@supabase/supabase-js";
 import type { GetServerSideProps, NextPage } from "next";
-import Head from "next/head";
 import { useEffect, useState } from "react";
 import { supabase } from "../utils/supabaseClient";
-import Account from "./new-user";
-import Auth from "./login";
-import NewUser from "./new-user";
 import { useRouter } from "next/router";
 import { useAuthContext } from "../src/context";
 import { HomePageProps, Profile } from "../models/interfaces";
@@ -58,7 +53,7 @@ const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
 
 export default InitialPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const getProfiles = async () => {
     let { data, error, status } = await supabase.from("profiles").select();
 

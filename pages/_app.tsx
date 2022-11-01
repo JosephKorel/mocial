@@ -18,8 +18,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       </nav> */}
       <ContextProvider>
         <Component {...pageProps} />
+        <BottomNav />
       </ContextProvider>
-      <BottomNav />
     </>
   );
 }
