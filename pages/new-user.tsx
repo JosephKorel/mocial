@@ -8,6 +8,7 @@ import {
   GenreSelect,
   MusicSelect,
 } from "../src/components/LoginInfo/index";
+import { useAuthContext } from "../src/context";
 import { supabase } from "../utils/supabaseClient";
 
 export default function NewUser({ token }: { token: string }) {
@@ -20,23 +21,12 @@ export default function NewUser({ token }: { token: string }) {
   const [step, setStep] = useState(1);
   const [selectedMusics, setSelectedMusics] = useState<Music[]>([]);
   const [selectedAlbums, setSelectedAlbums] = useState<Albums[]>([]);
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
-
+  const { setError, setSuccess } = useAuthContext();
   const router = useRouter();
-
-  //This is a test comment
 
   useEffect(() => {
     getGenres(token);
   }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setSuccess("");
-      setError("");
-    }, 3000);
-  }, [success, error]);
 
   const renderComponent = (): JSX.Element => {
     switch (step) {
@@ -207,7 +197,6 @@ export default function NewUser({ token }: { token: string }) {
           </ul>
         </section>
       </main>
-      <Alert success={success} error={error} />
     </div>
   );
 }

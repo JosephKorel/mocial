@@ -20,6 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ContextProvider>
         <Component {...pageProps} />
         <BottomNav />
+        <Alert />
       </ContextProvider>
     </>
   );
