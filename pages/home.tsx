@@ -52,7 +52,14 @@ const Home: NextPage<HomePageProps> = () => {
                 <li
                   key={index}
                   className="avatar"
-                  onClick={() => setSeeUser(user)}
+                  onClick={() => {
+                    router.push({
+                      pathname: "/[seeUser]",
+                      query: { seeUser: user.id },
+                    });
+                    return;
+                    setSeeUser(user);
+                  }}
                 >
                   <div className="w-14 rounded-full">
                     <img src={user.avatar_url}></img>
