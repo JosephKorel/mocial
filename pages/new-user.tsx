@@ -21,7 +21,7 @@ export default function NewUser({ token }: { token: string }) {
   const [step, setStep] = useState(1);
   const [selectedMusics, setSelectedMusics] = useState<Music[]>([]);
   const [selectedAlbums, setSelectedAlbums] = useState<Albums[]>([]);
-  const { setError, setSuccess } = useAuthContext();
+  const { setError } = useAuthContext();
   const router = useRouter();
 
   useEffect(() => {

@@ -15,14 +15,12 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ target, setTarget }) => {
   const { user, setUser, setSuccess, setError } = useAuthContext();
   const isFollowing = target?.id ? user!.following.includes(target.id) : false;
-  const getCommonMusics = user!.musics.map((music) => {
+  const getCommonMusics = user?.musics.map((music) => {
     return target?.musics.filter((item) => item.id == music.id).length
       ? music
       : null;
   });
-  const commonMusics = getCommonMusics.length
-    ? getCommonMusics
-    : target!.musics;
+
   const isCommonMusic = (id: string): boolean => {
     return user?.musics.filter((music) => music.id == id).length ? true : false;
   };
