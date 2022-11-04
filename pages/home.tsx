@@ -16,7 +16,7 @@ const Home: NextPage<HomePageProps> = () => {
     return (
       <div className="modal">
         <div className="modal-box pt-2 px-2">
-          <UserProfile target={seeUser} />
+          <UserProfile target={seeUser} setTarget={setSeeUser} />
         </div>
       </div>
     );

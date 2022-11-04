@@ -36,6 +36,19 @@ module.exports = {
         cinzel: ["Cinzel", "serif"],
       },
       colors: {
+        danube: {
+          DEFAULT: "#6987D3",
+          50: "#F7F9FD",
+          100: "#E7ECF8",
+          200: "#C8D3EF",
+          300: "#A8B9E6",
+          400: "#89A0DC",
+          500: "#6987D3",
+          600: "#3E64C6",
+          700: "#2E4E9E",
+          800: "#213872",
+          900: "#152347",
+        },
         led: {
           DEFAULT: "#F4CF71",
           50: "#FFFFFF",

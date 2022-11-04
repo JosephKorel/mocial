@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import ContextProvider from "../src/context";
 import { BottomNav } from "../src/components/BottomNav";
+import { Alert } from "../src/components/Alert";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

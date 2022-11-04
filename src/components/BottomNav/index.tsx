@@ -12,7 +12,7 @@ export const BottomNav: React.FC = () => {
         user == null ? "hidden" : "fixed bottom-2 w-full z-10 text-center"
       }
     >
-      <ul className="w-2/3 flex justify-between m-auto menu menu-horizontal bg-base-200 rounded-box text-primary">
+      <ul className="w-2/3 flex justify-between m-auto menu menu-horizontal bg-base-200 rounded-box text-danube">
         <li className="">
           <a onClick={() => router.push("/home")}>
             <GoHome />

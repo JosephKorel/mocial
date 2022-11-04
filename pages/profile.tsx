@@ -9,7 +9,7 @@ import { useAuthContext } from "../src/context/index";
 import { supabase } from "../utils/supabaseClient";
 
 const Account: NextPage = () => {
-  const { user, setUser } = useAuthContext();
+  const { user, setUser, setProfiles } = useAuthContext();
   const [avatarUrl, setAvatarUrl] = useState("");
 
   const router = useRouter();
@@ -30,6 +30,8 @@ const Account: NextPage = () => {
             onClick={() => {
               supabase.auth.signOut();
               router.push("/login");
+              setUser(null);
+              setProfiles([]);
             }}
           >
             SAIR
@@ -63,8 +65,8 @@ const Account: NextPage = () => {
       </header>
       <main className="mt-5 px-1 lg:mt-10 lg:px-5 w-full">
         <section>
-          <h1 className="ml-2 lg:ml-0 text-xl lg:text-left lg:text-3xl text-warning font-cinzel">
-            álbuns
+          <h1 className="ml-2 lg:ml-0 text-2xl font-thin lg:text-left lg:text-3xl text-danube">
+            ÁLBUNS
           </h1>
           <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md w-full">
             <ul className="carousel gap-2">
@@ -82,13 +84,13 @@ const Account: NextPage = () => {
                   </figure>
                   <div className="self-start">
                     <h2
-                      className={`text-warning ${
+                      className={`text-gray-100 ${
                         album.name.length > 20 && "text-xs"
                       }`}
                     >
                       {album.name}
                     </h2>
-                    <p className="text-sm">
+                    <p className="text-sm text-gray-400">
                       {album.artist.map((artist, index) => (
                         <span key={index}>{artist}</span>
                       ))}
@@ -100,8 +102,8 @@ const Account: NextPage = () => {
           </article>
         </section>
         <section className="mt-10 px-1">
-          <h1 className="ml-2 lg:ml-0 text-xl lg:text-left lg:text-3xl text-warning font-cinzel">
-            músicas
+          <h1 className="ml-2 lg:ml-0 font-thin text-2xl lg:text-left lg:text-3xl text-danube">
+            MÚSICAS
           </h1>
           <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md">
             <ul className="carousel gap-2">
@@ -119,14 +121,14 @@ const Account: NextPage = () => {
                   </figure>
                   <div className="self-start">
                     <h2
-                      className={`text-warning ${
+                      className={`text-gray-100 ${
                         music.name.length > 20 && "text-xs"
                       }`}
                     >
                       {music.name}
                     </h2>
                     <p
-                      className={`text-sm ${
+                      className={`text-sm text-gray-400 ${
                         music.artist.length > 1 && "text-xs"
                       }`}
                     >

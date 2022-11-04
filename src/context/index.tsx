@@ -7,6 +7,10 @@ const ContextDefaultValues = {
   setUser: () => {},
   profiles: [],
   setProfiles: () => {},
+  success: "",
+  setSuccess: () => {},
+  error: "",
+  setError: () => {},
 };
 
 const AuthContext = createContext<ContextType>(ContextDefaultValues);
@@ -18,8 +22,19 @@ export function useAuthContext() {
 const ContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<Profile | null>(null);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
-  const value: ContextType = { user, setUser, profiles, setProfiles };
+  const value: ContextType = {
+    user,
+    setUser,
+    profiles,
+    setProfiles,
+    success,
+    setSuccess,
+    error,
+    setError,
+  };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
