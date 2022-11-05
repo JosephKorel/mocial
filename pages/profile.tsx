@@ -1,30 +1,99 @@
-import { GetServerSideProps, NextPage } from "next";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import { IoLocationOutline } from "react-icons/io5";
-import { GiBrazilFlag } from "react-icons/gi";
 import { MdArrowBackIos } from "react-icons/md";
 import { VscSignOut } from "react-icons/vsc";
 import { useAuthContext } from "../src/context/index";
 import { supabase } from "../utils/supabaseClient";
 import { BsThreeDots } from "react-icons/bs";
 import { IoMdImages } from "react-icons/io";
+import { useState } from "react";
 
 const Account: NextPage = () => {
-  const { user, setUser, setProfiles } = useAuthContext();
+  const { user, setUser, setProfiles, setError } = useAuthContext();
+  const background = user?.background
+    ? user.background
+    : user?.albums[0].cover.lg;
 
   const router = useRouter();
+
+  const BackgroundModal = (): JSX.Element => {
+    const [selected, setSelected] = useState("");
+    let coverImages: string[] = [];
+    user?.albums.forEach((album) => coverImages.push(album.cover.lg));
+    user?.musics.forEach((music) => coverImages.push(music.cover.lg));
+
+    const changeBackground = async (): Promise<void | null> => {
+      if (!selected) {
+        setError("Você não selecionou nenhuma imagem");
+        return null;
+      }
+
+      try {
+        await supabase
+          .from("profiles")
+          .update({ background: selected })
+          .eq("id", user?.id);
+
+        setUser({ ...user!, background: selected });
+
+        const closeBtn = document.getElementById(
+          "closeBgModal"
+        ) as HTMLLabelElement;
+        closeBtn.click();
+      } catch (error) {
+        setError("Houve algum erro, tente novamente");
+        return null;
+      }
+    };
+    return (
+      <div>
+        <input type="checkbox" id="bg-modal" className="modal-toggle" />
+        <div className="modal">
+          <div className="modal-box font-kanit">
+            <h3 className="text-lg">Alterar capa do perfil</h3>
+            <div className="grid grid-cols-2 h-[26rem] overflow-y-auto auto-rows-max place-items-center gap-2 bg-dark p-2 rounded-md shadow-md shadow-black">
+              {coverImages.map((cover, index) => (
+                <img
+                  onClick={() => setSelected(cover)}
+                  key={index}
+                  src={cover}
+                  className={`w-32 rounded-md border-2 shadow-sm shadow-black ${
+                    selected == cover ? "border-danube" : "border-dark-600"
+                  }`}
+                ></img>
+              ))}
+            </div>
+            <div className="modal-action flex justify-between font-kanit">
+              <label
+                htmlFor="bg-modal"
+                id="closeBgModal"
+                className="btn btn-sm btn-outline btn-error"
+              >
+                Cancelar
+              </label>
+              <label
+                className="btn btn-sm btn-outline btn-primary"
+                onClick={changeBackground}
+              >
+                Confirmar
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div
       className="font-kanit w-full bg-no-repeat bg-cover h-64 relative"
-      style={{ backgroundImage: `url("${user?.albums[2].cover.lg}")` }}
+      style={{ backgroundImage: `url("${background}")` }}
     >
-      <header className="relative pt-16 pb-4 backdrop-blur">
+      <header className="relative pt-24 pb-4 backdrop-blur-sm">
         <div className="flex justify-between items-center absolute top-2 w-full px-2">
           <button
             onClick={() => router.back()}
-            className="text-gray-100 px-2 rounded-md bg-dark-400 duration-200 hover:text-warning flex items-center justify-center"
+            className="text-gray-100 px-2 rounded-md bg-dark-600 duration-200 hover:text-warning flex items-center justify-center"
           >
             <MdArrowBackIos className="lg:text-xl" />
             <p className="text-sm font-thin">VOLTAR</p>
@@ -32,7 +101,7 @@ const Account: NextPage = () => {
           <div className="dropdown dropdown-end">
             <button
               tabIndex={0}
-              className="p-[2px] px-2 rounded-md bg-dark-400 text-gray-100"
+              className="p-[2px] px-2 rounded-md bg-dark-600 text-gray-100"
             >
               <BsThreeDots />
             </button>
@@ -41,10 +110,10 @@ const Account: NextPage = () => {
               className="menu menu-compact dropdown-content text-gray-300 shadow bg-base-200 rounded-md w-44"
             >
               <li>
-                <a>
+                <label htmlFor="bg-modal" className="">
                   <IoMdImages className="" />
                   Alterar fundo
-                </a>
+                </label>
               </li>
               <li
                 onClick={() => {
@@ -61,7 +130,7 @@ const Account: NextPage = () => {
             </ul>
           </div>
         </div>
-        <div className="w-full h-12 bg-dark-600 absolute top-1/2 -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
+        <div className="w-full h-12 bg-dark-600 absolute top-[60%] -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
         <div className="flex justify-center z-10">
           <div className="avatar relative z-10">
             <div className="w-20 rounded-full border-4 border-danube">
@@ -173,7 +242,7 @@ const Account: NextPage = () => {
           </article>
         </section>
       </main>
-      <div className=""></div>
+      <BackgroundModal />
     </div>
   );
 };

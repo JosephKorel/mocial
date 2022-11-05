@@ -12,6 +12,7 @@ export interface Profile {
   following: string[];
   followers: string[];
   updated_at: Date;
+  background: string;
 }
 
 export interface Music {
