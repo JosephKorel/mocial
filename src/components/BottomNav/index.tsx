@@ -19,7 +19,7 @@ export const BottomNav: React.FC = () => {
           </a>
         </li>
         <li className="">
-          <a onClick={() => router.push("/home")}>
+          <a onClick={() => router.push("/search")}>
             <GoSearch />
           </a>
         </li>

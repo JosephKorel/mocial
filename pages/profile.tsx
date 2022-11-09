@@ -4,84 +4,54 @@ import { MdArrowBackIos } from "react-icons/md";
 import { VscSignOut } from "react-icons/vsc";
 import { useAuthContext } from "../src/context/index";
 import { supabase } from "../utils/supabaseClient";
-import { BsThreeDots } from "react-icons/bs";
+import { BsBoxArrowInUpRight, BsThreeDots } from "react-icons/bs";
 import { IoMdImages } from "react-icons/io";
 import { useState } from "react";
+import { Profile } from "../models/interfaces";
+import {
+  BackgroundModal,
+  FollowerFollowing,
+} from "../src/components/Profile/Modal";
 
 const Account: NextPage = () => {
-  const { user, setUser, setProfiles, setError } = useAuthContext();
+  const { user, setUser, profiles, setProfiles } = useAuthContext();
+  const [open, setOpen] = useState(false);
+  const [seeing, setSeeing] = useState("");
   const background = user?.background
     ? user.background
     : user?.albums[0].cover.lg;
 
   const router = useRouter();
 
-  const BackgroundModal = (): JSX.Element => {
-    const [selected, setSelected] = useState("");
-    let coverImages: string[] = [];
-    user?.albums.forEach((album) => coverImages.push(album.cover.lg));
-    user?.musics.forEach((music) => coverImages.push(music.cover.lg));
+  const followers = (): Profile[] => {
+    if (!user) return [];
 
-    const changeBackground = async (): Promise<void | null> => {
-      if (!selected) {
-        setError("Você não selecionou nenhuma imagem");
-        return null;
-      }
+    const getProfiles = user.followers.reduce((acc, curr) => {
+      const filter = profiles.filter((item) => item.id == curr);
+      acc.push(filter[0]);
+      return acc;
+    }, [] as Profile[]);
 
-      try {
-        await supabase
-          .from("profiles")
-          .update({ background: selected })
-          .eq("id", user?.id);
+    return getProfiles;
+  };
 
-        setUser({ ...user!, background: selected });
+  const following = (): Profile[] => {
+    if (!user) return [];
 
-        const closeBtn = document.getElementById(
-          "closeBgModal"
-        ) as HTMLLabelElement;
-        closeBtn.click();
-      } catch (error) {
-        setError("Houve algum erro, tente novamente");
-        return null;
-      }
-    };
-    return (
-      <div>
-        <input type="checkbox" id="bg-modal" className="modal-toggle" />
-        <div className="modal">
-          <div className="modal-box font-kanit">
-            <h3 className="text-lg">Alterar capa do perfil</h3>
-            <div className="grid grid-cols-2 h-[26rem] overflow-y-auto auto-rows-max place-items-center gap-2 bg-dark p-2 rounded-md shadow-md shadow-black">
-              {coverImages.map((cover, index) => (
-                <img
-                  onClick={() => setSelected(cover)}
-                  key={index}
-                  src={cover}
-                  className={`w-32 rounded-md border-2 shadow-sm shadow-black ${
-                    selected == cover ? "border-danube" : "border-dark-600"
-                  }`}
-                ></img>
-              ))}
-            </div>
-            <div className="modal-action flex justify-between font-kanit">
-              <label
-                htmlFor="bg-modal"
-                id="closeBgModal"
-                className="btn btn-sm btn-outline btn-error"
-              >
-                Cancelar
-              </label>
-              <label
-                className="btn btn-sm btn-outline btn-primary"
-                onClick={changeBackground}
-              >
-                Confirmar
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    const getProfiles = user.following.reduce((acc, curr) => {
+      const filter = profiles.filter((item) => item.id == curr);
+      acc.push(filter[0]);
+      return acc;
+    }, [] as Profile[]);
+
+    return getProfiles;
+  };
+
+  const handleLogout = () => {
+    supabase.auth.signOut();
+    router.push("/login");
+    setUser(null);
+    setProfiles([]);
   };
 
   return (
@@ -110,19 +80,20 @@ const Account: NextPage = () => {
               className="menu menu-compact dropdown-content text-gray-300 shadow bg-base-200 rounded-md w-44"
             >
               <li>
-                <label htmlFor="bg-modal" className="">
+                <label
+                  htmlFor="bg-modal"
+                  className=""
+                  onClick={() =>
+                    setTimeout(() => {
+                      setOpen(true);
+                    }, 100)
+                  }
+                >
                   <IoMdImages className="" />
                   Alterar fundo
                 </label>
               </li>
-              <li
-                onClick={() => {
-                  supabase.auth.signOut();
-                  router.push("/login");
-                  setUser(null);
-                  setProfiles([]);
-                }}
-              >
+              <li onClick={handleLogout}>
                 <a>
                   <VscSignOut className="text-error" /> Sair
                 </a>
@@ -152,11 +123,21 @@ const Account: NextPage = () => {
           <article className="w-2/3 m-auto">
             <ul className="flex justify-between items-center">
               <li className="w-fit font-thin p-1 text-xs rounded-md">
-                {user?.followers.length} SEGUIDORES
+                <label
+                  htmlFor="friend-modal"
+                  onClick={() => setSeeing("followers")}
+                >
+                  {user?.followers.length} SEGUIDORES
+                </label>
               </li>
               <li className="divider divider-horizontal"></li>
               <li className="w-fit font-thin p-1 text-xs rounded-md">
-                SEGUINDO {user?.following.length}
+                <label
+                  htmlFor="friend-modal"
+                  onClick={() => setSeeing("following")}
+                >
+                  SEGUINDO {user?.following.length}
+                </label>
               </li>
             </ul>
           </article>
@@ -242,7 +223,8 @@ const Account: NextPage = () => {
           </article>
         </section>
       </main>
-      <BackgroundModal />
+      <BackgroundModal bgProps={{ open, setOpen }} />
+      <FollowerFollowing modalProps={{ seeing, followers, following }} />
     </div>
   );
 };

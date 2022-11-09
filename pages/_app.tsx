@@ -14,9 +14,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           rel="stylesheet"
         />
       </Head>
-      {/*  <nav className="prose">
-        {authenticaded ? <h1>Autenticado</h1> : <h1>Não Autenticado</h1>}
-      </nav> */}
       <ContextProvider>
         <Component {...pageProps} />
         <BottomNav />
