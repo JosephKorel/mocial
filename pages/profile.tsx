@@ -63,15 +63,15 @@ const Account: NextPage = () => {
         <div className="flex justify-between items-center absolute top-2 w-full px-2">
           <button
             onClick={() => router.back()}
-            className="text-gray-100 px-2 rounded-md bg-dark-600 duration-200 hover:text-warning flex items-center justify-center"
+            className="text-gray-100 px-3 py-1 rounded-md bg-dark-600 duration-200 hover:text-warning flex items-center justify-center"
           >
             <MdArrowBackIos className="lg:text-xl" />
-            <p className="text-sm font-thin">VOLTAR</p>
+            <span className="text-sm font-thin">VOLTAR</span>
           </button>
           <div className="dropdown dropdown-end">
             <button
               tabIndex={0}
-              className="p-[2px] px-2 rounded-md bg-dark-600 text-gray-100"
+              className="p-1 px-2 rounded-md bg-dark-600 text-gray-100"
             >
               <BsThreeDots />
             </button>
@@ -143,7 +143,7 @@ const Account: NextPage = () => {
           </article>
         </div>
       </header>
-      <main className="px-1 lg:mt-10 lg:px-5 w-full bg-dark-600 -translate-y-4 pb-14">
+      <main className="px-1 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 -translate-y-4 pb-14">
         <section>
           <h1 className="ml-2 lg:ml-0 text-2xl font-thin lg:text-left lg:text-3xl text-danube">
             ÁLBUNS

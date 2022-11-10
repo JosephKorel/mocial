@@ -21,19 +21,17 @@ const Search: NextPage = () => {
       <header className="w-11/12 m-auto mt-4 relative">
         <div className="w-full bg-danube p-[2px] rounded-lg absolute left-0 top-4 z-0"></div>
         <h1 className="text-2xl text-gray-200 font-thin rounded-full bg-dark-600 m-auto w-fit px-3 relative z-10">
-          Procurar usuário
+          Procurar Usuário
         </h1>
         <form className="form-control mt-2">
-          <div className="input-group">
+          <div className="bg-dark rounded-lg flex justify-between items-center relative">
             <input
-              placeholder="Procurar usuário"
-              className="input input-primary input-ghost input-sm w-full"
+              placeholder="Nome do usuário"
+              className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <button className="btn btn-sm btn-square btn-primary">
-              <AiOutlineSearch />
-            </button>
+            <AiOutlineSearch className="absolute left-2 text-lg text-danube" />
           </div>
         </form>
       </header>

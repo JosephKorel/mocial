@@ -4,8 +4,10 @@ import { BsBoxArrowUpRight, BsThreeDots } from "react-icons/bs";
 import { AiOutlineCheck, AiOutlineUserAdd } from "react-icons/ai";
 import { useAuthContext } from "../../context";
 import { supabase } from "../../../utils/supabaseClient";
-import { MdLibraryAdd } from "react-icons/md";
+import { MdArrowBackIos, MdLibraryAdd } from "react-icons/md";
 import { FaHeadphonesAlt } from "react-icons/fa";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 interface UserProfileProps {
   target: Profile | null;
@@ -14,12 +16,12 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ target, setTarget }) => {
   const { user, setUser, setSuccess, setError } = useAuthContext();
+  const [seeing, setSeeing] = useState("");
+  const router = useRouter();
   const isFollowing = target?.id ? user!.following.includes(target.id) : false;
-  const getCommonMusics = user?.musics.map((music) => {
-    return target?.musics.filter((item) => item.id == music.id).length
-      ? music
-      : null;
-  });
+  const background = target?.background
+    ? target.background
+    : target?.albums[0].cover.lg;
 
   const isCommonMusic = (id: string): boolean => {
     return user?.musics.filter((music) => music.id == id).length ? true : false;
@@ -114,57 +116,61 @@ const UserProfile: React.FC<UserProfileProps> = ({ target, setTarget }) => {
   };
 
   return (
-    <div className="font-kanit relative">
-      <header className="w-full">
-        <div className="flex flex-row-reverse sticky top-0">
-          <label htmlFor="my-modal" className="text-right text-xl">
-            <IoCloseOutline />
-          </label>
+    <div
+      className="font-kanit w-full bg-no-repeat bg-cover h-64 relative"
+      style={{ backgroundImage: `url("${background}")` }}
+    >
+      <header className="relative pt-24 pb-4 backdrop-blur-sm">
+        <div className="flex justify-between items-center absolute top-2 w-full px-2">
+          <button
+            onClick={() => router.back()}
+            className="text-gray-100 px-2 rounded-md bg-dark-600 duration-200 hover:text-warning flex items-center justify-center"
+          >
+            <MdArrowBackIos className="lg:text-xl" />
+            <p className="text-sm font-thin">VOLTAR</p>
+          </button>
         </div>
-        <div className="flex items-start justify-between mt-2">
-          <div className="flex items-center gap-2">
-            <div className="avatar">
-              <div className="w-12 rounded-full">
-                <img
-                  src={target?.avatar_url}
-                  alt="Avatar"
-                  referrerPolicy="no-referrer"
-                  className=""
-                ></img>
-              </div>
+        <div className="w-full h-12 bg-dark-600 absolute top-[60%] -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
+        <div className="flex justify-center z-10">
+          <div className="avatar relative z-10">
+            <div className="w-20 rounded-full border-4 border-danube">
+              <img
+                src={target?.avatar_url}
+                alt="Avatar"
+                referrerPolicy="no-referrer"
+                className=""
+              ></img>
             </div>
-            <h2 className="text-gray-100 text-lg self-start font-light">
+          </div>
+        </div>
+        <div className="bg-dark-600 relative z-10">
+          <div className="flex flex-col items-center gap-0">
+            <h2 className="text-gray-100 text-lg font-light">
               {target?.username}
             </h2>
           </div>
-          <button
-            className="gap-2 btn btn-outline btn-tertiary btn-sm font-light"
-            onClick={handleFollow}
-          >
-            {isFollowing ? (
-              <>
-                <AiOutlineCheck />
-                SEGUINDO
-              </>
-            ) : (
-              <>
-                <AiOutlineUserAdd />
-                SEGUIR
-              </>
-            )}
-          </button>
+          <article className="w-2/3 m-auto">
+            <ul className="flex justify-between items-center">
+              <li className="w-fit font-thin p-1 text-xs rounded-md">
+                <label
+                  htmlFor="friend-modal"
+                  onClick={() => setSeeing("followers")}
+                >
+                  {target?.followers.length} SEGUIDORES
+                </label>
+              </li>
+              <li className="divider divider-horizontal"></li>
+              <li className="w-fit font-thin p-1 text-xs rounded-md">
+                <label
+                  htmlFor="friend-modal"
+                  onClick={() => setSeeing("following")}
+                >
+                  SEGUINDO {target?.following.length}
+                </label>
+              </li>
+            </ul>
+          </article>
         </div>
-        <article className="w-2/3 m-auto">
-          <ul className="flex justify-between items-center">
-            <li className="w-fit font-thin p-1 text-xs rounded-md">
-              {target?.followers.length} SEGUIDORES
-            </li>
-            <li className="divider divider-horizontal"></li>
-            <li className="w-fit font-thin p-1 text-xs rounded-md">
-              SEGUINDO {target?.following.length}
-            </li>
-          </ul>
-        </article>
       </header>
       <main className="mt-5 lg:mt-10 lg:px-5 w-full">
         <section>
@@ -283,3 +289,57 @@ const UserProfile: React.FC<UserProfileProps> = ({ target, setTarget }) => {
 };
 
 export default UserProfile;
+
+{
+  /* <header className="w-full">
+<div className="flex flex-row-reverse sticky top-0">
+  <label htmlFor="my-modal" className="text-right text-xl">
+    <IoCloseOutline />
+  </label>
+</div>
+<div className="flex items-start justify-between mt-2">
+  <div className="flex items-center gap-2">
+    <div className="avatar">
+      <div className="w-12 rounded-full">
+        <img
+          src={target?.avatar_url}
+          alt="Avatar"
+          referrerPolicy="no-referrer"
+          className=""
+        ></img>
+      </div>
+    </div>
+    <h2 className="text-gray-100 text-lg self-start font-light">
+      {target?.username}
+    </h2>
+  </div>
+  <button
+    className="gap-2 btn btn-outline btn-tertiary btn-sm font-light"
+    onClick={handleFollow}
+  >
+    {isFollowing ? (
+      <>
+        <AiOutlineCheck />
+        SEGUINDO
+      </>
+    ) : (
+      <>
+        <AiOutlineUserAdd />
+        SEGUIR
+      </>
+    )}
+  </button>
+</div>
+<article className="w-2/3 m-auto">
+  <ul className="flex justify-between items-center">
+    <li className="w-fit font-thin p-1 text-xs rounded-md">
+      {target?.followers.length} SEGUIDORES
+    </li>
+    <li className="divider divider-horizontal"></li>
+    <li className="w-fit font-thin p-1 text-xs rounded-md">
+      SEGUINDO {target?.following.length}
+    </li>
+  </ul>
+</article>
+</header> */
+}

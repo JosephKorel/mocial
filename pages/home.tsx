@@ -9,41 +9,11 @@ import UserProfile from "../src/components/Profile";
 const Home: NextPage<HomePageProps> = () => {
   const router = useRouter();
   const { user, profiles } = useAuthContext();
-  const [seeUser, setSeeUser] = useState<Profile | null>(null);
   const users = profiles.filter((item) => item.id != user?.id);
-
-  const UserModal = (): JSX.Element => {
-    return (
-      <div className="modal">
-        <div className="modal-box pt-2 px-2">
-          <UserProfile target={seeUser} setTarget={setSeeUser} />
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="font-kanit">
-      <header>
-        {/* <nav className="p-2 px-4">
-          <div className="flex justify-end items-center gap-4">
-            <p
-              onClick={() => router.push("/profile")}
-              className="text-gray-100 duration-200 hover:text-warning cursor-pointer text-lg"
-            >
-              {user?.username}
-            </p>
-            <div className="avatar">
-              <div className="w-10 rounded-full cursor-pointer">
-                <img
-                  src={user?.avatar_url}
-                  onClick={() => router.push("/profile")}
-                ></img>
-              </div>
-            </div>
-          </div>
-        </nav> */}
-      </header>
+      <header></header>
       <main className="mt-2">
         <section>
           <article className="px-2">
@@ -57,8 +27,6 @@ const Home: NextPage<HomePageProps> = () => {
                       pathname: "/[seeUser]",
                       query: { seeUser: user.id },
                     });
-                    return;
-                    setSeeUser(user);
                   }}
                 >
                   <div className="w-14 rounded-full">
@@ -76,7 +44,6 @@ const Home: NextPage<HomePageProps> = () => {
           </article>
         </section>
         <input type="checkbox" id="my-modal" className="modal-toggle" />
-        <UserModal />
       </main>
     </div>
   );

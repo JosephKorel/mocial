@@ -31,7 +31,7 @@ export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
               {group?.map((item, index) => (
                 <li
                   key={index}
-                  className="flex justify-between items-center bg-dark-600 rounded-lg py-1 px-2"
+                  className="flex justify-between items-center bg-dark-600 rounded-lg py-1 px-2 shadow-sm shadow-black"
                 >
                   <div className="avatar">
                     <div className="w-10 border-2 border-primary rounded-full">
