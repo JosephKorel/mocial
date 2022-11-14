@@ -1,5 +1,6 @@
 export type HomePageProps = {
   profiles: Profile[];
+  user: Profile;
 };
 
 export interface Profile {

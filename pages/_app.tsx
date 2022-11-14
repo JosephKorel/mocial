@@ -4,6 +4,10 @@ import Head from "next/head";
 import ContextProvider from "../src/context";
 import { BottomNav } from "../src/components/BottomNav";
 import { Alert } from "../src/components/Alert";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+export const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -15,9 +19,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
       </Head>
       <ContextProvider>
-        <Component {...pageProps} />
-        <BottomNav />
-        <Alert />
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={true} />
+          <Component {...pageProps} />
+          <BottomNav />
+          <Alert />
+        </QueryClientProvider>
       </ContextProvider>
     </>
   );

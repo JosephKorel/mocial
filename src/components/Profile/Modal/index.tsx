@@ -4,6 +4,13 @@ import { Profile } from "../../../../models/interfaces";
 import React, { useState } from "react";
 import { useAuthContext } from "../../../context";
 import { supabase } from "../../../../utils/supabaseClient";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import {
+  getUser,
+  ProfilePayload,
+  updateUser,
+} from "../../../../pages/api/query-tools";
+import { userUserMutation, useUser } from "../../../../utils/Hooks";
 
 interface UsersModal {
   modalProps: {
@@ -87,7 +94,16 @@ interface BgModal {
 export const BackgroundModal = ({ bgProps }: BgModal): JSX.Element => {
   const [selected, setSelected] = useState("");
   const { open, setOpen } = bgProps;
-  const { user, setError, setUser } = useAuthContext();
+  const { setError, setUser } = useAuthContext();
+  const { data, isLoading } = useUser();
+  const useUpdate = userUserMutation();
+
+  const user = isLoading ? ({} as Profile) : (data as Profile);
+
+  const onUpdate = (payload: ProfilePayload) => {
+    useUpdate.mutate(payload);
+  };
+
   let coverImages: string[] = [];
   user?.albums.forEach((album) => coverImages.push(album.cover.lg));
   user?.musics.forEach((music) => coverImages.push(music.cover.lg));
@@ -99,12 +115,8 @@ export const BackgroundModal = ({ bgProps }: BgModal): JSX.Element => {
     }
 
     try {
-      await supabase
-        .from("profiles")
-        .update({ background: selected })
-        .eq("id", user?.id);
-
-      setUser({ ...user!, background: selected });
+      const payload = { id: user.id, background: selected };
+      onUpdate(payload);
 
       const closeBtn = document.getElementById(
         "closeBgModal"

@@ -12,11 +12,19 @@ import {
   BackgroundModal,
   FollowerFollowing,
 } from "../src/components/Profile/Modal";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { useProfiles, useUser } from "../utils/Hooks";
 
 const Account: NextPage = () => {
-  const { user, setUser, profiles, setProfiles } = useAuthContext();
+  const { setUser, profiles, setProfiles } = useAuthContext();
   const [open, setOpen] = useState(false);
   const [seeing, setSeeing] = useState("");
+  const { data: thisUser, isLoading } = useUser();
+  const { data: users } = useProfiles();
+  const queryClient = useQueryClient();
+
+  const user = isLoading ? ({} as Profile) : (thisUser as Profile);
+
   const background = user?.background
     ? user.background
     : user?.albums[0].cover.lg;

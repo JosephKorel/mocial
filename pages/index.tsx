@@ -4,9 +4,11 @@ import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/router";
 import { useAuthContext } from "../src/context";
 import { HomePageProps, Profile } from "../models/interfaces";
+import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
+import { getProfiles, ProfilePayload } from "./api/query-tools";
+import { getUser, useUser } from "../utils/Hooks";
 
 const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { setUser, setProfiles } = useAuthContext();
 
@@ -54,12 +56,6 @@ const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
 export default InitialPage;
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const getProfiles = async () => {
-    let { data, error, status } = await supabase.from("profiles").select();
-
-    return data as Profile[];
-  };
-
   const profiles = await getProfiles();
 
   return {
