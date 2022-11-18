@@ -33,7 +33,12 @@ export const getUser = async (): Promise<Profile | PostgrestError | null> => {
 };
 
 export const updateUser = async (payload: ProfilePayload) => {
-  console.log(payload);
+  let { error, data } = await supabase.from("profiles").upsert(payload);
+
+  return error ? error : data;
+};
+
+export const updateProfiles = async (payload: Profile[]) => {
   let { error, data } = await supabase.from("profiles").upsert(payload);
 
   return error ? error : data;

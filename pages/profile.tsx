@@ -4,7 +4,7 @@ import { MdArrowBackIos } from "react-icons/md";
 import { VscSignOut } from "react-icons/vsc";
 import { useAuthContext } from "../src/context/index";
 import { supabase } from "../utils/supabaseClient";
-import { BsBoxArrowInUpRight, BsThreeDots } from "react-icons/bs";
+import { BsThreeDots } from "react-icons/bs";
 import { IoMdImages } from "react-icons/io";
 import { useState } from "react";
 import { Profile } from "../models/interfaces";
@@ -12,18 +12,17 @@ import {
   BackgroundModal,
   FollowerFollowing,
 } from "../src/components/Profile/Modal";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { useProfiles, useUser } from "../utils/Hooks";
+import { useUser } from "../utils/Hooks";
+import { RenderAlbums, RenderMusics } from "../src/components/Profile/Visuals";
 
 const Account: NextPage = () => {
   const { setUser, profiles, setProfiles } = useAuthContext();
   const [open, setOpen] = useState(false);
   const [seeing, setSeeing] = useState("");
-  const { data: thisUser, isLoading } = useUser();
-  const { data: users } = useProfiles();
-  const queryClient = useQueryClient();
-
-  const user = isLoading ? ({} as Profile) : (thisUser as Profile);
+  const [option, setOption] = useState(1);
+  const { data, isLoading } = useUser();
+  if (isLoading) return <div></div>;
+  const user = data as Profile;
 
   const background = user?.background
     ? user.background
@@ -153,82 +152,45 @@ const Account: NextPage = () => {
       </header>
       <main className="px-1 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 -translate-y-4 pb-14">
         <section>
-          <h1 className="ml-2 lg:ml-0 text-2xl font-thin lg:text-left lg:text-3xl text-danube">
-            ÁLBUNS
-          </h1>
+          <div className="tabs">
+            <a
+              className={`tab font-thin text-xl duration-100 ${
+                option == 1 && "text-danube text-2xl tab-active"
+              }`}
+              onClick={() => setOption(1)}
+            >
+              ÁLBUNS
+            </a>
+            <a
+              className={`tab font-thin text-xl duration-100 ${
+                option == 2 && "text-danube tab-active text-2xl"
+              }`}
+              onClick={() => setOption(2)}
+            >
+              MÚSICAS
+            </a>
+          </div>
           <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md w-full">
             <ul className="carousel gap-4">
-              {user?.albums.map((album, index) => (
-                <li
-                  key={index}
-                  className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32"
-                >
-                  <figure className="">
-                    <img
-                      src={album.cover.md}
-                      alt={album.name}
-                      className="h-32 lg:h-52 rounded-md"
-                    ></img>
-                  </figure>
-                  <div className="self-start">
-                    <h2
-                      className={`text-gray-100 ${
-                        album.name.length > 20 && "text-xs"
-                      }`}
-                    >
-                      {album.name}
-                    </h2>
-                    <p className="text-sm text-gray-400">
-                      {album.artist.map((artist, index) => (
-                        <span key={index}>{artist}</span>
-                      ))}
-                    </p>
-                  </div>
-                </li>
-              ))}
+              {option == 1 ? (
+                <>
+                  {user.albums.map((album, index) => (
+                    <RenderAlbums album={album} index={index} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  {user.musics.map((music, index) => (
+                    <RenderMusics music={music} index={index} />
+                  ))}
+                </>
+              )}
             </ul>
           </article>
         </section>
         <section className="mt-10 px-1">
-          <h1 className="ml-2 lg:ml-0 font-thin text-2xl lg:text-left lg:text-3xl text-danube">
-            MÚSICAS
-          </h1>
-          <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md">
-            <ul className="carousel gap-4">
-              {user?.musics.map((music, index) => (
-                <li
-                  key={index}
-                  className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32"
-                >
-                  <figure>
-                    <img
-                      src={music.cover.md}
-                      alt={music.name}
-                      className="h-32 lg:h-52 rounded-md"
-                    ></img>
-                  </figure>
-                  <div className="self-start">
-                    <h2
-                      className={`text-gray-100 ${
-                        music.name.length > 20 && "text-xs"
-                      }`}
-                    >
-                      {music.name}
-                    </h2>
-                    <p
-                      className={`text-sm text-gray-400 ${
-                        music.artist.length > 1 && "text-xs"
-                      }`}
-                    >
-                      {music.artist.map((artist, index) => (
-                        <span key={index}>{artist}</span>
-                      ))}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </article>
+          <h1 className="text-2xl text-danube font-thin">SUGESTÕES</h1>
+          <article></article>
         </section>
       </main>
       <BackgroundModal bgProps={{ open, setOpen }} />

@@ -10,7 +10,7 @@ import {
   ProfilePayload,
   updateUser,
 } from "../../../../pages/api/query-tools";
-import { userUserMutation, useUser } from "../../../../utils/Hooks";
+import { useUserMutation, useUser } from "../../../../utils/Hooks";
 
 interface UsersModal {
   modalProps: {
@@ -94,9 +94,9 @@ interface BgModal {
 export const BackgroundModal = ({ bgProps }: BgModal): JSX.Element => {
   const [selected, setSelected] = useState("");
   const { open, setOpen } = bgProps;
-  const { setError, setUser } = useAuthContext();
+  const { setError } = useAuthContext();
   const { data, isLoading } = useUser();
-  const useUpdate = userUserMutation();
+  const useUpdate = useUserMutation();
 
   const user = isLoading ? ({} as Profile) : (data as Profile);
 
