@@ -166,3 +166,35 @@ export const BackgroundModal = ({ bgProps }: BgModal): JSX.Element => {
     </div>
   );
 };
+
+export const SuggestModal = (): JSX.Element => {
+  const router = useRouter();
+
+  return (
+    <div>
+      <input type="checkbox" id="suggest-modal" className="modal-toggle" />
+      <div className={`modal`}>
+        <div className="modal-box font-kanit">
+          <h3 className="text-lg">Nova sugestão</h3>
+          <div className="mt-4">
+            <ul className="flex flex-col gap-2 p-2 bg-dark rounded-md h-[26rem]"></ul>
+          </div>
+          <div className="modal-action flex justify-between font-kanit">
+            <label
+              htmlFor="suggest-modal"
+              className="btn btn-sm btn-outline btn-error"
+            >
+              Fechar
+            </label>
+            {/* <label
+                className="btn btn-sm btn-outline btn-primary"
+            
+              >
+                Confirmar
+              </label> */}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

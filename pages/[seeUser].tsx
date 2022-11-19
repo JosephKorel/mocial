@@ -1,9 +1,12 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { MdArrowBackIos } from "react-icons/md";
+import { MdArrowBackIos, MdRecommend } from "react-icons/md";
 import { Profile } from "../models/interfaces";
-import { FollowerFollowing } from "../src/components/Profile/Modal";
+import {
+  FollowerFollowing,
+  SuggestModal,
+} from "../src/components/Profile/Modal";
 import { BsArrowLeftRight } from "react-icons/bs";
 import { useProfileMutation, useProfiles, useUser } from "../utils/Hooks";
 import { RenderAlbums, RenderMusics } from "../src/components/Profile/Visuals";
@@ -107,7 +110,7 @@ const Profile: NextPage = () => {
             <span>{isFollowing ? "SEGUINDO" : "SEGUIR"}</span>
           </button>
         </div>
-        <div className="w-full h-12 bg-dark-600 absolute top-[60%] -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
+        <div className="w-full h-12 bg-dark-600 absolute top-1/2 -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
         <div className="flex justify-center z-10">
           <div className="avatar relative z-10">
             <div className="w-20 rounded-full border-4 border-danube">
@@ -126,48 +129,83 @@ const Profile: NextPage = () => {
               {target?.username}
             </h2>
           </div>
-          <article className="w-2/3 m-auto">
+
+          <article className="px-2">
+            <ul className="flex justify-center items-center gap-1">
+              {target.genres.map((genre) => (
+                <li>
+                  <span className="badge badge-sm badge-secondary badge-outline">
+                    {genre}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </article>
+          <article className="w-2/3 m-auto mt-4">
             <ul className="flex justify-between items-center">
-              <li className="w-fit font-thin p-1 text-xs rounded-md">
+              <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
+                <span className="font-normal text-base">0</span>
                 <label
                   htmlFor="friend-modal"
                   onClick={() => setSeeing("followers")}
                 >
-                  {target.followers.length} SEGUIDORES
+                  POSTS
                 </label>
               </li>
-              <li className="divider divider-horizontal"></li>
-              <li className="w-fit font-thin p-1 text-xs rounded-md">
+              <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
+                <span className="font-normal text-base">
+                  {target.followers.length}
+                </span>
+                <label
+                  htmlFor="friend-modal"
+                  onClick={() => setSeeing("followers")}
+                >
+                  SEGUIDORES
+                </label>
+              </li>
+              <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
+                <span className="font-normal text-base">
+                  {target.following.length}
+                </span>
                 <label
                   htmlFor="friend-modal"
                   onClick={() => setSeeing("following")}
                 >
-                  SEGUINDO {target.following.length}
+                  SEGUINDO
                 </label>
               </li>
             </ul>
           </article>
         </div>
       </header>
-      <main className="px-2 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 -translate-y-4 pb-14">
+      <main className="px-2 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 -translate-y-4 pb-14 mt-4">
         <section>
-          <div className="tabs">
-            <a
-              className={`tab font-thin text-xl duration-100 ${
-                option == 1 && "text-danube text-2xl tab-active"
-              }`}
-              onClick={() => setOption(1)}
+          <div className="flex justify-between items-center">
+            <div className="tabs">
+              <a
+                className={`tab font-thin text-xl duration-100 ${
+                  option == 1 && "text-danube text-2xl tab-active"
+                }`}
+                onClick={() => setOption(1)}
+              >
+                ÁLBUNS
+              </a>
+              <a
+                className={`tab font-thin text-xl duration-100 ${
+                  option == 2 && "text-danube tab-active text-2xl"
+                }`}
+                onClick={() => setOption(2)}
+              >
+                MÚSICAS
+              </a>
+            </div>
+            <label
+              className="btn btn-xs btn-primary btn-outline gap-1"
+              htmlFor="suggest-modal"
             >
-              ÁLBUNS
-            </a>
-            <a
-              className={`tab font-thin text-xl duration-100 ${
-                option == 2 && "text-danube tab-active text-2xl"
-              }`}
-              onClick={() => setOption(2)}
-            >
-              MÚSICAS
-            </a>
+              SUGERIR
+              <MdRecommend />
+            </label>
           </div>
           <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md w-full">
             <ul className="carousel gap-4">
@@ -187,13 +225,14 @@ const Profile: NextPage = () => {
             </ul>
           </article>
         </section>
-        <section className="mt-10">
+        {/* <section className="mt-10">
           <h1 className="ml-2 lg:ml-0 font-thin text-2xl lg:text-left lg:text-3xl text-danube">
-            MÚSICAS
+            SUGESTÕES
           </h1>
-        </section>
+        </section> */}
       </main>
       <FollowerFollowing modalProps={{ seeing, followers, following }} />
+      <SuggestModal />
     </div>
   );
 };
