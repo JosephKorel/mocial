@@ -15,8 +15,26 @@ export interface ProfilePayload {
   background?: string;
 }
 
+export const getAccessToken = async () => {
+  const parameters = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `grant_type=client_credentials&client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&client_secret=${process.env.NEXT_PUBLIC_CLIENT_SECRET}`,
+  };
+  const onFetch = await fetch(
+    "https://accounts.spotify.com/api/token",
+    parameters
+  );
+
+  const data = await onFetch.json();
+
+  return data.access_token;
+};
+
 export const getProfiles = async (): Promise<Profile[] | null> => {
-  let { data, error } = await supabase.from("profiles").select();
+  let { data } = await supabase.from("profiles").select();
   return data;
 };
 

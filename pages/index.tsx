@@ -1,16 +1,20 @@
 import type { GetServerSideProps, NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/router";
-import { useAuthContext } from "../src/context";
-import { HomePageProps, Profile } from "../models/interfaces";
-import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
-import { getProfiles, ProfilePayload } from "./api/query-tools";
-import { getUser, useUser } from "../utils/Hooks";
+import { HomePageProps } from "../models/interfaces";
+import { useQuery } from "@tanstack/react-query";
+import { getProfiles, getUser } from "./api/query-tools";
+import { useUser } from "../utils/Hooks";
 
 const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
   const router = useRouter();
-  const { setUser, setProfiles } = useAuthContext();
+  const { data } = useQuery({
+    queryKey: ["profiles"],
+    queryFn: getProfiles,
+    initialData: profiles,
+  });
+  const {} = useUser();
 
   useEffect(() => {
     let mounted = true;
@@ -37,15 +41,8 @@ const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
   }, []);
 
   const checkUser = async (id: string) => {
-    let { data, error, status } = await supabase
-      .from("profiles")
-      .select()
-      .eq("id", id)
-      .single();
-
-    if (data) {
-      setProfiles(profiles);
-      setUser(data);
+    const hasData = await getUser();
+    if (hasData) {
       return true;
     } else return false;
   };

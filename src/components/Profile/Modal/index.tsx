@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { BsBoxArrowInUpRight } from "react-icons/bs";
-import { Profile } from "../../../../models/interfaces";
+import { Music, Profile } from "../../../../models/interfaces";
 import React, { useState } from "react";
 import { useAuthContext } from "../../../context";
 import { supabase } from "../../../../utils/supabaseClient";
@@ -10,7 +10,12 @@ import {
   ProfilePayload,
   updateUser,
 } from "../../../../pages/api/query-tools";
-import { useUserMutation, useUser } from "../../../../utils/Hooks";
+import {
+  useUserMutation,
+  useUser,
+  useToken,
+  useSongs,
+} from "../../../../utils/Hooks";
 
 interface UsersModal {
   modalProps: {
@@ -168,17 +173,36 @@ export const BackgroundModal = ({ bgProps }: BgModal): JSX.Element => {
 };
 
 export const SuggestModal = (): JSX.Element => {
-  const router = useRouter();
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<Music[]>([]);
+  const token = useToken();
+  const { data, isLoading, refetch } = useSongs(search, token);
 
+  const handleSearch = (text: string) => {
+    setSearch(text);
+    refetch();
+  };
+
+  console.log(data);
   return (
     <div>
       <input type="checkbox" id="suggest-modal" className="modal-toggle" />
       <div className={`modal`}>
         <div className="modal-box font-kanit">
           <h3 className="text-lg">Nova sugestão</h3>
-          <div className="mt-4">
-            <ul className="flex flex-col gap-2 p-2 bg-dark rounded-md h-[26rem]"></ul>
-          </div>
+          <input
+            value={search}
+            onChange={(e) => handleSearch(e.currentTarget.value)}
+            placeholder="Procurar álbum ou música"
+            className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+          />
+          <section className="mt-4">
+            <ul className="flex flex-col gap-2 p-2 bg-dark rounded-md h-[26rem]">
+              {results.map((result, index) => (
+                <li key={index}></li>
+              ))}
+            </ul>
+          </section>
           <div className="modal-action flex justify-between font-kanit">
             <label
               htmlFor="suggest-modal"
