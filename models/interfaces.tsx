@@ -30,6 +30,14 @@ export interface Albums {
   cover: CoverImg;
 }
 
+export interface Suggestion {
+  id: string;
+  name: string;
+  artist: string[];
+  cover: CoverImg;
+  type: string;
+}
+
 export interface CoverImg {
   sm: string;
   md: string;

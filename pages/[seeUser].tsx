@@ -203,7 +203,7 @@ const Profile: NextPage = () => {
               className="btn btn-xs btn-primary btn-outline gap-1"
               htmlFor="suggest-modal"
             >
-              SUGERIR
+              SUGERIR {option == 1 ? "ALBUM" : "MÚSICA"}
               <MdRecommend />
             </label>
           </div>
@@ -232,7 +232,7 @@ const Profile: NextPage = () => {
         </section> */}
       </main>
       <FollowerFollowing modalProps={{ seeing, followers, following }} />
-      <SuggestModal />
+      <SuggestModal option={option} />
     </div>
   );
 };

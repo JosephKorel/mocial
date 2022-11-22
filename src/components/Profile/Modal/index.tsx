@@ -1,21 +1,25 @@
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { BsBoxArrowInUpRight } from "react-icons/bs";
-import { Music, Profile } from "../../../../models/interfaces";
+import {
+  Albums,
+  CoverImg,
+  Music,
+  Profile,
+  Suggestion,
+} from "../../../../models/interfaces";
 import React, { useState } from "react";
 import { useAuthContext } from "../../../context";
-import { supabase } from "../../../../utils/supabaseClient";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import {
-  getUser,
-  ProfilePayload,
-  updateUser,
-} from "../../../../pages/api/query-tools";
+import { ProfilePayload } from "../../../../pages/api/query-tools";
 import {
   useUserMutation,
   useUser,
   useToken,
   useSongs,
+  useAlbums,
 } from "../../../../utils/Hooks";
+import { MdOutlineLibraryAdd } from "react-icons/md";
+import { formatAlbums, formatMusic } from "../../../../utils/Tools";
 
 interface UsersModal {
   modalProps: {
@@ -172,23 +176,41 @@ export const BackgroundModal = ({ bgProps }: BgModal): JSX.Element => {
   );
 };
 
-export const SuggestModal = (): JSX.Element => {
+export const SuggestModal = ({ option }: { option: number }): JSX.Element => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Music[]>([]);
+  const [selected, setSelected] = useState<Suggestion[]>([]);
   const token = useToken();
-  const { data, isLoading, refetch } = useSongs(search, token);
+  const viewing =
+    option == 1 ? useAlbums(search, token) : useSongs(search, token);
+
+  useEffect(() => {
+    if (!viewing.data) return;
+
+    if (option == 1) {
+      const albums = formatAlbums(viewing.data);
+      setResults(albums);
+      return;
+    }
+
+    const musics = formatMusic(viewing.data);
+    setResults(musics);
+  }, [viewing.data]);
 
   const handleSearch = (text: string) => {
+    if (!text) {
+      setResults([]);
+      setSearch("");
+      return;
+    }
     setSearch(text);
-    refetch();
   };
 
-  console.log(data);
   return (
     <div>
       <input type="checkbox" id="suggest-modal" className="modal-toggle" />
       <div className={`modal`}>
-        <div className="modal-box font-kanit">
+        <div className="modal-box py-3 pb-4 px-3 font-kanit">
           <h3 className="text-lg">Nova sugestão</h3>
           <input
             value={search}
@@ -197,9 +219,38 @@ export const SuggestModal = (): JSX.Element => {
             className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
           />
           <section className="mt-4">
-            <ul className="flex flex-col gap-2 p-2 bg-dark rounded-md h-[26rem]">
+            <ul className="flex flex-col justify-start gap-2 p-2 bg-dark rounded-md h-[26rem] overflow-auto">
               {results.map((result, index) => (
-                <li key={index}></li>
+                <li
+                  key={index}
+                  className="w-full m-auto relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
+                >
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={result.cover.sm}
+                      className="rounded-full w-12 lg:w-auto"
+                    ></img>
+                    <div className="flex flex-col self-start">
+                      <p
+                        className={`lg:text-lg ${
+                          result.name.length > 25 ? "text-sm" : "text-base"
+                        }`}
+                      >
+                        {result.name}
+                      </p>
+                      <p className="font-thin text-gray-400 text-sm">
+                        {result.artist.map((obj, i, arr) => {
+                          return i == arr.length - 1 ? obj : obj + ", ";
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="self-start">
+                    <button className="text-danube text-xl lg:text-2xl duration-200 lg:hover:text-danube-600">
+                      <MdOutlineLibraryAdd />
+                    </button>
+                  </div>
+                </li>
               ))}
             </ul>
           </section>

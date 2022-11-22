@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Profile } from "../../models/interfaces";
 import {
@@ -37,13 +38,42 @@ export const getSongs = async (text: string, token: string) => {
 
   const data = await onFetch.json();
 
-  console.log("calling");
+  console.log(data);
 
   return data.tracks.items;
 };
 
+export const getAlbums = async (text: string, token: string) => {
+  const parameters = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  };
+
+  const onFetch = await fetch(
+    `https://api.spotify.com/v1/search?q=${text}&type=album&limit=10`,
+    parameters
+  );
+
+  const data = await onFetch.json();
+
+  console.log(data);
+
+  return data.albums.items;
+};
+
 export const useSongs = (text: string, token: string) => {
-  return useQuery(["songs"], () => getSongs(text, token));
+  return useQuery(["songs", text], () => getSongs(text, token), {
+    keepPreviousData: true,
+  });
+};
+
+export const useAlbums = (text: string, token: string) => {
+  return useQuery(["albums", text], () => getAlbums(text, token), {
+    keepPreviousData: true,
+  });
 };
 
 export const useProfiles = () => {
