@@ -232,7 +232,7 @@ const Profile: NextPage = () => {
         </section> */}
       </main>
       <FollowerFollowing modalProps={{ seeing, followers, following }} />
-      <SuggestModal option={option} />
+      <SuggestModal option={option} targetId={target.id} />
     </div>
   );
 };

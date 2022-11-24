@@ -12,15 +12,20 @@ import {
   BackgroundModal,
   FollowerFollowing,
 } from "../src/components/Profile/Modal";
-import { useUser } from "../utils/Hooks";
-import { RenderAlbums, RenderMusics } from "../src/components/Profile/Visuals";
+import { useQueryData, useUser } from "../utils/Hooks";
+import {
+  RenderAlbums,
+  RenderMusics,
+  RenderSuggestions,
+} from "../src/components/Profile/Visuals";
 
 const Account: NextPage = () => {
-  const { setUser, profiles, setProfiles } = useAuthContext();
+  const { setUser, setProfiles } = useAuthContext();
   const [open, setOpen] = useState(false);
   const [seeing, setSeeing] = useState("");
   const [option, setOption] = useState(1);
   const { data, isLoading } = useUser();
+  const { profiles } = useQueryData(["profiles"]);
   if (isLoading) return <div></div>;
   const user = data as Profile;
 
@@ -31,8 +36,6 @@ const Account: NextPage = () => {
   const router = useRouter();
 
   const followers = (): Profile[] => {
-    if (!user) return [];
-
     const getProfiles = user.followers.reduce((acc, curr) => {
       const filter = profiles.filter((item) => item.id == curr);
       acc.push(filter[0]);
@@ -43,8 +46,6 @@ const Account: NextPage = () => {
   };
 
   const following = (): Profile[] => {
-    if (!user) return [];
-
     const getProfiles = user.following.reduce((acc, curr) => {
       const filter = profiles.filter((item) => item.id == curr);
       acc.push(filter[0]);
@@ -190,7 +191,13 @@ const Account: NextPage = () => {
         </section>
         <section className="mt-10 px-1">
           <h1 className="text-2xl text-danube font-thin">SUGESTÕES</h1>
-          <article></article>
+          <article>
+            <ul>
+              {user.suggestions.map((item, index) => (
+                <RenderSuggestions result={item} index={index} />
+              ))}
+            </ul>
+          </article>
         </section>
       </main>
       <BackgroundModal bgProps={{ open, setOpen }} />

@@ -15,6 +15,11 @@ export interface ProfilePayload {
   background?: string;
 }
 
+export interface UpdatePayload {
+  id: string;
+  body: any;
+}
+
 export const getAccessToken = async () => {
   const parameters = {
     method: "POST",
@@ -52,6 +57,15 @@ export const getUser = async (): Promise<Profile | PostgrestError | null> => {
 
 export const updateUser = async (payload: ProfilePayload) => {
   let { error, data } = await supabase.from("profiles").upsert(payload);
+
+  return error ? error : data;
+};
+
+export const userUpdate = async (payload: UpdatePayload) => {
+  const { error, data } = await supabase
+    .from("profiles")
+    .update(payload.body)
+    .eq("id", payload.id);
 
   return error ? error : data;
 };

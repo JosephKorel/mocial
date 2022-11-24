@@ -17,9 +17,12 @@ import {
   useToken,
   useSongs,
   useAlbums,
+  useQueryData,
+  useUserUpdate,
 } from "../../../../utils/Hooks";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { formatAlbums, formatMusic } from "../../../../utils/Tools";
+import { RenderMusicList } from "../Visuals";
 
 interface UsersModal {
   modalProps: {
@@ -176,10 +179,19 @@ export const BackgroundModal = ({ bgProps }: BgModal): JSX.Element => {
   );
 };
 
-export const SuggestModal = ({ option }: { option: number }): JSX.Element => {
+export const SuggestModal = ({
+  option,
+  targetId,
+}: {
+  option: number;
+  targetId: string;
+}): JSX.Element => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Music[]>([]);
   const [selected, setSelected] = useState<Suggestion[]>([]);
+  const { mutate } = useUserUpdate();
+  const { user } = useQueryData(["user"]);
+  const { setError, setSuccess } = useAuthContext();
   const token = useToken();
   const viewing =
     option == 1 ? useAlbums(search, token) : useSongs(search, token);
@@ -206,67 +218,94 @@ export const SuggestModal = ({ option }: { option: number }): JSX.Element => {
     setSearch(text);
   };
 
+  const handleSelect = (choice: Music) => {
+    const isSelected = selected.filter((item) => item.id == choice.id);
+
+    if (isSelected.length) {
+      const onFilter = selected.filter((item) => item.id != choice.id);
+      setSelected(onFilter);
+      return;
+    }
+
+    if (selected.length == 3) {
+      setError(
+        `Você só pode sugerir até três ${option == 1 ? "álbuns" : "músicas"}`
+      );
+
+      return;
+    }
+
+    setSelected([
+      ...selected,
+      {
+        ...choice,
+        sent_by: user.id,
+        type: option == 1 ? "track" : "album",
+      },
+    ]);
+
+    return;
+  };
+
+  const handleSuggestion = () => {
+    const payload = {
+      id: targetId,
+      body: { suggestions: selected },
+    };
+    try {
+      mutate(payload);
+
+      const closeBtn = document.getElementById(
+        "closeSuggestModal"
+      ) as HTMLLabelElement;
+      closeBtn.click();
+      setSuccess("Sugestões enviadas!");
+    } catch (error) {
+      setError("Houve algum erro, tente novamente");
+      console.log(error);
+    }
+  };
+
   return (
     <div>
       <input type="checkbox" id="suggest-modal" className="modal-toggle" />
       <div className={`modal`}>
-        <div className="modal-box py-3 pb-4 px-3 font-kanit">
-          <h3 className="text-lg">Nova sugestão</h3>
+        <div className="modal-box py-3 pb-4 px-4 font-kanit">
+          <h3 className="text-lg indent-1">Nova sugestão</h3>
           <input
             value={search}
             onChange={(e) => handleSearch(e.currentTarget.value)}
-            placeholder="Procurar álbum ou música"
+            placeholder={`Procurar ${option == 1 ? "álbum" : "música"}`}
             className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
           />
           <section className="mt-4">
-            <ul className="flex flex-col justify-start gap-2 p-2 bg-dark rounded-md h-[26rem] overflow-auto">
+            <ul className="flex flex-col justify-start gap-2 p-2 bg-dark rounded-md h-[24rem] overflow-auto">
               {results.map((result, index) => (
-                <li
-                  key={index}
-                  className="w-full m-auto relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={result.cover.sm}
-                      className="rounded-full w-12 lg:w-auto"
-                    ></img>
-                    <div className="flex flex-col self-start">
-                      <p
-                        className={`lg:text-lg ${
-                          result.name.length > 25 ? "text-sm" : "text-base"
-                        }`}
-                      >
-                        {result.name}
-                      </p>
-                      <p className="font-thin text-gray-400 text-sm">
-                        {result.artist.map((obj, i, arr) => {
-                          return i == arr.length - 1 ? obj : obj + ", ";
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="self-start">
-                    <button className="text-danube text-xl lg:text-2xl duration-200 lg:hover:text-danube-600">
-                      <MdOutlineLibraryAdd />
-                    </button>
-                  </div>
-                </li>
+                <RenderMusicList
+                  result={result}
+                  index={index}
+                  handleSelect={handleSelect}
+                />
               ))}
             </ul>
+            <div>
+              <p>{selected.length} selecionadas</p>
+            </div>
           </section>
           <div className="modal-action flex justify-between font-kanit">
             <label
               htmlFor="suggest-modal"
               className="btn btn-sm btn-outline btn-error"
+              id="closeSuggestModal"
             >
               Fechar
             </label>
-            {/* <label
-                className="btn btn-sm btn-outline btn-primary"
-            
-              >
-                Confirmar
-              </label> */}
+            <label
+              className="btn btn-sm btn-outline btn-primary"
+              onClick={handleSuggestion}
+            >
+              Confirmar
+            </label>
           </div>
         </div>
       </div>

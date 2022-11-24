@@ -14,6 +14,7 @@ export interface Profile {
   followers: string[];
   updated_at: Date;
   background: string;
+  suggestions: Suggestion[];
 }
 
 export interface Music {
@@ -36,6 +37,8 @@ export interface Suggestion {
   artist: string[];
   cover: CoverImg;
   type: string;
+  sent_by?: string;
+  sent_at?: Date;
 }
 
 export interface CoverImg {

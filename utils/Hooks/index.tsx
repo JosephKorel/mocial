@@ -8,6 +8,8 @@ import {
   ProfilePayload,
   updateProfiles,
   getAccessToken,
+  userUpdate,
+  UpdatePayload,
 } from "../../pages/api/query-tools";
 import { queryClient } from "../../pages/_app";
 
@@ -59,8 +61,6 @@ export const getAlbums = async (text: string, token: string) => {
 
   const data = await onFetch.json();
 
-  console.log(data);
-
   return data.albums.items;
 };
 
@@ -98,6 +98,12 @@ export const useProfileMutation = () => {
       queryClient.invalidateQueries(["profiles"]);
       queryClient.invalidateQueries(["user"]);
     },
+  });
+};
+
+export const useUserUpdate = () => {
+  return useMutation((payload: UpdatePayload) => userUpdate(payload), {
+    onSuccess: () => queryClient.invalidateQueries(["profiles"]),
   });
 };
 
