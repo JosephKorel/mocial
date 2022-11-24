@@ -2,7 +2,8 @@ import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { RiDeleteBackLine } from "react-icons/ri";
 import { Albums, Music, Suggestion } from "../../../../models/interfaces";
-import { useQueryData } from "../../../../utils/Hooks";
+import { useQueryData, useUserUpdate } from "../../../../utils/Hooks";
+import { useAuthContext } from "../../../context";
 
 export const RenderAlbums = ({
   album,
@@ -122,10 +123,10 @@ export const RenderMusicList = ({
 
 export const RenderSuggestions = ({
   result,
-  index,
+  setSuggestion,
 }: {
   result: Suggestion;
-  index: number;
+  setSuggestion: (data: Suggestion) => void;
 }) => {
   const { profiles } = useQueryData(["profiles"]);
   const sentBy = (id: string) => {
@@ -133,11 +134,9 @@ export const RenderSuggestions = ({
 
     return user.username;
   };
+
   return (
-    <li
-      key={index}
-      className="w-full m-auto relative z-10 cursor-pointer bg-dark duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
-    >
+    <li className="w-full mt-2 m-auto relative cursor-pointer bg-dark duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg">
       <div className=" flex justify-between items-center relative">
         <div className="flex items-center gap-4">
           <img
@@ -180,9 +179,12 @@ export const RenderSuggestions = ({
               </a>
             </li>
             <li>
-              <a>
+              <label
+                htmlFor="confirm-modal"
+                onClick={() => setSuggestion(result)}
+              >
                 <RiDeleteBackLine /> Remover
-              </a>
+              </label>
             </li>
           </ul>
         </div>

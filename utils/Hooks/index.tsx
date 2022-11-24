@@ -103,7 +103,10 @@ export const useProfileMutation = () => {
 
 export const useUserUpdate = () => {
   return useMutation((payload: UpdatePayload) => userUpdate(payload), {
-    onSuccess: () => queryClient.invalidateQueries(["profiles"]),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["profiles"]);
+      queryClient.invalidateQueries(["user"]);
+    },
   });
 };
 

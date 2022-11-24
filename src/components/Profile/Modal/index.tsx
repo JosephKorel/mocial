@@ -240,7 +240,7 @@ export const SuggestModal = ({
       {
         ...choice,
         sent_by: user.id,
-        type: option == 1 ? "track" : "album",
+        type: option == 1 ? "album" : "track",
       },
     ]);
 
