@@ -1,4 +1,6 @@
+import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineLibraryAdd } from "react-icons/md";
+import { RiDeleteBackLine } from "react-icons/ri";
 import { Albums, Music, Suggestion } from "../../../../models/interfaces";
 import { useQueryData } from "../../../../utils/Hooks";
 
@@ -134,9 +136,9 @@ export const RenderSuggestions = ({
   return (
     <li
       key={index}
-      className="w-full m-auto relative z-10 cursor-pointer bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
+      className="w-full m-auto relative z-10 cursor-pointer bg-dark duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
     >
-      <div className=" flex justify-between items-center">
+      <div className=" flex justify-between items-center relative">
         <div className="flex items-center gap-4">
           <img
             src={result.cover.sm}
@@ -157,14 +159,39 @@ export const RenderSuggestions = ({
             </p>
           </div>
         </div>
-        <div className="self-start">
-          <button className="text-danube text-xl lg:text-2xl duration-200 lg:hover:text-danube-600">
-            <MdOutlineLibraryAdd />
+        <div className="dropdown dropdown-end self-start">
+          <button
+            tabIndex={0}
+            className="p-1 px-2 rounded-md bg-dark-600 text-gray-100"
+          >
+            <BsThreeDots />
           </button>
+          <ul
+            tabIndex={0}
+            className="menu menu-compact dropdown-content text-gray-300 shadow bg-base-200 rounded-md w-60"
+          >
+            <li>
+              <a>
+                <MdOutlineLibraryAdd />
+                Adicionar{" "}
+                {result.type == "track"
+                  ? "às minhas músicas"
+                  : "aos meus álbuns"}
+              </a>
+            </li>
+            <li>
+              <a>
+                <RiDeleteBackLine /> Remover
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
-      <p className="text-right text-sm text-danube">
-        Sugerido por {sentBy(result.sent_by!)}
+      <p className="text-right text-sm font-light text-gray-100">
+        sugerido por{" "}
+        <span className="font-medium text-danube">
+          {sentBy(result.sent_by!)}
+        </span>
       </p>
     </li>
   );

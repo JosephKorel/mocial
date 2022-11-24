@@ -192,7 +192,7 @@ const Account: NextPage = () => {
         <section className="mt-10 px-1">
           <h1 className="text-2xl text-danube font-thin">SUGESTÕES</h1>
           <article>
-            <ul>
+            <ul className="flex flex-col gap-2 h-60 overflow-auto">
               {user.suggestions.map((item, index) => (
                 <RenderSuggestions result={item} index={index} />
               ))}
