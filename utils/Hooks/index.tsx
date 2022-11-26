@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Profile } from "../../models/interfaces";
+import { Post, Profile } from "../../models/interfaces";
 import {
   getProfiles,
   getUser,
@@ -10,12 +10,14 @@ import {
   getAccessToken,
   userUpdate,
   UpdatePayload,
+  getPosts,
 } from "../../pages/api/query-tools";
 import { queryClient } from "../../pages/_app";
 
 interface QueryData {
   user: Profile;
   profiles: Profile[];
+  posts: Post[];
 }
 
 export const useToken = (): string => {
@@ -118,4 +120,8 @@ export const useQueryData = (keys: string[]): QueryData => {
   });
 
   return data;
+};
+
+export const usePosts = () => {
+  return useQuery(["posts"], getPosts);
 };

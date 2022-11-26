@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { HomePageProps } from "../models/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { getProfiles, getUser } from "./api/query-tools";
-import { useUser } from "../utils/Hooks";
+import { usePosts, useUser } from "../utils/Hooks";
 
 const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
   const router = useRouter();
@@ -15,6 +15,19 @@ const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
     initialData: profiles,
   });
   const {} = useUser();
+  const {} = usePosts();
+
+  if (!data) {
+    router.push("/");
+    return <div></div>;
+  }
+
+  useEffect(() => {
+    if (!data) {
+      router.push("/");
+      return;
+    }
+  }, [data]);
 
   useEffect(() => {
     let mounted = true;
@@ -26,8 +39,7 @@ const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
 
       if (mounted) {
         if (session) {
-          const id = session?.user.id;
-          const hasDocument = (await checkUser(id!)) ? true : false;
+          const hasDocument = (await checkUser()) ? true : false;
           hasDocument
             ? router.push({
                 pathname: "/home",
@@ -40,7 +52,7 @@ const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
     getInitialSession();
   }, []);
 
-  const checkUser = async (id: string) => {
+  const checkUser = async () => {
     const hasData = await getUser();
     if (hasData) {
       return true;

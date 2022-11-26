@@ -5,7 +5,7 @@ import { useQueryData } from "../utils/Hooks";
 
 const Home: NextPage<HomePageProps> = () => {
   const router = useRouter();
-  const { user, profiles } = useQueryData(["user", "profiles"]);
+  const { user, profiles, posts } = useQueryData(["user", "profiles", "posts"]);
   const users = profiles.filter((item) => item.id != user?.id);
 
   return (

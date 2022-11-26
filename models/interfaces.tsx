@@ -46,3 +46,11 @@ export interface CoverImg {
   md: string;
   lg: string;
 }
+
+export interface Post {
+  id?: number;
+  author: string;
+  title: string;
+  content: string;
+  created_at: Date;
+}

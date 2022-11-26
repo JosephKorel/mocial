@@ -1,7 +1,8 @@
-import { Profile } from "../../models/interfaces";
+import { Post, Profile } from "../../models/interfaces";
 import { supabase } from "../../utils/supabaseClient";
 import { Music, Albums } from "../../models/interfaces";
 import { PostgrestError } from "@supabase/supabase-js";
+import { queryClient } from "../_app";
 
 export interface ProfilePayload {
   id: string;
@@ -72,6 +73,19 @@ export const userUpdate = async (payload: UpdatePayload) => {
 
 export const updateProfiles = async (payload: Profile[]) => {
   let { error, data } = await supabase.from("profiles").upsert(payload);
+
+  return error ? error : data;
+};
+
+export const getPosts = async () => {
+  let { error, data } = await supabase.from("posts").select();
+
+  return error ? error : (data as unknown as Post[]);
+};
+
+export const createPost = async (payload: any) => {
+  let { error, data } = await supabase.from("posts").insert(payload);
+  queryClient.invalidateQueries(["posts"]);
 
   return error ? error : data;
 };
