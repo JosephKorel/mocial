@@ -78,7 +78,7 @@ export const updateProfiles = async (payload: Profile[]) => {
 };
 
 export const getPosts = async () => {
-  let { error, data } = await supabase.from("posts").select();
+  let { error, data } = await supabase.from("posts").select("*, profiles(*)");
 
   return error ? error : (data as unknown as Post[]);
 };

@@ -39,6 +39,7 @@ export interface Suggestion {
   type: string;
   sent_by?: string;
   sent_at?: Date;
+  rate?: number;
 }
 
 export interface CoverImg {

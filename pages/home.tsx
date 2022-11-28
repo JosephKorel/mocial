@@ -8,6 +8,8 @@ const Home: NextPage<HomePageProps> = () => {
   const { user, profiles, posts } = useQueryData(["user", "profiles", "posts"]);
   const users = profiles.filter((item) => item.id != user?.id);
 
+  console.log(posts);
+
   return (
     <div className="font-kanit">
       <header></header>

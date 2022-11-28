@@ -2,7 +2,6 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { MdArrowBackIos } from "react-icons/md";
 import { VscSignOut } from "react-icons/vsc";
-import { useAuthContext } from "../src/context/index";
 import { supabase } from "../utils/supabaseClient";
 import { BsThreeDots } from "react-icons/bs";
 import { IoMdImages } from "react-icons/io";
@@ -10,20 +9,19 @@ import { useState } from "react";
 import { Profile, Suggestion } from "../models/interfaces";
 import {
   BackgroundModal,
+  ConfirmModal,
   FollowerFollowing,
+  Modal,
 } from "../src/components/Profile/Modal";
 import { useQueryData, useUser, useUserUpdate } from "../utils/Hooks";
-import {
-  RenderAlbums,
-  RenderMusics,
-  RenderSuggestions,
-} from "../src/components/Profile/Visuals";
+import { RenderAlbums, RenderMusics } from "../src/components/Profile/Visuals";
+import { RenderSuggestions } from "../src/components/Profile/Suggestion";
 
 const Account: NextPage = () => {
-  const { setUser, setProfiles } = useAuthContext();
   const [open, setOpen] = useState(false);
   const [seeing, setSeeing] = useState("");
   const [option, setOption] = useState(1);
+  const [children, setChildren] = useState<React.ReactNode | null>(null);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const { data, isLoading } = useUser();
   const { profiles } = useQueryData(["profiles"]);
@@ -59,64 +57,6 @@ const Account: NextPage = () => {
   const handleLogout = () => {
     supabase.auth.signOut();
     router.push("/login");
-    setUser(null);
-    setProfiles([]);
-  };
-
-  const ConfirmModal = ({ suggestion }: { suggestion: Suggestion | null }) => {
-    if (!suggestion) return <div></div>;
-    const { setError } = useAuthContext();
-    const { user } = useQueryData(["user"]);
-    const { mutate } = useUserUpdate();
-    const removeSong = () => {
-      const onFilter = user.suggestions.filter(
-        (item) => item.id != suggestion.id
-      );
-
-      const payload = { id: user.id, body: { suggestions: onFilter } };
-
-      try {
-        mutate(payload);
-
-        const closeBtn = document.getElementById(
-          "closeConfirmModal"
-        ) as HTMLLabelElement;
-        closeBtn.click();
-      } catch (error) {
-        setError("Houve algum erro, tente novamente");
-        console.log(error);
-      }
-    };
-    return (
-      <div>
-        <input type="checkbox" id="confirm-modal" className="modal-toggle" />
-        <div className="modal">
-          <div className="modal-box">
-            <h1>
-              Deseja mesmo remover{" "}
-              {suggestion.type == "track"
-                ? "esta música das suas sugestões?"
-                : "este álbum das suas sugestões?"}
-            </h1>
-            <div className="modal-action flex justify-between font-kanit">
-              <label
-                htmlFor="confirm-modal"
-                className="btn btn-sm btn-outline btn-error"
-                id="closeConfirmModal"
-              >
-                Fechar
-              </label>
-              <label
-                className="btn btn-sm btn-outline btn-primary"
-                onClick={removeSong}
-              >
-                Confirmar
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -255,6 +195,7 @@ const Account: NextPage = () => {
                   result={item}
                   key={index}
                   setSuggestion={setSuggestion}
+                  setChildren={setChildren}
                 />
               ))}
             </ul>
@@ -264,6 +205,7 @@ const Account: NextPage = () => {
       <BackgroundModal bgProps={{ open, setOpen }} />
       <FollowerFollowing modalProps={{ seeing, followers, following }} />
       <ConfirmModal suggestion={suggestion} />
+      <Modal children={children} />
     </div>
   );
 };

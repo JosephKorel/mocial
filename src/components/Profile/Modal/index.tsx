@@ -271,7 +271,7 @@ export const SuggestModal = ({
       <input type="checkbox" id="suggest-modal" className="modal-toggle" />
       <div className={`modal`}>
         <div className="modal-box py-3 pb-4 px-4 font-kanit">
-          <h3 className="text-lg indent-1">Nova sugestão</h3>
+          <h1 className="text-lg indent-1">Nova sugestão</h1>
           <input
             value={search}
             onChange={(e) => handleSearch(e.currentTarget.value)}
@@ -308,6 +308,81 @@ export const SuggestModal = ({
             </label>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+export const ConfirmModal = ({
+  suggestion,
+}: {
+  suggestion: Suggestion | null;
+}) => {
+  if (!suggestion) return <div></div>;
+  const { setError } = useAuthContext();
+  const { user } = useQueryData(["user"]);
+  const { mutate } = useUserUpdate();
+  const removeSong = () => {
+    const onFilter = user.suggestions.filter(
+      (item) => item.id != suggestion.id
+    );
+
+    const payload = { id: user.id, body: { suggestions: onFilter } };
+
+    try {
+      mutate(payload);
+
+      const closeBtn = document.getElementById(
+        "closeConfirmModal"
+      ) as HTMLLabelElement;
+      closeBtn.click();
+    } catch (error) {
+      setError("Houve algum erro, tente novamente");
+      console.log(error);
+    }
+  };
+  return (
+    <div>
+      <input type="checkbox" id="confirm-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h1>
+            Deseja mesmo remover{" "}
+            {suggestion.type == "track"
+              ? "esta música das suas sugestões?"
+              : "este álbum das suas sugestões?"}
+          </h1>
+          <div className="modal-action flex justify-between font-kanit">
+            <label
+              htmlFor="confirm-modal"
+              className="btn btn-sm btn-outline btn-error"
+              id="closeConfirmModal"
+            >
+              Fechar
+            </label>
+            <label
+              className="btn btn-sm btn-outline btn-primary"
+              onClick={removeSong}
+            >
+              Confirmar
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Modal = ({ children }: { children: React.ReactNode }) => {
+  const { setError } = useAuthContext();
+  const { user } = useQueryData(["user"]);
+  const { mutate } = useUserUpdate();
+
+  return (
+    <div>
+      <input type="checkbox" id="general-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">{children}</div>
       </div>
     </div>
   );
