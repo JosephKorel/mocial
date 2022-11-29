@@ -25,14 +25,13 @@ const Account: NextPage = () => {
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const { data, isLoading } = useUser();
   const { profiles } = useQueryData(["profiles"]);
+  const router = useRouter();
   if (isLoading) return <div></div>;
   const user = data as Profile;
 
   const background = user?.background
     ? user.background
     : user?.albums[0].cover.lg;
-
-  const router = useRouter();
 
   const followers = (): Profile[] => {
     const getProfiles = user.followers.reduce((acc, curr) => {
@@ -173,13 +172,13 @@ const Account: NextPage = () => {
               {option == 1 ? (
                 <>
                   {user.albums.map((album, index) => (
-                    <RenderAlbums album={album} index={index} />
+                    <RenderAlbums album={album} key={index} />
                   ))}
                 </>
               ) : (
                 <>
                   {user.musics.map((music, index) => (
-                    <RenderMusics music={music} index={index} />
+                    <RenderMusics music={music} key={index} />
                   ))}
                 </>
               )}

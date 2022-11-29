@@ -282,8 +282,8 @@ export const SuggestModal = ({
             <ul className="flex flex-col justify-start gap-2 p-2 bg-dark rounded-md h-[24rem] overflow-auto">
               {results.map((result, index) => (
                 <RenderMusicList
+                  key={index}
                   result={result}
-                  index={index}
                   handleSelect={handleSelect}
                 />
               ))}

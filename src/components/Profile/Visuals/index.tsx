@@ -1,25 +1,10 @@
-import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineLibraryAdd } from "react-icons/md";
-import { RiDeleteBackLine } from "react-icons/ri";
-import { TiThumbsOk, TiThumbsUp, TiThumbsDown } from "react-icons/ti";
-import { Albums, Music, Suggestion } from "../../../../models/interfaces";
-import { useQueryData, useUserUpdate } from "../../../../utils/Hooks";
-import { GrStar } from "react-icons/gr";
-import { useState } from "react";
-import { useAuthContext } from "../../../context";
 
-export const RenderAlbums = ({
-  album,
-  index,
-}: {
-  album: Albums;
-  index: number;
-}) => {
+import { Albums, Music } from "../../../../models/interfaces";
+
+export const RenderAlbums = ({ album }: { album: Albums }) => {
   return (
-    <li
-      key={index}
-      className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32"
-    >
+    <li className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32">
       <figure className="">
         <img
           src={album.cover.md}
@@ -41,18 +26,9 @@ export const RenderAlbums = ({
   );
 };
 
-export const RenderMusics = ({
-  music,
-  index,
-}: {
-  music: Music;
-  index: number;
-}) => {
+export const RenderMusics = ({ music }: { music: Music }) => {
   return (
-    <li
-      key={index}
-      className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32"
-    >
+    <li className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32">
       <figure>
         <img
           src={music.cover.md}
@@ -80,18 +56,13 @@ export const RenderMusics = ({
 
 export const RenderMusicList = ({
   result,
-  index,
   handleSelect,
 }: {
   result: Music;
-  index: number;
   handleSelect: (data: Music) => void;
 }) => {
   return (
-    <li
-      key={index}
-      className="w-full m-auto relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg"
-    >
+    <li className="w-full m-auto relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg">
       <div className="flex items-center gap-4">
         <img
           src={result.cover.sm}

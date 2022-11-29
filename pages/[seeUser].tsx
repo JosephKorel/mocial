@@ -132,8 +132,8 @@ const Profile: NextPage = () => {
 
           <article className="px-2">
             <ul className="flex justify-center items-center gap-1">
-              {target.genres.map((genre) => (
-                <li>
+              {target.genres.map((genre, index) => (
+                <li key={index}>
                   <span className="badge badge-sm badge-secondary badge-outline">
                     {genre}
                   </span>
@@ -212,24 +212,19 @@ const Profile: NextPage = () => {
               {option == 1 ? (
                 <>
                   {target.albums.map((album, index) => (
-                    <RenderAlbums album={album} index={index} />
+                    <RenderAlbums album={album} key={index} />
                   ))}
                 </>
               ) : (
                 <>
                   {target.musics.map((music, index) => (
-                    <RenderMusics music={music} index={index} />
+                    <RenderMusics music={music} key={index} />
                   ))}
                 </>
               )}
             </ul>
           </article>
         </section>
-        {/* <section className="mt-10">
-          <h1 className="ml-2 lg:ml-0 font-thin text-2xl lg:text-left lg:text-3xl text-danube">
-            SUGESTÕES
-          </h1>
-        </section> */}
       </main>
       <FollowerFollowing modalProps={{ seeing, followers, following }} />
       <SuggestModal option={option} targetId={target.id} />

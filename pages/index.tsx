@@ -17,18 +17,6 @@ const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
   const {} = useUser();
   const {} = usePosts();
 
-  if (!data) {
-    router.push("/");
-    return <div></div>;
-  }
-
-  useEffect(() => {
-    if (!data) {
-      router.push("/");
-      return;
-    }
-  }, [data]);
-
   useEffect(() => {
     let mounted = true;
 
