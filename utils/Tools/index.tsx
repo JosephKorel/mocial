@@ -2,6 +2,7 @@ import { Albums, CoverImg, Music } from "../../models/interfaces";
 
 export const formatMusic = (data: any[]) => {
   let musics: Music[] = [];
+  if (!data) return [];
   data.forEach((item: any) => {
     let artists: string[] = [];
     const coverImg: CoverImg = {
@@ -26,6 +27,7 @@ export const formatMusic = (data: any[]) => {
 
 export const formatAlbums = (data: any[]) => {
   let albums: Albums[] = [];
+  if (!data) return [];
   data.forEach((item: any) => {
     let artists: string[] = [];
     const coverImg: CoverImg = {

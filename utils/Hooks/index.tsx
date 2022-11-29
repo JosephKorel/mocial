@@ -42,8 +42,6 @@ export const getSongs = async (text: string, token: string) => {
 
   const data = await onFetch.json();
 
-  console.log(data);
-
   return data.tracks.items;
 };
 

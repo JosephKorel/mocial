@@ -197,8 +197,6 @@ export const SuggestModal = ({
   const { data: musics } = useSongs(search, token);
 
   useEffect(() => {
-    /*   if (!viewing.data) return; */
-
     if (option == 1) {
       const showAlbums = formatAlbums(albums);
       setResults(showAlbums);
