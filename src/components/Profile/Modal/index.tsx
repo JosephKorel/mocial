@@ -193,21 +193,21 @@ export const SuggestModal = ({
   const { user } = useQueryData(["user"]);
   const { setError, setSuccess } = useAuthContext();
   const token = useToken();
-  const viewing =
-    option == 1 ? useAlbums(search, token) : useSongs(search, token);
+  const { data: albums } = useAlbums(search, token);
+  const { data: musics } = useSongs(search, token);
 
   useEffect(() => {
-    if (!viewing.data) return;
+    /*   if (!viewing.data) return; */
 
     if (option == 1) {
-      const albums = formatAlbums(viewing.data);
-      setResults(albums);
+      const showAlbums = formatAlbums(albums);
+      setResults(showAlbums);
       return;
     }
 
-    const musics = formatMusic(viewing.data);
-    setResults(musics);
-  }, [viewing.data]);
+    const showMusics = formatMusic(musics);
+    setResults(showMusics);
+  }, [albums, musics]);
 
   const handleSearch = (text: string) => {
     if (!text) {
@@ -318,10 +318,10 @@ export const ConfirmModal = ({
 }: {
   suggestion: Suggestion | null;
 }) => {
-  if (!suggestion) return <div></div>;
   const { setError } = useAuthContext();
   const { user } = useQueryData(["user"]);
   const { mutate } = useUserUpdate();
+  if (!suggestion) return <div></div>;
   const removeSong = () => {
     const onFilter = user.suggestions.filter(
       (item) => item.id != suggestion.id

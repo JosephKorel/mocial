@@ -204,7 +204,10 @@ const Account: NextPage = () => {
       <BackgroundModal bgProps={{ open, setOpen }} />
       <FollowerFollowing modalProps={{ seeing, followers, following }} />
       <ConfirmModal suggestion={suggestion} />
-      <Modal children={children} />
+      {
+        // eslint-disable-next-line
+        <Modal children={children} />
+      }
     </div>
   );
 };

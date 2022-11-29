@@ -6,9 +6,11 @@ import { useQueryData } from "../utils/Hooks";
 const Home: NextPage<HomePageProps> = () => {
   const router = useRouter();
   const { user, profiles, posts } = useQueryData(["user", "profiles", "posts"]);
-  const users = profiles.filter((item) => item.id != user?.id);
+  if (!profiles) {
+    return <div></div>;
+  }
 
-  console.log(posts);
+  const users = profiles.filter((item) => item.id != user?.id);
 
   return (
     <div className="font-kanit">
