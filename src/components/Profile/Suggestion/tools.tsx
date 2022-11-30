@@ -21,11 +21,12 @@ interface SuggestionTools {
     user: Profile;
     mutate: (data: any) => void;
     result: Suggestion;
+    setSuccess: (data: string) => void;
   };
 }
 
 export const addSuggestion = ({ add }: SuggestionTools) => {
-  const { user, result, mutate } = add!;
+  const { user, result, mutate, setSuccess } = add!;
   switch (result.type) {
     case "track":
       const song: Music = {
@@ -43,6 +44,7 @@ export const addSuggestion = ({ add }: SuggestionTools) => {
 
       try {
         mutate(payload);
+        setSuccess("Música adicionada");
       } catch (error) {
         throw new Error();
       }
@@ -60,11 +62,12 @@ export const addSuggestion = ({ add }: SuggestionTools) => {
 
       const albumPayload = {
         id: user.id,
-        body: { musics: albums },
+        body: { albums },
       };
 
       try {
         mutate(albumPayload);
+        setSuccess("Álbum adicionado");
       } catch (error) {
         throw new Error();
       }
@@ -92,7 +95,7 @@ export const rateSuggestion = ({ rate }: SuggestionTools) => {
     return;
   }
 
-  const addParams = { user, result, mutate };
+  const addParams = { user, result, mutate, setSuccess };
 
   if (step == 1) {
     try {
@@ -116,7 +119,6 @@ export const rateSuggestion = ({ rate }: SuggestionTools) => {
 
   try {
     addSuggestion({ add: addParams });
-    setSuccess("Música adicionada");
     const closeBtn = document.getElementById(
       "general-modal"
     ) as HTMLLabelElement;

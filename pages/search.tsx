@@ -20,7 +20,7 @@ const Search: NextPage = () => {
     <div className="font-kanit">
       <header className="w-11/12 m-auto mt-4 relative">
         <div className="w-full bg-danube p-[2px] rounded-lg absolute left-0 top-4 z-0"></div>
-        <h1 className="text-2xl text-gray-200 font-thin rounded-full bg-dark-600 m-auto w-fit px-3 relative z-10">
+        <h1 className="text-2xl text-gray-200 font-semibold rounded-full bg-dark-600 m-auto w-fit px-3 relative z-10">
           Procurar Usuário
         </h1>
         <form className="form-control mt-2">

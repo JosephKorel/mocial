@@ -1,19 +1,60 @@
 import { NextPage } from "next";
-import React, { useState } from "react";
-import { Post } from "../../models/interfaces";
-import { useQueryData } from "../../utils/Hooks";
+import React, { useState, useEffect } from "react";
+import { AiOutlineSearch } from "react-icons/ai";
+import { Music, Post } from "../../models/interfaces";
+import {
+  ChooseSubject,
+  PostStep,
+  ResultList,
+} from "../../src/components/Posts";
+import ProtectedRoute from "../../src/components/Protector";
+import { useAlbums, useQueryData, useSongs, useToken } from "../../utils/Hooks";
+import { formatAlbums, formatMusic } from "../../utils/Tools";
 import { createPost } from "../api/query-tools";
 
 const NewPost: NextPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const { user } = useQueryData(["user", "profiles", "post"]);
+  const [option, setOption] = useState(0);
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<Music[]>([]);
+  const [selected, setSelected] = useState<Music | null>(null);
+  const [step, setStep] = useState(1);
+  const { user } = useQueryData(["user"]);
+  const token = useToken();
+  const { data: albums } = useAlbums(search, token);
+  const { data: musics } = useSongs(search, token);
+
+  const chooseProps = {
+    option,
+    setOption,
+    results,
+    selected,
+    setSelected,
+    search,
+    setSearch,
+    setResults,
+    setStep,
+  };
+
+  const postProps = { title, content, setContent, setTitle, setStep, selected };
+
+  useEffect(() => {
+    if (option == 1) {
+      const showMusics = formatMusic(musics);
+      setResults(showMusics);
+
+      return;
+    }
+
+    const showAlbums = formatAlbums(albums);
+    setResults(showAlbums);
+  }, [musics, albums]);
 
   const handleCreate = async () => {
     const payload: Post = {
       title,
       content,
-      created_at: new Date(),
       author: user.id,
     };
 
@@ -27,36 +68,11 @@ const NewPost: NextPage = () => {
   };
 
   return (
-    <div>
-      <header>
-        <h1>Nova publicação</h1>
-      </header>
-      <main>
-        <section>
-          <div className="flex flex-col">
-            <label>Título</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.currentTarget.value)}
-              className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
-            />
-          </div>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.currentTarget.value)}
-            className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
-          />
-        </section>
-        <div>
-          <button
-            className="btn btn-primary btn-outline btn-sm"
-            onClick={handleCreate}
-          >
-            Publicar
-          </button>
-        </div>
-      </main>
-    </div>
+    <ProtectedRoute>
+      <div className="font-kanit py-2">
+        <PostStep step={step} chooseProps={chooseProps} postProps={postProps} />
+      </div>
+    </ProtectedRoute>
   );
 };
 

@@ -47,13 +47,14 @@ export const getProfiles = async (): Promise<Profile[] | null> => {
 export const getUser = async (): Promise<Profile | PostgrestError | null> => {
   const onFetch = await supabase.auth.getUser();
   const userId = onFetch.data.user?.id;
+  if (!userId) throw new Error();
   let { data, error } = await supabase
     .from("profiles")
     .select()
     .eq("id", userId)
     .single();
 
-  return data ? data : error;
+  return data;
 };
 
 export const updateUser = async (payload: ProfilePayload) => {

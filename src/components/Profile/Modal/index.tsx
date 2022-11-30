@@ -27,15 +27,15 @@ import { RenderMusicList } from "../Visuals";
 interface UsersModal {
   modalProps: {
     seeing: string;
-    followers: () => Profile[];
-    following: () => Profile[];
+    followers: Profile[];
+    following: Profile[];
   };
 }
 
 export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
   const { seeing, followers, following } = modalProps;
   const title = seeing == "followers" ? "Seguidores" : "Seguindo";
-  const group = seeing == "followers" ? followers() : following();
+  const group = seeing == "followers" ? followers : following;
 
   const router = useRouter();
 

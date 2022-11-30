@@ -7,6 +7,7 @@ import { IoCreateOutline } from "react-icons/io5";
 export const BottomNav: React.FC = () => {
   const router = useRouter();
   const { data } = useUser();
+
   return (
     <div
       className={!data ? "hidden" : "fixed bottom-2 w-full z-10 text-center"}
