@@ -59,3 +59,7 @@ export const getArtist = (artist: string[]) => {
     </>
   ));
 };
+
+export const getDate = (date: string) => {
+  return new Date(date).toLocaleDateString("pt-BR");
+};

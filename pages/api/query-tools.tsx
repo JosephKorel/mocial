@@ -104,7 +104,6 @@ export const updatePost = async (payload: any) => {
     .single();
 
   if (error) {
-    console.log(error);
     throw new Error();
   }
 

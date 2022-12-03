@@ -1,4 +1,4 @@
-import { Music } from "../../../models/interfaces";
+import { Music } from "../../../../models/interfaces";
 
 export interface ParentProps {
   option: number;

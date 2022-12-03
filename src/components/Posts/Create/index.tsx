@@ -1,11 +1,11 @@
 import React from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdClear } from "react-icons/md";
-import { Post } from "../../../models/interfaces";
-import { createPost } from "../../../pages/api/query-tools";
-import { usePostMutation, useQueryData } from "../../../utils/Hooks";
-import { getArtist } from "../../../utils/Tools";
-import { useAuthContext } from "../../context";
+import { Post } from "../../../../models/interfaces";
+import { createPost } from "../../../../pages/api/query-tools";
+import { usePostMutation, useQueryData } from "../../../../utils/Hooks";
+import { getArtist } from "../../../../utils/Tools";
+import { useAuthContext } from "../../../context";
 import { ChooseProps, CreateProps, ResultProps, StepProps } from "./models";
 
 export const PostStep = ({ step, chooseProps, postProps }: StepProps) => {
@@ -176,6 +176,7 @@ export const CreatePost = ({ props }: CreateProps) => {
       type: option == 1 ? "track" : "album",
       subject: selected!,
       liked_by: [],
+      comments: [],
     };
 
     try {

@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
-import { Music, Post } from "../../models/interfaces";
-import { PostStep } from "../../src/components/Posts";
+import { Music } from "../../models/interfaces";
+import { PostStep } from "../../src/components/Posts/Create";
 import ProtectedRoute from "../../src/components/Protector";
 import { useAlbums, useQueryData, useSongs, useToken } from "../../utils/Hooks";
 import { formatAlbums, formatMusic } from "../../utils/Tools";

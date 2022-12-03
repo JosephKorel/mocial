@@ -48,6 +48,13 @@ export interface CoverImg {
   lg: string;
 }
 
+export interface Comment {
+  author: string;
+  content: string;
+  liked_by: string[];
+  created_at: Date;
+}
+
 export interface Post {
   id?: number;
   author: string;
@@ -58,4 +65,5 @@ export interface Post {
   created_at?: string;
   profiles?: Profile;
   liked_by: string[];
+  comments: Comment[];
 }
