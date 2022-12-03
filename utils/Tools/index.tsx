@@ -50,3 +50,12 @@ export const formatAlbums = (data: any[]) => {
 
   return albums;
 };
+
+export const getArtist = (artist: string[]) => {
+  return artist.map((item, index, arr) => (
+    <>
+      {item}
+      {index == arr.length - 1 ? "" : ", "}
+    </>
+  ));
+};

@@ -1,14 +1,18 @@
 import { useRouter } from "next/router";
-import React from "react";
-import { useQueryData } from "../../../utils/Hooks";
+import React, { useEffect } from "react";
+import { useProfiles, useUser } from "../../../utils/Hooks";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
-  const { user, profiles } = useQueryData(["profiles", "user"]);
+  const { data: user } = useUser();
+  const { data: profiles } = useProfiles();
   const router = useRouter();
-  if (!user || !profiles) {
-    router.push("/");
-    return <div></div>;
-  }
+
+  useEffect(() => {
+    if (!profiles) {
+      router.push("/");
+    }
+  }, [profiles]);
+
   return <div>{children}</div>;
 }
 

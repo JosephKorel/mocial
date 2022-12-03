@@ -86,7 +86,25 @@ export const getPosts = async () => {
 
 export const createPost = async (payload: any) => {
   let { error, data } = await supabase.from("posts").insert(payload);
-  queryClient.invalidateQueries(["posts"]);
 
-  return error ? error : data;
+  if (error) {
+    console.log(error);
+    throw new Error();
+  }
+
+  return data;
+};
+
+export const updatePost = async (payload: any) => {
+  let { error } = await supabase
+    .from("posts")
+    .update(payload.body)
+    .eq("id", payload.id);
+
+  if (error) {
+    console.log(error);
+    throw new Error();
+  }
+
+  queryClient.invalidateQueries(["posts"]);
 };

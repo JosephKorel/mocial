@@ -1,6 +1,6 @@
 import { MdOutlineLibraryAdd } from "react-icons/md";
 
-import { Albums, Music } from "../../../../models/interfaces";
+import { Albums, Music, Suggestion } from "../../../../models/interfaces";
 
 export const RenderAlbums = ({ album }: { album: Albums }) => {
   return (
@@ -56,13 +56,23 @@ export const RenderMusics = ({ music }: { music: Music }) => {
 
 export const RenderMusicList = ({
   result,
+  selected,
   handleSelect,
 }: {
   result: Music;
+  selected: Suggestion[];
   handleSelect: (data: Music) => void;
 }) => {
+  const isSelected = selected.filter((item) => item.id == result.id).length
+    ? true
+    : false;
+
   return (
-    <li className="w-full m-auto relative z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg">
+    <li
+      className={`w-full m-auto relative border ${
+        isSelected ? "border-danube" : "border-transparent"
+      } z-10 cursor-pointer flex justify-between items-center bg-dark-600 duration-200 lg:hover:bg-base-300 p-1 px-2 rounded-lg`}
+    >
       <div className="flex items-center gap-4">
         <img
           src={result.cover.sm}
@@ -72,7 +82,7 @@ export const RenderMusicList = ({
           <p
             className={`lg:text-lg ${
               result.name.length > 25 ? "text-sm" : "text-base"
-            }`}
+            } ${isSelected && "text-danube font-medium"} `}
           >
             {result.name}
           </p>
@@ -83,7 +93,7 @@ export const RenderMusicList = ({
           </p>
         </div>
       </div>
-      <div className="self-start">
+      <div className="self-start px-1">
         <button
           className="text-danube text-xl lg:text-2xl duration-200 lg:hover:text-danube-600"
           onClick={() => handleSelect(result)}

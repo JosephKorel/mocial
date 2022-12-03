@@ -13,10 +13,11 @@ import {
   FollowerFollowing,
   Modal,
 } from "../src/components/Profile/Modal";
-import { useQueryData, useUser, useUserUpdate } from "../utils/Hooks";
+import { useQueryData, useUser } from "../utils/Hooks";
 import { RenderAlbums, RenderMusics } from "../src/components/Profile/Visuals";
 import { RenderSuggestions } from "../src/components/Profile/Suggestion";
 import ProtectedRoute from "../src/components/Protector";
+import { getFollowers, getFollowing } from "../src/components/Profile/Visit";
 
 const Account: NextPage = () => {
   const [open, setOpen] = useState(false);
@@ -34,25 +35,8 @@ const Account: NextPage = () => {
     ? user.background
     : user?.albums[0].cover.lg;
 
-  const followers = (): Profile[] => {
-    const getProfiles = user.followers.reduce((acc, curr) => {
-      const filter = profiles.filter((item) => item.id == curr);
-      acc.push(filter[0]);
-      return acc;
-    }, [] as Profile[]);
-
-    return getProfiles;
-  };
-
-  const following = (): Profile[] => {
-    const getProfiles = user.following.reduce((acc, curr) => {
-      const filter = profiles.filter((item) => item.id == curr);
-      acc.push(filter[0]);
-      return acc;
-    }, [] as Profile[]);
-
-    return getProfiles;
-  };
+  const followers = getFollowers(user, profiles);
+  const following = getFollowing(user, profiles);
 
   const handleLogout = () => {
     supabase.auth.signOut();
@@ -206,10 +190,7 @@ const Account: NextPage = () => {
         <BackgroundModal bgProps={{ open, setOpen }} />
         <FollowerFollowing modalProps={{ seeing, followers, following }} />
         <ConfirmModal suggestion={suggestion} />
-        {
-          // eslint-disable-next-line
-          <Modal children={children} />
-        }
+        <Modal>{children}</Modal>
       </div>
     </ProtectedRoute>
   );

@@ -1,16 +1,10 @@
 import { NextPage } from "next";
 import React, { useState, useEffect } from "react";
-import { AiOutlineSearch } from "react-icons/ai";
 import { Music, Post } from "../../models/interfaces";
-import {
-  ChooseSubject,
-  PostStep,
-  ResultList,
-} from "../../src/components/Posts";
+import { PostStep } from "../../src/components/Posts";
 import ProtectedRoute from "../../src/components/Protector";
 import { useAlbums, useQueryData, useSongs, useToken } from "../../utils/Hooks";
 import { formatAlbums, formatMusic } from "../../utils/Tools";
-import { createPost } from "../api/query-tools";
 
 const NewPost: NextPage = () => {
   const [title, setTitle] = useState("");
@@ -37,7 +31,15 @@ const NewPost: NextPage = () => {
     setStep,
   };
 
-  const postProps = { title, content, setContent, setTitle, setStep, selected };
+  const postProps = {
+    title,
+    content,
+    setContent,
+    setTitle,
+    setStep,
+    selected,
+    option,
+  };
 
   useEffect(() => {
     if (option == 1) {
@@ -50,22 +52,6 @@ const NewPost: NextPage = () => {
     const showAlbums = formatAlbums(albums);
     setResults(showAlbums);
   }, [musics, albums]);
-
-  const handleCreate = async () => {
-    const payload: Post = {
-      title,
-      content,
-      author: user.id,
-    };
-
-    try {
-      await createPost(payload);
-      console.log("success");
-    } catch (error) {
-      console.log(error);
-    }
-    return;
-  };
 
   return (
     <ProtectedRoute>

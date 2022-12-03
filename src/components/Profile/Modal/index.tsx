@@ -23,6 +23,7 @@ import {
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { formatAlbums, formatMusic } from "../../../../utils/Tools";
 import { RenderMusicList } from "../Visuals";
+import { handleSelect, handleSuggestion } from "./tools";
 
 interface UsersModal {
   modalProps: {
@@ -195,6 +196,20 @@ export const SuggestModal = ({
   const token = useToken();
   const { data: albums } = useAlbums(search, token);
   const { data: musics } = useSongs(search, token);
+  const handleSelectParams = { option, selected, setError, setSelected, user };
+  const handleSuggestionParams = {
+    targetId,
+    selected,
+    setError,
+    setSuccess,
+    mutate,
+  };
+
+  useEffect(() => {
+    setSelected([]);
+    setSearch("");
+    setResults([]);
+  }, [option]);
 
   useEffect(() => {
     if (option == 1) {
@@ -216,54 +231,6 @@ export const SuggestModal = ({
     setSearch(text);
   };
 
-  const handleSelect = (choice: Music) => {
-    const isSelected = selected.filter((item) => item.id == choice.id);
-
-    if (isSelected.length) {
-      const onFilter = selected.filter((item) => item.id != choice.id);
-      setSelected(onFilter);
-      return;
-    }
-
-    if (selected.length == 3) {
-      setError(
-        `Você só pode sugerir até três ${option == 1 ? "álbuns" : "músicas"}`
-      );
-
-      return;
-    }
-
-    setSelected([
-      ...selected,
-      {
-        ...choice,
-        sent_by: user.id,
-        type: option == 1 ? "album" : "track",
-      },
-    ]);
-
-    return;
-  };
-
-  const handleSuggestion = () => {
-    const payload = {
-      id: targetId,
-      body: { suggestions: selected },
-    };
-    try {
-      mutate(payload);
-
-      const closeBtn = document.getElementById(
-        "closeSuggestModal"
-      ) as HTMLLabelElement;
-      closeBtn.click();
-      setSuccess("Sugestões enviadas!");
-    } catch (error) {
-      setError("Houve algum erro, tente novamente");
-      console.log(error);
-    }
-  };
-
   return (
     <div>
       <input type="checkbox" id="suggest-modal" className="modal-toggle" />
@@ -274,7 +241,7 @@ export const SuggestModal = ({
             value={search}
             onChange={(e) => handleSearch(e.currentTarget.value)}
             placeholder={`Procurar ${option == 1 ? "álbum" : "música"}`}
-            className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+            className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-gray-300 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
           />
           <section className="mt-4">
             <ul className="flex flex-col justify-start gap-2 p-2 bg-dark rounded-md h-[24rem] overflow-auto">
@@ -282,7 +249,10 @@ export const SuggestModal = ({
                 <RenderMusicList
                   key={index}
                   result={result}
-                  handleSelect={handleSelect}
+                  selected={selected}
+                  handleSelect={() =>
+                    handleSelect({ ...handleSelectParams, choice: result })
+                  }
                 />
               ))}
             </ul>
@@ -300,7 +270,7 @@ export const SuggestModal = ({
             </label>
             <label
               className="btn btn-sm btn-outline btn-primary"
-              onClick={handleSuggestion}
+              onClick={() => handleSuggestion(handleSuggestionParams)}
             >
               Confirmar
             </label>

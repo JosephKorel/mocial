@@ -11,6 +11,8 @@ import {
   userUpdate,
   UpdatePayload,
   getPosts,
+  createPost,
+  updatePost,
 } from "../../pages/api/query-tools";
 import { queryClient } from "../../pages/_app";
 
@@ -21,7 +23,7 @@ interface QueryData {
 }
 
 export const useToken = (): string => {
-  const { data, isLoading } = useQuery(["access_token"], getAccessToken);
+  const { data } = useQuery(["access_token"], getAccessToken);
 
   return data;
 };
@@ -121,5 +123,25 @@ export const useQueryData = (keys: string[]): QueryData => {
 };
 
 export const usePosts = () => {
-  return useQuery(["posts"], getPosts);
+  return useQuery(["posts"], getPosts, { keepPreviousData: true });
+};
+
+export const usePostMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation((payload: Post) => createPost(payload), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["profiles"]);
+      queryClient.invalidateQueries(["user"]);
+      queryClient.invalidateQueries(["posts"]);
+    },
+  });
+};
+
+export const useUpdatePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation((payload: any) => updatePost(payload), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["posts"]);
+    },
+  });
 };

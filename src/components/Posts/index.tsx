@@ -1,14 +1,12 @@
 import React from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdClear } from "react-icons/md";
+import { Post } from "../../../models/interfaces";
+import { createPost } from "../../../pages/api/query-tools";
+import { usePostMutation, useQueryData } from "../../../utils/Hooks";
+import { getArtist } from "../../../utils/Tools";
 import { useAuthContext } from "../../context";
-import {
-  ChooseProps,
-  CreateProps,
-  PostProps,
-  ResultProps,
-  StepProps,
-} from "./models";
+import { ChooseProps, CreateProps, ResultProps, StepProps } from "./models";
 
 export const PostStep = ({ step, chooseProps, postProps }: StepProps) => {
   if (step == 1) {
@@ -114,7 +112,7 @@ export const ChooseSubject = ({ props }: ChooseProps) => {
             <div className="bg-dark rounded-lg flex justify-between items-center relative">
               <input
                 placeholder={`Procurar ${option == 1 ? "música" : "álbum"}`}
-                className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+                className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -154,40 +152,79 @@ export const ChooseSubject = ({ props }: ChooseProps) => {
 };
 
 export const CreatePost = ({ props }: CreateProps) => {
-  const { title, content, setContent, setTitle, setStep, selected } = props;
+  const { title, content, setContent, setTitle, setStep, selected, option } =
+    props;
+  const { mutate } = usePostMutation();
+  const { user } = useQueryData(["user"]);
+  const { setError, setSuccess } = useAuthContext();
+
+  const handleCreate = async () => {
+    if (!title) {
+      setError("Sua publicação deve ter um título");
+      return;
+    }
+
+    if (content.length < 16) {
+      setError("Sua publicação deve ter no mínimo 16 caracteres");
+      return;
+    }
+
+    const payload: Post = {
+      author: user.id,
+      title,
+      content,
+      type: option == 1 ? "track" : "album",
+      subject: selected!,
+      liked_by: [],
+    };
+
+    try {
+      mutate(payload);
+      setSuccess("Publicado");
+    } catch (error) {
+      setError("Houve algum erro, tente novamente");
+      console.log(error);
+    }
+  };
   return (
     <div>
       <header>
-        <div className="flex justify-center items-center">
+        <div className="flex flex-col justify-center items-center">
           <img
             src={selected?.cover.sm}
             alt={selected?.name}
-            className="rounded-full"
+            className="rounded-lg"
           ></img>
-          <h1>{selected?.name}</h1>
+          <div className="text-center">
+            <h1 className="text-xl text-warning font-light">
+              <span className="font-medium">{getArtist(selected!.artist)}</span>{" "}
+              - {selected?.name}
+            </h1>
+          </div>
         </div>
       </header>
-      <section>
-        <div className="flex flex-col">
-          <label>Título</label>
+      <section className="p-2 px-3">
+        <div className="flex flex-col gap-1">
           <input
+            placeholder="Título"
             value={title}
             onChange={(e) => setTitle(e.currentTarget.value)}
-            className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+            className="bg-inherit relative block rounded-md w-full px-3 py-2 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
           />
         </div>
         <textarea
+          placeholder="Sobre o que você quer falar?"
           value={content}
           onChange={(e) => setContent(e.currentTarget.value)}
-          className="bg-inherit relative block rounded-md w-full px-3 pl-8 py-2 border border-danube placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+          className="bg-inherit font-light relative block h-[22rem] mt-4 rounded-md w-full p-3 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
         />
-        <div className="flex justify-between">
+        <div className="flex justify-between mt-6">
           <button className="btn btn-outline btn-sm" onClick={() => setStep(1)}>
             Voltar
           </button>
           <button
             className="btn btn-primary btn-outline btn-sm"
-            /* onClick={handleCreate} */
+            onClick={handleCreate}
           >
             Publicar
           </button>

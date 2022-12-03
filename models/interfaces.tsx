@@ -53,5 +53,9 @@ export interface Post {
   author: string;
   title: string;
   content: string;
-  created_at?: Date;
+  type: string;
+  subject: Music;
+  created_at?: string;
+  profiles?: Profile;
+  liked_by: string[];
 }

@@ -37,6 +37,7 @@ export interface PostProps {
   setContent: (data: string) => void;
   setStep: (data: number) => void;
   selected: Music | null;
+  option: number;
 }
 
 export interface CreateProps {
