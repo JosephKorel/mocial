@@ -123,7 +123,7 @@ export const useQueryData = (keys: string[]): QueryData => {
 };
 
 export const usePosts = () => {
-  return useQuery(["posts"], getPosts, { keepPreviousData: true });
+  return useQuery(["posts"], getPosts);
 };
 
 export const usePostMutation = () => {
@@ -140,8 +140,12 @@ export const usePostMutation = () => {
 export const useUpdatePost = () => {
   const queryClient = useQueryClient();
   return useMutation((payload: any) => updatePost(payload), {
-    onSuccess: () => {
-      queryClient.invalidateQueries(["posts"]);
+    onSuccess: (updatedPost) => {
+      queryClient.setQueryData(["posts"], (prev: any) =>
+        prev.map((post: Post) =>
+          post.id === updatedPost.id ? updatedPost : post
+        )
+      );
     },
   });
 };

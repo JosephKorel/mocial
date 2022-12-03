@@ -96,15 +96,17 @@ export const createPost = async (payload: any) => {
 };
 
 export const updatePost = async (payload: any) => {
-  let { error } = await supabase
+  let { error, data } = await supabase
     .from("posts")
     .update(payload.body)
-    .eq("id", payload.id);
+    .eq("id", payload.id)
+    .select("*, profiles(*)")
+    .single();
 
   if (error) {
     console.log(error);
     throw new Error();
   }
 
-  queryClient.invalidateQueries(["posts"]);
+  return data;
 };
