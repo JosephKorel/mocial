@@ -49,10 +49,11 @@ export interface CoverImg {
 }
 
 export interface Comment {
+  id: number;
   author: string;
   content: string;
   liked_by: string[];
-  created_at: Date;
+  created_at: number;
 }
 
 export interface Post {

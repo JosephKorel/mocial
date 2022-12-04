@@ -4,17 +4,28 @@ import { useRouter } from "next/router";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BsBoxArrowInUpRight } from "react-icons/bs";
 import { useAuthContext } from "../src/context";
+import { useQueryData } from "../utils/Hooks";
+import { Post, Profile } from "../models/interfaces";
 
 const Search: NextPage = () => {
-  const { user, profiles } = useAuthContext();
-  const [name, setName] = useState("");
   const router = useRouter();
-  const users = profiles.filter((item) => item.id != user?.id);
-  const searchResults = name.length
-    ? users.filter((item) =>
-        item.username.toLowerCase().includes(name.toLowerCase())
-      )
-    : [];
+  const { user, profiles, posts } = useQueryData(["user", "profiles", "posts"]);
+  const [search, setSearch] = useState("");
+  const users = profiles.filter((item) => item.id != user.id);
+  const onSearch = () => {
+    let results: (Post | Profile)[] = [];
+    const profileFilter = users.filter((item) =>
+      item.username.toLowerCase().includes(search.toLowerCase())
+    );
+    const postFilter = posts.filter((item) =>
+      item.title.toLowerCase().includes(search.toLowerCase())
+    );
+
+    results = profileFilter.concat(postFilter);
+
+    return [];
+  };
+  const searchResults = search.length ? onSearch() : [];
 
   return (
     <div className="font-kanit">

@@ -1,4 +1,5 @@
-import { Albums, CoverImg, Music } from "../../models/interfaces";
+import { Albums, CoverImg, Music, Profile } from "../../models/interfaces";
+import moment from "moment";
 
 export const formatMusic = (data: any[]) => {
   let musics: Music[] = [];
@@ -62,4 +63,49 @@ export const getArtist = (artist: string[]) => {
 
 export const getDate = (date: string) => {
   return new Date(date).toLocaleDateString("pt-BR");
+};
+
+export const getDateDifference = (date: number) => {
+  const today = moment();
+  const compareDate = moment(date);
+  const difference = today.diff(compareDate);
+
+  if (difference < 60000) {
+    const getDif = today.diff(compareDate, "seconds");
+    return getDif + "s";
+  }
+
+  if (difference < 3600000) {
+    const getDif = today.diff(compareDate, "minutes");
+    return getDif + "m";
+  }
+
+  if (difference < 24 * 3600000) {
+    const getDif = today.diff(compareDate, "hours");
+    return getDif + "h";
+  }
+
+  if (difference < 24 * 7 * 3600000) {
+    const getDif = today.diff(compareDate, "days");
+    return getDif + "d";
+  }
+
+  if (difference < 24 * 7 * 3600000 * 4) {
+    const getDif = today.diff(compareDate, "weeks");
+    return getDif + "s";
+  }
+  if (difference < 24 * 7 * 3600000 * 4 * 12) {
+    const getDif = today.diff(compareDate, "months");
+    return getDif + "m";
+  }
+
+  if (difference > 24 * 7 * 3600000 * 4 * 12) {
+    const getDif = today.diff(compareDate, "years");
+    return getDif + "a";
+  }
+};
+
+export const getProfile = (profiles: Profile[], id: string) => {
+  const onFilter = profiles.filter((item) => item.id == id);
+  return onFilter[0];
 };
