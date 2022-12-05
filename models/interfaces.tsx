@@ -57,14 +57,21 @@ export interface Comment {
 }
 
 export interface Post {
-  id?: number;
+  id: number;
   author: string;
   title: string;
   content: string;
   type: string;
   subject: Music;
-  created_at?: string;
+  created_at: number;
+  updated_at: number;
   profiles?: Profile;
   liked_by: string[];
   comments: Comment[];
+}
+
+export interface MutationPayload {
+  id: number;
+  body: any;
+  option: string;
 }

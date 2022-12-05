@@ -1,4 +1,4 @@
-import { Post, Profile } from "../../models/interfaces";
+import { MutationPayload, Post, Profile } from "../../models/interfaces";
 import { supabase } from "../../utils/supabaseClient";
 import { Music, Albums } from "../../models/interfaces";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -85,7 +85,7 @@ export const getPosts = async () => {
 };
 
 export const createPost = async (payload: any) => {
-  let { error, data } = await supabase.from("posts").insert(payload);
+  let { error, data } = await supabase.from("posts").insert(payload.body);
 
   if (error) {
     console.log(error);
@@ -104,8 +104,42 @@ export const updatePost = async (payload: any) => {
     .single();
 
   if (error) {
+    console.log(error);
     throw new Error();
   }
 
   return data;
+};
+export const deletePost = async (payload: MutationPayload) => {
+  const { error, data } = await supabase
+    .from("posts")
+    .delete()
+    .eq("id", payload.id)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error();
+  }
+
+  return data;
+};
+
+export const handlePostMutation = async (payload: MutationPayload) => {
+  switch (payload.option) {
+    case "create":
+      createPost(payload);
+      break;
+
+    case "update":
+      updatePost(payload);
+      break;
+
+    case "delete":
+      deletePost(payload);
+      break;
+
+    default:
+      break;
+  }
 };

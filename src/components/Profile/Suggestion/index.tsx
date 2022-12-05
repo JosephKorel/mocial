@@ -1,12 +1,8 @@
 import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineLibraryAdd } from "react-icons/md";
 import { RiDeleteBackLine } from "react-icons/ri";
-import { TiThumbsOk, TiThumbsUp, TiThumbsDown } from "react-icons/ti";
-import { Albums, Music, Suggestion } from "../../../../models/interfaces";
+import { Suggestion } from "../../../../models/interfaces";
 import { useQueryData, useUserUpdate } from "../../../../utils/Hooks";
 import { GrStar } from "react-icons/gr";
-import { useState } from "react";
-import { useAuthContext } from "../../../context";
 import { RateBadge, RateSuggestion } from "./components";
 
 export const RenderSuggestions = ({

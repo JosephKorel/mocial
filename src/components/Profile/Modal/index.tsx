@@ -35,10 +35,28 @@ interface UsersModal {
 
 export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
   const { seeing, followers, following } = modalProps;
+  const { user } = useQueryData(["user"]);
   const title = seeing == "followers" ? "Seguidores" : "Seguindo";
   const group = seeing == "followers" ? followers : following;
 
   const router = useRouter();
+
+  const goToProfile = (id: string) => {
+    if (id == user.id) {
+      router.push("/profile");
+      const closeBtn = document.getElementById("closeFriendModal");
+      closeBtn?.click();
+      return;
+    }
+
+    router.push({
+      pathname: "/[seeUser]",
+      query: { seeUser: id },
+    });
+
+    const closeBtn = document.getElementById("closeFriendModal");
+    closeBtn?.click();
+  };
 
   return (
     <div>
@@ -51,28 +69,17 @@ export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
               {group?.map((item, index) => (
                 <li
                   key={index}
-                  className="flex justify-between items-center bg-dark-600 rounded-lg py-1 px-2 shadow-sm shadow-black"
+                  onClick={() => goToProfile(item.id)}
+                  className="flex gap-2 items-center bg-dark rounded-md py-1 px-2 shadow-sm shadow-black"
                 >
                   <div className="avatar">
                     <div className="w-10 border-2 border-primary rounded-full">
                       <img src={item.avatar_url}></img>
                     </div>
                   </div>
-                  <p className="flex-1 pl-2 self-start text-gray-200 text-lg">
+                  <p className="flex-1 self-start text-gray-200 text-lg">
                     {item.username}
                   </p>
-                  <button
-                    className="btn btn-xs btn-ghost text-primary self-start font-normal gap-1"
-                    onClick={() =>
-                      router.push({
-                        pathname: "/[seeUser]",
-                        query: { seeUser: item.id },
-                      })
-                    }
-                  >
-                    <BsBoxArrowInUpRight />
-                    Perfil
-                  </button>
                 </li>
               ))}
             </ul>
@@ -80,16 +87,11 @@ export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
           <div className="modal-action flex justify-between font-kanit">
             <label
               htmlFor="friend-modal"
+              id="closeFriendModal"
               className="btn btn-sm btn-outline btn-error"
             >
               Fechar
             </label>
-            {/* <label
-                className="btn btn-sm btn-outline btn-primary"
-            
-              >
-                Confirmar
-              </label> */}
           </div>
         </div>
       </div>

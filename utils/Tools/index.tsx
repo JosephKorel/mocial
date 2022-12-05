@@ -1,4 +1,5 @@
 import { Albums, CoverImg, Music, Profile } from "../../models/interfaces";
+import stringSimilarity from "string-similarity-js";
 import moment from "moment";
 
 export const formatMusic = (data: any[]) => {
@@ -61,18 +62,18 @@ export const getArtist = (artist: string[]) => {
   ));
 };
 
-export const getDate = (date: string) => {
-  return new Date(date).toLocaleDateString("pt-BR");
+export const getDate = (date: number) => {
+  return moment(date).format("DD/MM/YYYY");
 };
 
 export const getDateDifference = (date: number) => {
   const today = moment();
   const compareDate = moment(date);
   const difference = today.diff(compareDate);
+  const dateFormat = moment(date).format("DD/MM/YYYY");
 
   if (difference < 60000) {
-    const getDif = today.diff(compareDate, "seconds");
-    return getDif + "s";
+    return "há menos de um minuto";
   }
 
   if (difference < 3600000) {
@@ -90,11 +91,11 @@ export const getDateDifference = (date: number) => {
     return getDif + "d";
   }
 
-  if (difference < 24 * 7 * 3600000 * 4) {
-    const getDif = today.diff(compareDate, "weeks");
-    return getDif + "s";
+  if (difference > 24 * 7 * 3600000 * 4) {
+    return dateFormat;
   }
-  if (difference < 24 * 7 * 3600000 * 4 * 12) {
+
+  /* if (difference < 24 * 7 * 3600000 * 4 * 12) {
     const getDif = today.diff(compareDate, "months");
     return getDif + "m";
   }
@@ -102,10 +103,15 @@ export const getDateDifference = (date: number) => {
   if (difference > 24 * 7 * 3600000 * 4 * 12) {
     const getDif = today.diff(compareDate, "years");
     return getDif + "a";
-  }
+  } */
 };
 
 export const getProfile = (profiles: Profile[], id: string) => {
   const onFilter = profiles.filter((item) => item.id == id);
   return onFilter[0];
+};
+
+export const getSimilarity = (first: string, second: string) => {
+  const similarity = stringSimilarity(first, second);
+  return similarity;
 };

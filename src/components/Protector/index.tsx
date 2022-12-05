@@ -7,11 +7,10 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { data: profiles } = useProfiles();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!profiles) {
-      router.push("/");
-    }
-  }, [profiles]);
+  if (!user || !profiles) {
+    router.push("/");
+    return <div></div>;
+  }
 
   return <div>{children}</div>;
 }

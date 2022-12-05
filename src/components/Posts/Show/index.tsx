@@ -1,19 +1,25 @@
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { BsHeart, BsHeartFill } from "react-icons/bs";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { BsHeart, BsHeartFill, BsThreeDots } from "react-icons/bs";
 import { FaCommentAlt } from "react-icons/fa";
-import { RiSendPlaneFill } from "react-icons/ri";
+import { RiDeleteBackLine, RiEdit2Line, RiSendPlaneFill } from "react-icons/ri";
 import { Comment, Post } from "../../../../models/interfaces";
-import { useQueryData, useUpdatePost } from "../../../../utils/Hooks";
+import {
+  useMutatePost,
+  useQueryData,
+  useUpdatePost,
+} from "../../../../utils/Hooks";
 import {
   getDate,
   getDateDifference,
   getProfile,
 } from "../../../../utils/Tools";
 import { useAuthContext } from "../../../context";
+import { Modal } from "../../Profile/Modal";
 import { handleComment, handleCommentLike, handleLike } from "./tools";
 
 export const Posts = ({ post }: { post: Post }) => {
+  const router = useRouter();
   const { user } = useQueryData(["user"]);
   const [content, setContent] = useState("");
   const [showComments, setShowComments] = useState(false);
@@ -26,6 +32,23 @@ export const Posts = ({ post }: { post: Post }) => {
   const comments = post.comments.sort((a, b) => b.created_at - a.created_at);
   const postLikeParams = { post, user, mutate, setError };
   const commentParams = { content, user, post, mutate, setError, setContent };
+
+  const goToProfile = (id: string) => {
+    if (id == user.id) {
+      router.push("/profile");
+      const closeBtn = document.getElementById("closeFriendModal");
+      closeBtn?.click();
+      return;
+    }
+
+    router.push({
+      pathname: "/[seeUser]",
+      query: { seeUser: id },
+    });
+
+    const closeBtn = document.getElementById("closeFriendModal");
+    closeBtn?.click();
+  };
 
   return (
     <article className="text-center py-1 px-3 bg-dark rounded-md">
@@ -40,13 +63,17 @@ export const Posts = ({ post }: { post: Post }) => {
               ></img>
             </div>
           </div>
-          <p className="text-sm italic underline text-gray-100">
+          <p
+            className="text-sm italic underline text-gray-100"
+            onClick={() => goToProfile(author.id)}
+          >
             {author.username}
           </p>
         </div>
         <p className="font-light italic text-xs text-gray-400">{created_at}</p>
       </div>
-      <div className="flex flex-col justify-center p-2 px-3 bg-dark shadow-md border border-danube shadow-black rounded-md my-2 text-gray-100">
+      <div className="flex flex-col justify-center p-2 px-3 bg-dark shadow-md border border-danube shadow-black rounded-md my-2 text-gray-100 relative">
+        {author.id == user.id ? <PostOptions id={post.id} /> : <></>}
         <div className="flex flex-col items-center justify-center">
           <img
             src={subject.cover.sm}
@@ -83,7 +110,7 @@ export const Posts = ({ post }: { post: Post }) => {
         </div>
       </div>
       {showComments ? (
-        <div className="text-left shadow-md shadow-black rounded-md py-1 px-2">
+        <div className="text-left rounded-md py-1">
           <p className="text-lg">Comentários</p>
           <div className="flex flex-col gap-2">
             <textarea
@@ -104,7 +131,8 @@ export const Posts = ({ post }: { post: Post }) => {
               Enviar <RiSendPlaneFill />
             </button>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="w-full p-[1px] bg-gray-300 rounded-md mt-4 mb-2"></div>
+          <div className="flex flex-col gap-2 py-2 pb-4">
             {comments.map((comment, index) => (
               <RenderComment key={index} comment={comment} post={post} />
             ))}
@@ -113,6 +141,9 @@ export const Posts = ({ post }: { post: Post }) => {
       ) : (
         <></>
       )}
+      <Modal>
+        <ConfirmDelete id={post.id} />
+      </Modal>
     </article>
   );
 };
@@ -124,6 +155,7 @@ export const RenderComment = ({
   comment: Comment;
   post: Post;
 }) => {
+  const router = useRouter();
   const { profiles, user } = useQueryData(["profiles", "user"]);
   const { mutate } = useUpdatePost();
   const { setError } = useAuthContext();
@@ -132,8 +164,25 @@ export const RenderComment = ({
   const timestamp = getDateDifference(comment.created_at);
   const handleLikeParams = { post, comment, mutate, setError, user, hasLiked };
 
+  const goToProfile = (id: string) => {
+    if (id == user.id) {
+      router.push("/profile");
+      const closeBtn = document.getElementById("closeFriendModal");
+      closeBtn?.click();
+      return;
+    }
+
+    router.push({
+      pathname: "/[seeUser]",
+      query: { seeUser: id },
+    });
+
+    const closeBtn = document.getElementById("closeFriendModal");
+    closeBtn?.click();
+  };
+
   return (
-    <article className="rounded-md flex items-start gap-3 mt-4 p-2 border border-danube">
+    <article className="rounded-md flex items-start gap-3 mt-4 p-2 shadow-md shadow-black">
       <div className="avatar">
         <div className="w-12 rounded-full border border-gray-100">
           <img
@@ -145,8 +194,13 @@ export const RenderComment = ({
       </div>
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-start text-sm">
-          <p className="italic underline text-gray-100">{author.username}</p>
-          <span>{timestamp}</span>
+          <p
+            className="italic underline text-gray-100"
+            onClick={() => goToProfile(author.id)}
+          >
+            {author.username}
+          </p>
+          <span className="text-gray-400">{timestamp}</span>
         </div>
         <p className="text-sm text-justify max-h-20 overflow-y-auto font-light">
           {comment.content}
@@ -164,5 +218,72 @@ export const RenderComment = ({
         </div>
       </div>
     </article>
+  );
+};
+
+export const PostOptions = ({ id }: { id: number }) => {
+  const router = useRouter();
+  const editPost = (id: number) => {
+    router.push({ pathname: "/Posts/Edit/[id]", query: { id } });
+  };
+  return (
+    <div className="dropdown dropdown-end absolute top-2 right-2">
+      <button tabIndex={0} className="p-1 px-2 rounded-md">
+        <BsThreeDots />
+      </button>
+      <ul
+        tabIndex={0}
+        className="menu menu-compact dropdown-content text-gray-300 shadow bg-base-200 rounded-md w-44"
+      >
+        <li>
+          <label onClick={() => editPost(id)}>
+            <RiEdit2Line />
+            Editar
+          </label>
+        </li>
+        <li>
+          <label htmlFor="general-modal">
+            <RiDeleteBackLine /> Excluir
+          </label>
+        </li>
+      </ul>
+    </div>
+  );
+};
+
+export const ConfirmDelete = ({ id }: { id: number }) => {
+  const { mutate } = useMutatePost("delete");
+  const handleDelete = () => {
+    let payload = { id, body: {}, option: "delete" };
+    const closeBtn = document.getElementById("closeModal");
+    try {
+      mutate(payload);
+      closeBtn?.click();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <div>
+      <h1 className="text-xl text-left text-gray-200">Excluir publicação</h1>
+      <p className="text-sm text-gray-300 text-left mt-2 mb-6">
+        Deseja mesmo excluir esta publicação? De id {id}
+      </p>
+      <div className="modal-action flex justify-between items-center">
+        <label
+          className="btn btn-sm btn-outline"
+          htmlFor="general-modal"
+          id="closeModal"
+        >
+          Cancelar
+        </label>
+        <button
+          className="btn btn-sm btn-error btn-outline"
+          onClick={handleDelete}
+        >
+          Excluir
+        </button>
+      </div>
+    </div>
   );
 };

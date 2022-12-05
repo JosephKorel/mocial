@@ -3,7 +3,11 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { MdClear } from "react-icons/md";
 import { Post } from "../../../../models/interfaces";
 import { createPost } from "../../../../pages/api/query-tools";
-import { usePostMutation, useQueryData } from "../../../../utils/Hooks";
+import {
+  useMutatePost,
+  usePostMutation,
+  useQueryData,
+} from "../../../../utils/Hooks";
 import { getArtist } from "../../../../utils/Tools";
 import { useAuthContext } from "../../../context";
 import { ChooseProps, CreateProps, ResultProps, StepProps } from "./models";
@@ -154,13 +158,13 @@ export const ChooseSubject = ({ props }: ChooseProps) => {
 export const CreatePost = ({ props }: CreateProps) => {
   const { title, content, setContent, setTitle, setStep, selected, option } =
     props;
-  const { mutate } = usePostMutation();
+  const { mutate } = useMutatePost("create");
   const { user } = useQueryData(["user"]);
   const { setError, setSuccess } = useAuthContext();
 
   const handleCreate = async () => {
-    if (!title) {
-      setError("Sua publicação deve ter um título");
+    if (title.length < 8) {
+      setError("O título deve ter no mínimo 8 caracteres");
       return;
     }
 
@@ -169,14 +173,22 @@ export const CreatePost = ({ props }: CreateProps) => {
       return;
     }
 
-    const payload: Post = {
+    const body = {
       author: user.id,
       title,
       content,
       type: option == 1 ? "track" : "album",
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
       subject: selected!,
       liked_by: [],
       comments: [],
+    };
+
+    const payload = {
+      id: 0,
+      body,
+      option: "create",
     };
 
     try {

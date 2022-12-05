@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Post, Profile } from "../../models/interfaces";
+import { Post, Profile, MutationPayload } from "../../models/interfaces";
 import {
   getProfiles,
   getUser,
@@ -13,6 +13,7 @@ import {
   getPosts,
   createPost,
   updatePost,
+  deletePost,
 } from "../../pages/api/query-tools";
 import { queryClient } from "../../pages/_app";
 
@@ -126,6 +127,49 @@ export const usePosts = () => {
   return useQuery(["posts"], getPosts);
 };
 
+export const useMutatePost = (type: string) => {
+  const queryClient = useQueryClient();
+  switch (type) {
+    case "create":
+      return useMutation((payload: MutationPayload) => createPost(payload), {
+        onSuccess: () => {
+          queryClient.invalidateQueries(["profiles"]);
+          queryClient.invalidateQueries(["user"]);
+          queryClient.invalidateQueries(["posts"]);
+        },
+      });
+
+    case "update":
+      return useMutation((payload: MutationPayload) => updatePost(payload), {
+        onSuccess: (updatedPost: any) => {
+          queryClient.setQueryData(["posts"], (prev: any) =>
+            prev.map((post: Post) =>
+              post.id === updatedPost.id ? updatedPost : post
+            )
+          );
+        },
+      });
+
+    case "delete":
+      return useMutation((payload: MutationPayload) => deletePost(payload), {
+        onSuccess: (deletedPost: Post) => {
+          queryClient.setQueryData(["posts"], (prev: any) =>
+            prev.filter((post: Post) => post.id != deletedPost.id)
+          );
+        },
+      });
+
+    default:
+      return useMutation((payload: MutationPayload) => createPost(payload), {
+        onSuccess: () => {
+          queryClient.invalidateQueries(["profiles"]);
+          queryClient.invalidateQueries(["user"]);
+          queryClient.invalidateQueries(["posts"]);
+        },
+      });
+  }
+};
+
 export const usePostMutation = () => {
   const queryClient = useQueryClient();
   return useMutation((payload: Post) => createPost(payload), {
@@ -140,7 +184,7 @@ export const usePostMutation = () => {
 export const useUpdatePost = () => {
   const queryClient = useQueryClient();
   return useMutation((payload: any) => updatePost(payload), {
-    onSuccess: (updatedPost) => {
+    onSuccess: (updatedPost: any) => {
       queryClient.setQueryData(["posts"], (prev: any) =>
         prev.map((post: Post) =>
           post.id === updatedPost.id ? updatedPost : post

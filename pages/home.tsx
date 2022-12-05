@@ -26,14 +26,12 @@ const Home: NextPage<HomePageProps> = () => {
   return (
     <ProtectedRoute>
       <div className="font-kanit pb-16">
-        <header></header>
         <main className="mt-2">
           <section className="flex flex-col gap-10 p-2 py-3">
             {posts.map((post, index) => (
               <Posts post={post} key={index} />
             ))}
           </section>
-          <input type="checkbox" id="my-modal" className="modal-toggle" />
         </main>
       </div>
     </ProtectedRoute>
