@@ -65,7 +65,7 @@ export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
         <div className="modal-box font-kanit">
           <h3 className="text-lg">{title}</h3>
           <div className="mt-4">
-            <ul className="flex flex-col gap-2 p-2 bg-dark rounded-md h-[26rem]">
+            <ul className="flex flex-col gap-2 rounded-md h-[26rem]">
               {group?.map((item, index) => (
                 <li
                   key={index}
@@ -73,7 +73,7 @@ export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
                   className="flex gap-2 items-center bg-dark rounded-md py-1 px-2 shadow-sm shadow-black"
                 >
                   <div className="avatar">
-                    <div className="w-10 border-2 border-primary rounded-full">
+                    <div className="w-10 rounded-full">
                       <img src={item.avatar_url}></img>
                     </div>
                   </div>

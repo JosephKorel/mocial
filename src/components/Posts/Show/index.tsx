@@ -1,8 +1,13 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsHeart, BsHeartFill, BsThreeDots } from "react-icons/bs";
 import { FaCommentAlt } from "react-icons/fa";
-import { RiDeleteBackLine, RiEdit2Line, RiSendPlaneFill } from "react-icons/ri";
+import {
+  RiDeleteBackLine,
+  RiDeleteBin6Line,
+  RiEdit2Line,
+  RiSendPlaneFill,
+} from "react-icons/ri";
 import { Comment, Post } from "../../../../models/interfaces";
 import {
   useMutatePost,
@@ -16,6 +21,7 @@ import {
 } from "../../../../utils/Tools";
 import { useAuthContext } from "../../../context";
 import { Modal } from "../../Profile/Modal";
+import { CommentFooterProps } from "./models";
 import { handleComment, handleCommentLike, handleLike } from "./tools";
 
 export const Posts = ({ post }: { post: Post }) => {
@@ -23,6 +29,7 @@ export const Posts = ({ post }: { post: Post }) => {
   const { user } = useQueryData(["user"]);
   const [content, setContent] = useState("");
   const [showComments, setShowComments] = useState(false);
+  const [children, setChildren] = useState(<div></div>);
   const { mutate } = useUpdatePost();
   const { setError } = useAuthContext();
   const author = post.profiles!;
@@ -51,41 +58,24 @@ export const Posts = ({ post }: { post: Post }) => {
   };
 
   return (
-    <article className="text-center py-1 px-3 bg-dark rounded-md">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="avatar">
-            <div className="w-8 rounded-full border border-gray-100">
-              <img
-                src={author.avatar_url}
-                alt={author.username}
-                referrerPolicy="no-referrer"
-              ></img>
-            </div>
-          </div>
-          <p
-            className="text-sm italic underline text-gray-100"
-            onClick={() => goToProfile(author.id)}
-          >
-            {author.username}
-          </p>
-        </div>
-        <p className="font-light italic text-xs text-gray-400">{created_at}</p>
+    <article className="text-center p-3 bg-dark rounded-md relative">
+      {author.id == user.id ? (
+        <PostOptions id={post.id} setChildren={setChildren} />
+      ) : (
+        <></>
+      )}
+      <div className="flex flex-col items-center justify-center">
+        <img
+          src={subject.cover.sm}
+          alt={subject.name}
+          className={`rounded-full w-14 border-2 border-danube`}
+        ></img>
+        <p className="text-xl font-extralight italic text-gray-100">
+          {subject.name}
+        </p>
       </div>
+      <div className="p-[1px] mt-1 mb-4 w-11/12 mx-auto rounded-md bg-gray-200"></div>
       <div className="flex flex-col justify-center p-2 px-3 bg-dark shadow-md border border-danube shadow-black rounded-md my-2 text-gray-100 relative">
-        {author.id == user.id ? <PostOptions id={post.id} /> : <></>}
-        <div className="flex flex-col items-center justify-center">
-          <img
-            src={subject.cover.sm}
-            alt={subject.name}
-            className={`rounded-full w-14 border-2 border-danube`}
-          ></img>
-
-          <p className="text-xl font-extralight italic text-gray-100">
-            {subject.name}
-          </p>
-        </div>
-        <div className="p-[1px] mt-1 mb-4 w-11/12 mx-auto rounded-md bg-danube"></div>
         <h1 className="text-lg italic text-left">{post.title}</h1>
         <p className="text-sm font-thin text-justify py-2">{post.content}</p>
         <div className="flex items-center justify-end gap-4">
@@ -108,6 +98,26 @@ export const Posts = ({ post }: { post: Post }) => {
             <span className="text-sm">{post.liked_by.length}</span>
           </div>
         </div>
+      </div>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="avatar">
+            <div className="w-8 rounded-full border border-gray-100">
+              <img
+                src={author.avatar_url}
+                alt={author.username}
+                referrerPolicy="no-referrer"
+              ></img>
+            </div>
+          </div>
+          <p
+            className="text-sm italic underline text-gray-100"
+            onClick={() => goToProfile(author.id)}
+          >
+            {author.username}
+          </p>
+        </div>
+        <p className="font-light italic text-xs text-gray-400">{created_at}</p>
       </div>
       {showComments ? (
         <div className="text-left rounded-md py-1">
@@ -134,16 +144,19 @@ export const Posts = ({ post }: { post: Post }) => {
           <div className="w-full p-[1px] bg-gray-300 rounded-md mt-4 mb-2"></div>
           <div className="flex flex-col gap-2 py-2 pb-4">
             {comments.map((comment, index) => (
-              <RenderComment key={index} comment={comment} post={post} />
+              <RenderComment
+                key={index}
+                comment={comment}
+                post={post}
+                setChildren={setChildren}
+              />
             ))}
           </div>
         </div>
       ) : (
         <></>
       )}
-      <Modal>
-        <ConfirmDelete id={post.id} />
-      </Modal>
+      <Modal>{children}</Modal>
     </article>
   );
 };
@@ -151,9 +164,11 @@ export const Posts = ({ post }: { post: Post }) => {
 export const RenderComment = ({
   comment,
   post,
+  setChildren,
 }: {
   comment: Comment;
   post: Post;
+  setChildren: (data: JSX.Element) => void;
 }) => {
   const router = useRouter();
   const { profiles, user } = useQueryData(["profiles", "user"]);
@@ -163,6 +178,13 @@ export const RenderComment = ({
   const hasLiked = comment.liked_by.includes(user.id);
   const timestamp = getDateDifference(comment.created_at);
   const handleLikeParams = { post, comment, mutate, setError, user, hasLiked };
+  const footerProps = {
+    setChildren,
+    comment,
+    handleLikeParams,
+    hasLiked,
+    post,
+  };
 
   const goToProfile = (id: string) => {
     if (id == user.id) {
@@ -202,26 +224,22 @@ export const RenderComment = ({
           </p>
           <span className="text-gray-400">{timestamp}</span>
         </div>
-        <p className="text-sm text-justify max-h-20 overflow-y-auto font-light">
+        <p className="text-sm text-justify my-2 font-light">
           {comment.content}
         </p>
-        <div className="flex items-center justify-end gap-1 mt-2">
-          {hasLiked ? (
-            <BsHeartFill
-              className="text-error"
-              onClick={() => handleCommentLike(handleLikeParams)}
-            />
-          ) : (
-            <BsHeart onClick={() => handleCommentLike(handleLikeParams)} />
-          )}
-          <span className="text-sm">{comment.liked_by.length}</span>
-        </div>
+        <CommentFooter props={footerProps} />
       </div>
     </article>
   );
 };
 
-export const PostOptions = ({ id }: { id: number }) => {
+export const PostOptions = ({
+  id,
+  setChildren,
+}: {
+  id: number;
+  setChildren: (data: JSX.Element) => void;
+}) => {
   const router = useRouter();
   const editPost = (id: number) => {
     router.push({ pathname: "/Posts/Edit/[id]", query: { id } });
@@ -242,7 +260,10 @@ export const PostOptions = ({ id }: { id: number }) => {
           </label>
         </li>
         <li>
-          <label htmlFor="general-modal">
+          <label
+            htmlFor="general-modal"
+            onClick={() => setChildren(<ConfirmDelete id={id} />)}
+          >
             <RiDeleteBackLine /> Excluir
           </label>
         </li>
@@ -267,7 +288,7 @@ export const ConfirmDelete = ({ id }: { id: number }) => {
     <div>
       <h1 className="text-xl text-left text-gray-200">Excluir publicação</h1>
       <p className="text-sm text-gray-300 text-left mt-2 mb-6">
-        Deseja mesmo excluir esta publicação? De id {id}
+        Deseja mesmo excluir esta publicação?
       </p>
       <div className="modal-action flex justify-between items-center">
         <label
@@ -283,6 +304,146 @@ export const ConfirmDelete = ({ id }: { id: number }) => {
         >
           Excluir
         </button>
+      </div>
+    </div>
+  );
+};
+
+export const ConfirmCommmentDelete = ({
+  id,
+  post,
+}: {
+  id: number;
+  post: Post;
+}) => {
+  const { mutate } = useMutatePost("update");
+  const handleDelete = () => {
+    const comments = post.comments.filter((item) => item.id != id);
+    let payload = { id: post.id, body: { comments }, option: "update" };
+    const closeBtn = document.getElementById("closeModal");
+    try {
+      mutate(payload);
+      closeBtn?.click();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <div>
+      <h1 className="text-xl text-left text-gray-200">Excluir comentário</h1>
+      <p className="text-sm text-gray-300 text-left mt-2 mb-6">
+        Deseja mesmo excluir este comentário?
+      </p>
+      <div className="modal-action flex justify-between items-center">
+        <label
+          className="btn btn-sm btn-outline"
+          htmlFor="general-modal"
+          id="closeModal"
+        >
+          Cancelar
+        </label>
+        <button
+          className="btn btn-sm btn-error btn-outline"
+          onClick={handleDelete}
+        >
+          Excluir
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export const EditComment = ({ id, post }: { id: number; post: Post }) => {
+  const { mutate } = useMutatePost("update");
+  const [comment] = post.comments.filter((item) => item.id == id);
+  const [content, setContent] = useState(comment.content);
+
+  useEffect(() => {
+    setContent(comment.content);
+  }, [id]);
+
+  const handleEdit = () => {
+    const comments = post.comments.map((item) => {
+      return item.id == id
+        ? { ...item, content, created_at: new Date().getTime() }
+        : item;
+    });
+    let payload = { id: post.id, body: { comments }, option: "update" };
+    const closeBtn = document.getElementById("closeModal");
+    try {
+      mutate(payload);
+      closeBtn?.click();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <div>
+      <h1 className="text-xl text-left text-gray-200">Editar comentário</h1>
+      <textarea
+        placeholder="Escreva seu comentário"
+        value={content}
+        maxLength={165}
+        onChange={(e) => setContent(e.currentTarget.value)}
+        className="bg-inherit text-sm font-light relative block h-20 mt-4 rounded-md w-full p-3 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+      />
+      <div className="modal-action flex justify-between items-center">
+        <label
+          className="btn btn-sm btn-outline"
+          htmlFor="general-modal"
+          id="closeModal"
+        >
+          Cancelar
+        </label>
+        <button
+          className="btn btn-sm btn-error btn-outline"
+          onClick={handleEdit}
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export const CommentFooter = ({ props }: { props: CommentFooterProps }) => {
+  const { user } = useQueryData(["user"]);
+  const { setChildren, comment, handleLikeParams, hasLiked, post } = props;
+  return (
+    <div className="flex justify-between items-center mt-2">
+      {user.id == comment.author ? (
+        <div className="flex items-center gap-2">
+          <label htmlFor="general-modal">
+            <RiEdit2Line
+              onClick={() =>
+                setChildren(<EditComment id={comment.id} post={post} />)
+              }
+            />
+          </label>
+          <label htmlFor="general-modal">
+            <RiDeleteBin6Line
+              onClick={() =>
+                setChildren(
+                  <ConfirmCommmentDelete id={comment.id} post={post} />
+                )
+              }
+            />
+          </label>
+        </div>
+      ) : (
+        <div className="w-2"></div>
+      )}
+
+      <div className="flex items-center gap-1">
+        {hasLiked ? (
+          <BsHeartFill
+            className="text-error"
+            onClick={() => handleCommentLike(handleLikeParams)}
+          />
+        ) : (
+          <BsHeart onClick={() => handleCommentLike(handleLikeParams)} />
+        )}
+        <span className="text-sm">{comment.liked_by.length}</span>
       </div>
     </div>
   );

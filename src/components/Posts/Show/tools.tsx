@@ -1,29 +1,5 @@
-import { Comment, Post, Profile } from "../../../../models/interfaces";
-
-interface LikePost {
-  post: Post;
-  user: Profile;
-  mutate: (data: any) => void;
-  setError: (data: string) => void;
-}
-
-interface CommentPost {
-  content: string;
-  setContent: (data: string) => void;
-  user: Profile;
-  mutate: (data: any) => void;
-  setError: (data: string) => void;
-  post: Post;
-}
-
-interface LikeComment {
-  user: Profile;
-  mutate: (data: any) => void;
-  comment: Comment;
-  hasLiked: boolean;
-  setError: (data: string) => void;
-  post: Post;
-}
+import { Comment } from "../../../../models/interfaces";
+import { CommentPost, LikeComment, LikePost } from "./models";
 
 export const handleLike = (params: LikePost) => {
   const { post, user, mutate, setError } = params;
