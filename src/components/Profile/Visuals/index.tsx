@@ -1,6 +1,26 @@
-import { MdOutlineLibraryAdd } from "react-icons/md";
-
-import { Albums, Music, Suggestion } from "../../../../models/interfaces";
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { BsThreeDots } from "react-icons/bs";
+import { IoMdImages } from "react-icons/io";
+import {
+  MdArrowBackIos,
+  MdOutlineLibraryAdd,
+  MdOutlineManageAccounts,
+} from "react-icons/md";
+import { RiEdit2Line } from "react-icons/ri";
+import { VscSignOut } from "react-icons/vsc";
+import {
+  Albums,
+  Music,
+  Profile,
+  Suggestion,
+} from "../../../../models/interfaces";
+import {
+  useQueryData,
+  useUserMutation,
+  useUserUpdate,
+} from "../../../../utils/Hooks";
+import { Modal } from "../Modal";
 
 export const RenderAlbums = ({ album }: { album: Albums }) => {
   return (
@@ -102,5 +122,220 @@ export const RenderMusicList = ({
         </button>
       </div>
     </li>
+  );
+};
+
+interface Options {
+  setOpen: (data: boolean) => void;
+  handleLogout: () => void;
+}
+
+export const ProfileOptions = ({ props }: { props: Options }) => {
+  const router = useRouter();
+  const { setOpen, handleLogout } = props;
+  return (
+    <div>
+      <div className="flex justify-between items-center absolute top-2 w-full px-2">
+        <button
+          onClick={() => router.back()}
+          className="text-gray-100 px-3 py-1 rounded-md bg-dark-600 duration-200 hover:text-warning flex items-center justify-center"
+        >
+          <MdArrowBackIos className="lg:text-xl" />
+          <span className="text-sm font-thin">VOLTAR</span>
+        </button>
+        <div className="dropdown dropdown-end">
+          <button
+            tabIndex={0}
+            className="p-1 px-2 rounded-md bg-dark-600 text-gray-100"
+          >
+            <BsThreeDots />
+          </button>
+          <ul
+            tabIndex={0}
+            className="menu menu-compact dropdown-content text-gray-300 shadow bg-base-200 rounded-md w-44"
+          >
+            <li>
+              <label
+                htmlFor="bg-modal"
+                className=""
+                onClick={() =>
+                  setTimeout(() => {
+                    setOpen(true);
+                  }, 100)
+                }
+              >
+                <IoMdImages className="" />
+                Alterar fundo
+              </label>
+            </li>
+            <li>
+              <a className="" onClick={() => router.push("/edit-account")}>
+                <MdOutlineManageAccounts className="text-lg" />
+                Preferências
+              </a>
+            </li>
+            <li onClick={handleLogout}>
+              <a>
+                <VscSignOut className="text-error" /> Sair
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface HeaderProps {
+  user: Profile;
+  followers: Profile[];
+  following: Profile[];
+  setSeeing: (data: string) => void;
+  setChildren?: (data: JSX.Element) => void;
+}
+
+export const ProfileHeader = ({ props }: { props: HeaderProps }) => {
+  const { user, setSeeing, followers, following, setChildren } = props;
+  const { user: currentUser } = useQueryData(["user"]);
+  const visiting = currentUser.id != user.id;
+
+  return (
+    <div>
+      <div className="flex justify-center z-10">
+        <div className="avatar relative z-10">
+          <div className="w-20 rounded-full border-4 border-danube">
+            <img
+              src={user.avatar_url}
+              alt={user.username}
+              referrerPolicy="no-referrer"
+            ></img>
+          </div>
+        </div>
+      </div>
+      <div className="bg-dark-600 relative z-10">
+        <div className="flex flex-col items-center gap-0">
+          <h2 className="text-gray-100 text-lg font-light">{user?.username}</h2>
+        </div>
+        <article className="px-2">
+          <ul className="flex justify-center items-center gap-1">
+            {user.genres.map((genre, index) => (
+              <li key={index}>
+                <span className="badge badge-sm badge-primary badge-outline">
+                  {genre}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </article>
+        <article className="w-2/3 m-auto mt-2">
+          <ul className="flex justify-between items-center">
+            <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
+              <span className="font-normal text-base">0</span>
+              <label htmlFor="friend-modal">POSTS</label>
+            </li>
+            <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
+              <span className="font-normal text-base">{followers.length}</span>
+              <label
+                htmlFor="friend-modal"
+                onClick={() => setSeeing("followers")}
+              >
+                SEGUIDORES
+              </label>
+            </li>
+            <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
+              <span className="font-normal text-base">{following.length}</span>
+              <label
+                htmlFor="friend-modal"
+                onClick={() => setSeeing("following")}
+              >
+                SEGUINDO
+              </label>
+            </li>
+          </ul>
+        </article>
+        <div className="h-24">
+          <Description user={user} setChildren={setChildren!} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Description = ({
+  user,
+  setChildren,
+}: {
+  user: Profile;
+  setChildren: (data: JSX.Element) => void;
+}) => {
+  const { user: currentUser } = useQueryData(["user"]);
+  const visiting = currentUser.id != user.id;
+  if (!visiting) {
+    return (
+      <article className="w-11/12 m-auto py-2 px-4 shadow-md shadow-black rounded-md flex justify-between items-start">
+        <p className="w-11/12 text-justify text-sm">{user.description}</p>
+        <label
+          htmlFor="general-modal"
+          onClick={() => setChildren!(<EditDescription />)}
+        >
+          <RiEdit2Line className="text-danube" />
+        </label>
+      </article>
+    );
+  } else
+    return (
+      <article className="w-11/12 m-auto py-2 px-4 shadow-md shadow-black rounded-md">
+        <p className="text-justify text-sm">{user.description}</p>
+      </article>
+    );
+};
+
+export const EditDescription = () => {
+  const { user } = useQueryData(["user"]);
+  const { mutate } = useUserUpdate();
+  const [description, setDescription] = useState(user.description);
+
+  const handleEdit = () => {
+    const payload = {
+      id: user.id,
+      body: { description },
+    };
+
+    const closeBtn = document.getElementById("closeModal");
+
+    try {
+      mutate(payload);
+      closeBtn?.click();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <div>
+      <h1 className="text-xl text-left text-gray-200">Editar descrição</h1>
+      <textarea
+        placeholder="Escreva seu comentário"
+        value={description}
+        maxLength={120}
+        onChange={(e) => setDescription(e.currentTarget.value)}
+        className="bg-inherit text-sm font-light relative block h-20 mt-4 rounded-md w-full p-3 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+      />
+      <div className="modal-action flex justify-between items-center">
+        <label
+          className="btn btn-sm btn-outline"
+          htmlFor="general-modal"
+          id="closeModal"
+        >
+          Cancelar
+        </label>
+        <button
+          className="btn btn-sm btn-primary btn-outline"
+          onClick={handleEdit}
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
   );
 };

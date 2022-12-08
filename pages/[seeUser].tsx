@@ -9,7 +9,11 @@ import {
 } from "../src/components/Profile/Modal";
 import { BsArrowLeftRight } from "react-icons/bs";
 import { useProfileMutation, useProfiles, useUser } from "../utils/Hooks";
-import { RenderAlbums, RenderMusics } from "../src/components/Profile/Visuals";
+import {
+  ProfileHeader,
+  RenderAlbums,
+  RenderMusics,
+} from "../src/components/Profile/Visuals";
 import ProtectedRoute from "../src/components/Protector";
 import { getFollowers, getFollowing } from "../src/components/Profile/Visit";
 
@@ -69,6 +73,8 @@ const Profile: NextPage = () => {
     }
   };
 
+  const headerProps = { user: target, followers, following, setSeeing };
+
   return (
     <ProtectedRoute>
       <div
@@ -92,75 +98,10 @@ const Profile: NextPage = () => {
               <span>{isFollowing ? "SEGUINDO" : "SEGUIR"}</span>
             </button>
           </div>
-          <div className="w-full h-12 bg-dark-600 absolute top-1/2 -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
-          <div className="flex justify-center z-10">
-            <div className="avatar relative z-10">
-              <div className="w-20 rounded-full border-4 border-danube">
-                <img
-                  src={target?.avatar_url}
-                  alt="Avatar"
-                  referrerPolicy="no-referrer"
-                  className=""
-                ></img>
-              </div>
-            </div>
-          </div>
-          <div className="bg-dark-600 relative z-10">
-            <div className="flex flex-col items-center gap-0">
-              <h2 className="text-gray-100 text-lg font-light">
-                {target?.username}
-              </h2>
-            </div>
-
-            <article className="px-2">
-              <ul className="flex justify-center items-center gap-1">
-                {target.genres.map((genre, index) => (
-                  <li key={index}>
-                    <span className="badge badge-sm badge-secondary badge-outline">
-                      {genre}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-            <article className="w-2/3 m-auto mt-4">
-              <ul className="flex justify-between items-center">
-                <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
-                  <span className="font-normal text-base">0</span>
-                  <label
-                    htmlFor="friend-modal"
-                    onClick={() => setSeeing("followers")}
-                  >
-                    POSTS
-                  </label>
-                </li>
-                <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
-                  <span className="font-normal text-base">
-                    {target.followers.length}
-                  </span>
-                  <label
-                    htmlFor="friend-modal"
-                    onClick={() => setSeeing("followers")}
-                  >
-                    SEGUIDORES
-                  </label>
-                </li>
-                <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
-                  <span className="font-normal text-base">
-                    {target.following.length}
-                  </span>
-                  <label
-                    htmlFor="friend-modal"
-                    onClick={() => setSeeing("following")}
-                  >
-                    SEGUINDO
-                  </label>
-                </li>
-              </ul>
-            </article>
-          </div>
+          <div className="w-full h-16 bg-dark-600 absolute top-[38%] -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
+          <ProfileHeader props={headerProps} />
         </header>
-        <main className="px-2 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 -translate-y-4 pb-14 mt-4">
+        <main className="px-2 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 pb-14 mt-4">
           <section>
             <div className="flex justify-between items-center">
               <div className="tabs">

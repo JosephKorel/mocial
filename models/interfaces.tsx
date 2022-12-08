@@ -6,6 +6,7 @@ export type HomePageProps = {
 export interface Profile {
   id: string;
   username: string;
+  description: string;
   avatar_url: string;
   genres: string[];
   musics: Music[];

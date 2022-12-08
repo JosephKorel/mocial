@@ -344,10 +344,6 @@ export const ConfirmModal = ({
 };
 
 export const Modal = ({ children }: { children: React.ReactNode }) => {
-  const { setError } = useAuthContext();
-  const { user } = useQueryData(["user"]);
-  const { mutate } = useUserUpdate();
-
   return (
     <div>
       <input type="checkbox" id="general-modal" className="modal-toggle" />
