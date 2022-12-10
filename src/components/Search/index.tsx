@@ -27,6 +27,25 @@ export const RenderUser = ({ user }: { user: Profile }) => {
 export const RenderPost = ({ post }: { post: Post }) => {
   const router = useRouter();
   const { cover, name, artist } = post.subject;
+
+  const postSubject = () => {
+    let artistName = "";
+    artist.forEach((item, index, arr) => {
+      if (index == arr.length - 1) {
+        artistName += `${item}, `;
+        return;
+      }
+      artistName += item;
+    });
+
+    const combinedName = artistName + "-" + ` ${name}`;
+
+    if (combinedName.length > 32) {
+      return combinedName.slice(0, 32) + "...";
+    }
+
+    return combinedName;
+  };
   return (
     <li
       className="flex gap-2 items-start rounded-md p-2 bg-dark shadow-sm shadow-black"
@@ -43,9 +62,7 @@ export const RenderPost = ({ post }: { post: Post }) => {
         <h1 className={`leading-3 ${post.title.length > 24 && "text-sm"}`}>
           {post.title}
         </h1>
-        <span className="text-gray-500 text-sm">
-          {getArtist(artist)} - {name}
-        </span>
+        <span className="text-gray-500 text-sm">{postSubject()}</span>
       </div>
     </li>
   );

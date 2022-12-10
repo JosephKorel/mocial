@@ -69,6 +69,10 @@ export const userUpdate = async (payload: UpdatePayload) => {
     .update(payload.body)
     .eq("id", payload.id);
 
+  if (error) {
+    console.log(error);
+  }
+
   return error ? error : data;
 };
 

@@ -1,13 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { BsBoxArrowInUpRight } from "react-icons/bs";
-import {
-  Albums,
-  CoverImg,
-  Music,
-  Profile,
-  Suggestion,
-} from "../../../../models/interfaces";
+import { Music, Profile, Suggestion } from "../../../../models/interfaces";
 import React, { useState } from "react";
 import { useAuthContext } from "../../../context";
 import { ProfilePayload } from "../../../../pages/api/query-tools";
@@ -20,12 +13,13 @@ import {
   useQueryData,
   useUserUpdate,
 } from "../../../../utils/Hooks";
-import { MdOutlineLibraryAdd } from "react-icons/md";
 import { formatAlbums, formatMusic } from "../../../../utils/Tools";
 import { RenderMusicList } from "../Visuals";
 import { handleSelect, handleSuggestion } from "./tools";
+import { IoPersonRemoveOutline } from "react-icons/io5";
 
 interface UsersModal {
+  visiting: boolean;
   modalProps: {
     seeing: string;
     followers: Profile[];
@@ -33,13 +27,19 @@ interface UsersModal {
   };
 }
 
-export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
+export const FollowerFollowing = ({
+  modalProps,
+  visiting,
+}: UsersModal): JSX.Element => {
   const { seeing, followers, following } = modalProps;
-  const { user } = useQueryData(["user"]);
+  const { data } = useUser();
+  const { mutate } = useUserUpdate();
   const title = seeing == "followers" ? "Seguidores" : "Seguindo";
   const group = seeing == "followers" ? followers : following;
 
   const router = useRouter();
+
+  const user = data as Profile;
 
   const goToProfile = (id: string) => {
     if (id == user.id) {
@@ -58,6 +58,35 @@ export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
     closeBtn?.click();
   };
 
+  const handleFriends = (id: string) => {
+    if (seeing == "followers") {
+      const onFilter = user.followers.filter((item) => item != id);
+      const payload = {
+        id: user.id,
+        body: { followers: onFilter },
+      };
+
+      try {
+        mutate(payload);
+      } catch (error) {
+        console.log(error);
+      }
+      return;
+    }
+
+    const onFilter = user.following.filter((item) => item != id);
+    const payload = {
+      id: user.id,
+      body: { following: onFilter },
+    };
+
+    try {
+      mutate(payload);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
       <input type="checkbox" id="friend-modal" className="modal-toggle" />
@@ -69,17 +98,30 @@ export const FollowerFollowing = ({ modalProps }: UsersModal): JSX.Element => {
               {group?.map((item, index) => (
                 <li
                   key={index}
-                  onClick={() => goToProfile(item.id)}
-                  className="flex gap-2 items-center bg-dark rounded-md py-1 px-2 shadow-sm shadow-black"
+                  className="flex gap-2 items-center bg-dark border border-dark-400 rounded-md py-1 px-2"
                 >
                   <div className="avatar">
                     <div className="w-10 rounded-full">
                       <img src={item.avatar_url}></img>
                     </div>
                   </div>
-                  <p className="flex-1 self-start text-gray-200 text-lg">
-                    {item.username}
-                  </p>
+                  <div
+                    className="flex-1 flex flex-col"
+                    onClick={() => goToProfile(item.id)}
+                  >
+                    <p className=" text-gray-200 text-lg">{item.username}</p>
+                    <span className="overflow-y-hidden h-4 w-fit-content text-xs text-gray-400">
+                      {item.description.slice(0, 32)}...
+                    </span>
+                  </div>
+                  {visiting ? (
+                    <></>
+                  ) : (
+                    <IoPersonRemoveOutline
+                      className="text-error"
+                      onClick={() => handleFriends(item.id)}
+                    />
+                  )}
                 </li>
               ))}
             </ul>

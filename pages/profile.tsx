@@ -9,7 +9,7 @@ import {
   FollowerFollowing,
   Modal,
 } from "../src/components/Profile/Modal";
-import { useQueryData, useUser } from "../utils/Hooks";
+import { useProfiles, useQueryData, useUser } from "../utils/Hooks";
 import {
   ProfileHeader,
   ProfileOptions,
@@ -27,10 +27,11 @@ const Account: NextPage = () => {
   const [children, setChildren] = useState<React.ReactNode | null>(null);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const { data, isLoading } = useUser();
-  const { profiles } = useQueryData(["profiles"]);
+  const { data: profileData } = useProfiles();
   const router = useRouter();
   if (isLoading) return <div></div>;
   const user = data as Profile;
+  const profiles = profileData as Profile[];
 
   const background = user?.background
     ? user.background
@@ -120,7 +121,10 @@ const Account: NextPage = () => {
           </section>
         </main>
         <BackgroundModal bgProps={{ open, setOpen }} />
-        <FollowerFollowing modalProps={{ seeing, followers, following }} />
+        <FollowerFollowing
+          modalProps={{ seeing, followers, following }}
+          visiting={false}
+        />
         <ConfirmModal suggestion={suggestion} />
         <Modal>{children}</Modal>
       </div>

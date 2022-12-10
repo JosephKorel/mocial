@@ -149,7 +149,10 @@ const Profile: NextPage = () => {
             </article>
           </section>
         </main>
-        <FollowerFollowing modalProps={{ seeing, followers, following }} />
+        <FollowerFollowing
+          modalProps={{ seeing, followers, following }}
+          visiting
+        />
         <SuggestModal option={option} targetId={target.id} />
       </div>
     </ProtectedRoute>

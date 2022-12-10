@@ -7,7 +7,6 @@ import {
   MdOutlineLibraryAdd,
   MdOutlineManageAccounts,
 } from "react-icons/md";
-import { RiEdit2Line } from "react-icons/ri";
 import { VscSignOut } from "react-icons/vsc";
 import {
   Albums,
@@ -15,16 +14,11 @@ import {
   Profile,
   Suggestion,
 } from "../../../../models/interfaces";
-import {
-  useQueryData,
-  useUserMutation,
-  useUserUpdate,
-} from "../../../../utils/Hooks";
-import { Modal } from "../Modal";
+import { useQueryData, useUserUpdate } from "../../../../utils/Hooks";
 
 export const RenderAlbums = ({ album }: { album: Albums }) => {
   return (
-    <li className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32">
+    <li className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
       <figure className="">
         <img
           src={album.cover.md}
@@ -270,24 +264,12 @@ export const Description = ({
 }) => {
   const { user: currentUser } = useQueryData(["user"]);
   const visiting = currentUser.id != user.id;
-  if (!visiting) {
-    return (
-      <article className="w-11/12 m-auto py-2 px-4 shadow-md shadow-black rounded-md flex justify-between items-start">
-        <p className="w-11/12 text-justify text-sm">{user.description}</p>
-        <label
-          htmlFor="general-modal"
-          onClick={() => setChildren!(<EditDescription />)}
-        >
-          <RiEdit2Line className="text-danube" />
-        </label>
-      </article>
-    );
-  } else
-    return (
-      <article className="w-11/12 m-auto py-2 px-4 shadow-md shadow-black rounded-md">
-        <p className="text-justify text-sm">{user.description}</p>
-      </article>
-    );
+
+  return (
+    <article className="w-11/12 m-auto py-2 px-4 shadow-md shadow-black rounded-md">
+      <p className="text-justify text-sm">{user.description}</p>
+    </article>
+  );
 };
 
 export const EditDescription = () => {
