@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
+import { AiOutlinePlus, AiOutlineSearch } from "react-icons/ai";
 import { Albums, CoverImg, Music } from "../../../models/interfaces";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { CgPlayListRemove } from "react-icons/cg";
+import { getArtist } from "../../../utils/Tools";
 
 interface BasicInfo {
   setError: (data: string) => void;
   infoProps?: {
     username: string;
     setUsername: (data: string) => void;
+    description: string;
+    setDescription: (data: string) => void;
     imgUrl: string;
     displayImg: (data: any) => void;
     step: number;
@@ -37,7 +40,15 @@ interface BasicInfo {
 }
 
 export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
-  const { imgUrl, username, setUsername, displayImg, setStep } = infoProps!;
+  const {
+    imgUrl,
+    username,
+    setUsername,
+    description,
+    setDescription,
+    displayImg,
+    setStep,
+  } = infoProps!;
 
   const handleSubmit = () => {
     if (username.length < 3) {
@@ -47,7 +58,7 @@ export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
     setStep(2);
   };
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2 font-kanit">
       {imgUrl ? (
         <img
           src={imgUrl}
@@ -59,7 +70,7 @@ export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
             onClick={() => {
               document.getElementById("avatar_input")?.click();
             }}
-            className="w-20 h-20 lg:w-28 lg:h-28 rounded-full border border-secondary text-secondary duration-200 hover:bg-secondary hover:text-primary cursor-pointer flex flex-col items-center justify-center"
+            className="w-20 h-20 lg:w-28 lg:h-28 rounded-full border border-primary text-gray-300 duration-200 hover:bg-secondary hover:text-primary cursor-pointer flex flex-col items-center justify-center"
           >
             <AiOutlinePlus className="text-4xl" />
           </button>
@@ -68,19 +79,28 @@ export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
       <div className="w-5/6 lg:w-1/4 flex justify-center">
         <div className="w-full">
           <h2
-            className={`text-xl lg:text-3xl font-thin font-kanit ${
-              username ? "text-secondary" : "text-primary"
+            className={`text-xl lg:text-3xl font-thin ${
+              username ? "text-gray-300" : "text-gray-300"
             }`}
           >
             {username ? username : "Eu me chamo..."}
           </h2>
           <input
-            className="input input-bordered input-primary w-full mt-1 lg:mt-4"
+            className="bg-inherit relative block rounded-md w-full p-2 mt-2 border border-gray-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
             id="username"
             type="text"
+            maxLength={18}
             placeholder="Nome"
             value={username}
             onChange={(e) => setUsername(e.currentTarget.value)}
+          />
+          <h2 className="text-xl lg:text-3xl font-thin mt-4">Sobre mim</h2>
+          <textarea
+            placeholder="Fale sobre você"
+            value={description}
+            maxLength={165}
+            onChange={(e) => setDescription(e.currentTarget.value)}
+            className="bg-inherit relative block h-20 mt-2 rounded-md w-full p-2 border-2 border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
           />
           <input
             id="avatar_input"
@@ -89,7 +109,7 @@ export const BasicInfo = ({ infoProps, setError }: BasicInfo): JSX.Element => {
             className="hidden"
           />
           <button
-            className="btn btn-outline btn-secondary btn-sm lg:btn-md float-right mt-4"
+            className="btn btn-outline btn-primary btn-sm lg:btn-md float-right mt-4"
             onClick={handleSubmit}
           >
             CONTINUAR
@@ -128,17 +148,24 @@ export const GenreSelect = ({
   };
   return (
     <div className="font-kanit">
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center px-4">
         <h1 className="text-primary text-2xl lg:text-5xl font-semibold">
           Gêneros favoritos
         </h1>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Procurar"
-          className="input input-primary w-5/6 input-sm lg:input-md lg:w-1/3 mt-2"
-        />
-        <div className="w-11/12 lg:w-1/2 h-[26rem] overflow-auto lg:h-[32rem] flex justify-start gap-2 items-center flex-wrap mt-4">
+        <div className="bg-dark rounded-lg flex justify-between items-center relative w-full">
+          <input
+            placeholder="Procurar"
+            className="bg-inherit relative text-sm block rounded-md w-full px-3 pl-8 py-2 border border-gray-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <AiOutlineSearch
+            className={`absolute left-2 text-lg ${
+              search.length ? "text-danube" : "text-gray-400"
+            }`}
+          />
+        </div>
+        <div className="lg:w-1/2 h-[26rem] overflow-auto lg:h-[32rem] flex justify-start gap-2 items-center flex-wrap mt-4">
           {genres.map((genre, index) => (
             <p
               key={index}
@@ -164,7 +191,7 @@ export const GenreSelect = ({
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary btn-sm lg:btn-md w-32"
+          className="btn btn-outline btn-primary btn-sm lg:btn-md w-32"
           onClick={() => {
             selected.length >= 3 && setStep(3);
           }}
@@ -251,14 +278,23 @@ export const MusicSelect = ({
   return (
     <div className="font-kanit">
       <div className="flex flex-col items-center">
-        <h1 className="text-xl lg:text-5xl font-semibold">Músicas favoritas</h1>
-        <div className="w-full flex justify-center items-end relative">
-          <input
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Procurar"
-            className="input input-primary w-5/6 input-sm lg:input-md lg:w-1/2 mt-2"
-          />
+        <h1 className="text-primary text-2xl lg:text-5xl font-semibold">
+          Músicas favoritas
+        </h1>
+        <div className="w-full flex justify-center items-end relative px-4">
+          <div className="bg-dark rounded-lg flex justify-between items-center relative w-full">
+            <input
+              placeholder="Procurar"
+              className="bg-inherit relative text-sm block rounded-md w-full px-3 pl-8 py-2 border border-gray-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+              value={search}
+              onChange={(e) => handleSearch(e.currentTarget.value)}
+            />
+            <AiOutlineSearch
+              className={`absolute left-2 text-lg ${
+                search.length ? "text-danube" : "text-gray-400"
+              }`}
+            />
+          </div>
         </div>
       </div>
       <div className="w-11/12 lg:w-1/2 mx-auto px-1 lg:px-2 rounded-md mt-4 h-[26rem] lg:h-[32rem] flex flex-col gap-1 scroll-smooth scrollbar relative bg-dark">
@@ -292,14 +328,12 @@ export const MusicSelect = ({
                   <div className="flex flex-col self-start">
                     <p className="lg:text-lg">{item.name}</p>
                     <p className="font-thin text-gray-400 text-sm">
-                      {item.artist.map((obj, i, arr) => {
-                        return i == arr.length - 1 ? obj : obj + ", ";
-                      })}
+                      {getArtist(item.artist)}
                     </p>
                   </div>
                 </div>
                 <div className="self-start">
-                  <button className="text-warning text-xl lg:text-2xl duration-200 lg:hover:text-led-700">
+                  <button className="text-primary text-xl lg:text-2xl duration-200 lg:hover:text-led-700">
                     <MdOutlineLibraryAdd />
                   </button>
                 </div>
@@ -328,7 +362,7 @@ export const MusicSelect = ({
                   </div>
                 </div>
                 <button
-                  className="text-2xl self-start text-warning duration-200 lg:hover:text-error"
+                  className="text-2xl self-start text-error duration-200 lg:hover:text-error"
                   onClick={() => handleChoice(item)}
                 >
                   <CgPlayListRemove />
@@ -348,7 +382,7 @@ export const MusicSelect = ({
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary w-32 btn-sm lg:btn-md"
+          className="btn btn-outline btn-primary w-32 btn-sm lg:btn-md"
           disabled={selectedMusics.length >= 5 ? false : true}
           onClick={() => {
             selectedMusics.length >= 5 && setStep(4);
@@ -441,13 +475,24 @@ export const AlbumSelect = ({
   return (
     <div>
       <div className="flex flex-col items-center">
-        <h1 className="text-xl lg:text-5xl font-semibold">Àlbuns favoritos</h1>
-        <input
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Procurar"
-          className="input input-primary input-sm lg:input-md w-5/6 lg:w-1/2 mt-2"
-        />
+        <h1 className="text-primary text-2xl lg:text-5xl font-semibold">
+          Àlbuns favoritos
+        </h1>
+        <div className="w-full flex justify-center items-end relative px-4">
+          <div className="bg-dark rounded-lg flex justify-between items-center relative w-full">
+            <input
+              placeholder="Procurar"
+              className="bg-inherit relative text-sm block rounded-md w-full px-3 pl-8 py-2 border border-gray-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+              value={search}
+              onChange={(e) => handleSearch(e.currentTarget.value)}
+            />
+            <AiOutlineSearch
+              className={`absolute left-2 text-lg ${
+                search.length ? "text-danube" : "text-gray-400"
+              }`}
+            />
+          </div>
+        </div>
       </div>
       <div className="w-11/12 lg:w-1/2 px-1 lg:px-2 mx-auto mt-4 h-[26rem] lg:h-[32rem] flex flex-col gap-1 scroll-smooth scrollbar relative bg-dark rounded-md">
         <div className="tabs">
@@ -487,7 +532,7 @@ export const AlbumSelect = ({
                   </div>
                 </div>
                 <div className="self-start">
-                  <button className="text-warning text-xl lg:text-2xl duration-200 lg:hover:text-led-700">
+                  <button className="text-primary text-xl lg:text-2xl duration-200 lg:hover:text-led-700">
                     <MdOutlineLibraryAdd />
                   </button>
                 </div>
@@ -517,7 +562,7 @@ export const AlbumSelect = ({
                   </div>
                 </div>
                 <div className="self-start">
-                  <button className="text-warning text-2xl duration-200 lg:hover:text-led-700">
+                  <button className="text-error text-2xl duration-200 lg:hover:text-led-700">
                     <CgPlayListRemove />
                   </button>
                 </div>
@@ -536,7 +581,7 @@ export const AlbumSelect = ({
           VOLTAR
         </button>
         <button
-          className="btn btn-outline btn-secondary btn-sm lg:btn-md w-32"
+          className="btn btn-outline btn-primary btn-sm lg:btn-md w-32"
           disabled={selectedAlbums.length == 5 ? false : true}
           onClick={updateProfile}
         >

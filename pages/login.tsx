@@ -26,35 +26,33 @@ export default function Auth() {
   };
 
   return (
-    <div className="py-2 flex flex-col items-center justify-center h-screen font-kanit">
-      <header className="w-full lg:w-2/3 m-auto absolute top-4">
+    <div className="py-2 font-kanit">
+      <header className="w-full lg:w-2/3 m-auto">
         <h1 className="text-gray-100 font-semibold text-4xl text-center">
-          <span className="font-kanit font-bold text-6xl text-secondary">
-            M
-          </span>
+          <span className="font-bold text-6xl text-primary">M</span>
           ocial
         </h1>
       </header>
-      <main className="w-11/12 lg:w-1/2 m-auto flex flex-col items-center gap-4 p-2 py-5 rounded-md bg-dark h-96">
+      <main className="w-11/12 lg:w-1/2 m-auto flex flex-col items-center gap-4 p-2 py-5 rounded-md">
         <div className="w-full text-center">
           <p className="text-gray-100 text-xl font-light">
-            Entre usando seu email
+            Entre com seu email
           </p>
           <input
-            className="bg-inherit w-11/12 mt-2 lg:w-2/3 text-primary rounded-md p-2 border border-primary active:ring-0 focus:ring-0 active:border-warning-focus outline-none"
+            className="bg-inherit w-full mt-2 lg:w-2/3 text-gray-200 rounded-md p-2 border border-primary active:ring-0 focus:ring-0 active:border-warning-focus outline-none"
             type="email"
             placeholder="E-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        <div>
+        <div className="w-full">
           <button
             onClick={(e) => {
               e.preventDefault();
               handleLogin(email);
             }}
-            className="btn btn-secondary btn-outline text-white"
+            className="btn btn-primary btn-outline btn-block"
             disabled={loading}
           >
             <span>{loading ? "Aguarde" : "Me mande o link mágico!"}</span>

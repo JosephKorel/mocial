@@ -4,7 +4,7 @@ export const getFollowers = (
   target: Profile,
   profiles: Profile[]
 ): Profile[] => {
-  if (!target) return [];
+  if (!profiles) return [];
 
   const getProfiles = target.followers.reduce((acc, curr) => {
     const filter = profiles.filter((item) => item.id == curr);
@@ -19,7 +19,7 @@ export const getFollowing = (
   target: Profile,
   profiles: Profile[]
 ): Profile[] => {
-  if (!target) return [];
+  if (!profiles) return [];
 
   const getProfiles = target.following.reduce((acc, curr) => {
     const filter = profiles.filter((item) => item.id == curr);

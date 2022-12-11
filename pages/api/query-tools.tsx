@@ -129,6 +129,40 @@ export const deletePost = async (payload: MutationPayload) => {
   return data;
 };
 
+export const deleteAvatar = async (path: string) => {
+  try {
+    let { error, data } = await supabase.storage.from("avatars").remove([path]);
+
+    if (error) {
+      throw error;
+    }
+  } catch (error: any) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const uploadAvatar = async (path: string, file: any) => {
+  try {
+    let { error, data } = await supabase.storage
+      .from("avatars")
+      .upload(path, file);
+
+    if (error) {
+      throw error;
+    }
+  } catch (error: any) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getAvatarUrl = (path: string) => {
+  const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+
+  return data.publicUrl;
+};
+
 export const handlePostMutation = async (payload: MutationPayload) => {
   switch (payload.option) {
     case "create":

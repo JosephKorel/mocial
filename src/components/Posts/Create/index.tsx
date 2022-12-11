@@ -1,13 +1,7 @@
 import React from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdClear } from "react-icons/md";
-import { Post } from "../../../../models/interfaces";
-import { createPost } from "../../../../pages/api/query-tools";
-import {
-  useMutatePost,
-  usePostMutation,
-  useQueryData,
-} from "../../../../utils/Hooks";
+import { useMutatePost, useQueryData } from "../../../../utils/Hooks";
 import { getArtist } from "../../../../utils/Tools";
 import { useAuthContext } from "../../../context";
 import { ChooseProps, CreateProps, ResultProps, StepProps } from "./models";

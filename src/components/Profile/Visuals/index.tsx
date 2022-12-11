@@ -196,13 +196,25 @@ export const ProfileHeader = ({ props }: { props: HeaderProps }) => {
   return (
     <div>
       <div className="flex justify-center z-10">
-        <div className="avatar relative z-10">
-          <div className="w-20 rounded-full border-4 border-danube">
-            <img
-              src={user.avatar_url}
-              alt={user.username}
-              referrerPolicy="no-referrer"
-            ></img>
+        <div
+          className={`${
+            user.avatar_url ? "avatar" : "avatar placeholder"
+          } relative z-10`}
+        >
+          <div
+            className={`w-20 rounded-full border-4 border-danube ${
+              user.avatar_url ? "" : "bg-dark"
+            }`}
+          >
+            {user.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt={user.username}
+                referrerPolicy="no-referrer"
+              ></img>
+            ) : (
+              <span>{user.username.slice(0, 1)}</span>
+            )}
           </div>
         </div>
       </div>

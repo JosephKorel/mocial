@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Albums, Music } from "../models/interfaces";
+import { Albums, Music, Profile } from "../models/interfaces";
 import { Alert } from "../src/components/Alert";
 import {
   AlbumSelect,
@@ -10,10 +10,12 @@ import {
 } from "../src/components/LoginInfo/index";
 import { useAuthContext } from "../src/context";
 import { supabase } from "../utils/supabaseClient";
+import { getAvatarUrl, uploadAvatar } from "./api/query-tools";
 
 export default function NewUser({ token }: { token: string }) {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
+  const [description, setDescription] = useState("");
   const [img, setImg] = useState<any>(null);
   const [genres, setGenres] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
@@ -36,6 +38,8 @@ export default function NewUser({ token }: { token: string }) {
             infoProps={{
               username,
               setUsername,
+              description,
+              setDescription,
               step,
               setStep,
               displayImg,
@@ -111,7 +115,7 @@ export default function NewUser({ token }: { token: string }) {
     }
   };
 
-  async function uploadAvatar(file: any): Promise<string | void> {
+  async function handleUpload(file: any): Promise<string | void> {
     try {
       if (img == null) {
         return "";
@@ -119,22 +123,14 @@ export default function NewUser({ token }: { token: string }) {
 
       const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      await uploadAvatar(fileName, file);
 
-      let { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file);
+      const publicUrl = getAvatarUrl(fileName);
 
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-
-      return data.publicUrl;
+      return publicUrl;
     } catch (error: any) {
       alert(error.message);
-    } finally {
+      setError("Houve algum erro, tente novamente");
     }
   }
 
@@ -144,17 +140,21 @@ export default function NewUser({ token }: { token: string }) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      const avatar = await uploadAvatar(img);
+      const avatar = await handleUpload(img);
+      const avatar_url = typeof avatar == "string" ? avatar : "";
 
-      const updates = {
+      const updates: Profile = {
         id: user!.id,
         username,
-        avatar_url: avatar,
+        description,
+        background: "",
+        avatar_url,
         genres: selected,
         musics: selectedMusics,
         albums: selectedAlbums,
         following: [],
         followers: [],
+        suggestions: [],
         updated_at: new Date(),
       };
 
@@ -164,10 +164,7 @@ export default function NewUser({ token }: { token: string }) {
         throw error;
       }
 
-      router.push({
-        pathname: "/[id]",
-        query: { id: user!.id },
-      });
+      router.push("/");
     } catch (error: any) {
       alert(error.message);
     } finally {

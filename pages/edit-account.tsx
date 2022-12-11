@@ -7,6 +7,7 @@ import {
   Description,
   EditAccountHeader,
   SeeAlbums,
+  SeeMusics,
 } from "../src/components/EditAccount";
 import { useUser } from "../utils/Hooks";
 
@@ -16,7 +17,6 @@ const EditAccount = () => {
     return <div></div>;
   }
 
-  const router = useRouter();
   const user = data as Profile;
   const [page, setPage] = useState<JSX.Element | null>(null);
 
@@ -26,6 +26,9 @@ const EditAccount = () => {
         setPage(<SeeAlbums />);
         break;
 
+      case 2:
+        setPage(<SeeMusics />);
+        break;
       default:
         break;
     }
@@ -37,16 +40,20 @@ const EditAccount = () => {
         <>
           <EditAccountHeader />
           <main className="px-4">
+            <h1 className="text-lg">Descrição</h1>
             <Description user={user} />
             <ul className="flex flex-col gap-3 mt-4">
               <li
-                className="flex justify-between items-center p-1 rounded-md bg-dark"
+                className="flex justify-between items-center pl-2 p-1 rounded-md bg-dark"
                 onClick={() => showPage(1)}
               >
                 <span>Ver àlbuns</span>
                 <AiOutlineRight className="text-danube" />
               </li>
-              <li className="flex justify-between items-center p-1 rounded-md bg-dark">
+              <li
+                className="flex justify-between items-center pl-2 p-1 rounded-md bg-dark"
+                onClick={() => showPage(2)}
+              >
                 <span>Ver músicas</span>
                 <AiOutlineRight className="text-danube" />
               </li>

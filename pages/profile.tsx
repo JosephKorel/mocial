@@ -19,6 +19,7 @@ import {
 import { RenderSuggestions } from "../src/components/Profile/Suggestion";
 import ProtectedRoute from "../src/components/Protector";
 import { getFollowers, getFollowing } from "../src/components/Profile/Visit";
+import { queryClient } from "./_app";
 
 const Account: NextPage = () => {
   const [open, setOpen] = useState(false);
@@ -33,9 +34,11 @@ const Account: NextPage = () => {
   const user = data as Profile;
   const profiles = profileData as Profile[];
 
-  const background = user?.background
+  const background = user.background
     ? user.background
-    : user?.albums[0].cover.lg;
+    : user.albums[0].cover.lg;
+
+  console.log(user.background);
 
   const followers = getFollowers(user, profiles);
   const following = getFollowing(user, profiles);
@@ -51,6 +54,7 @@ const Account: NextPage = () => {
   const handleLogout = () => {
     supabase.auth.signOut();
     router.push("/login");
+    queryClient.cancelQueries(["user"]);
   };
 
   return (
