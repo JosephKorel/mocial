@@ -29,3 +29,46 @@ export const getFollowing = (
 
   return getProfiles;
 };
+
+interface HandleFollow {
+  isFollowing: boolean;
+  user: Profile;
+  target: Profile;
+  mutate: (data: any) => void;
+}
+
+export const handleFollow = async (params: HandleFollow): Promise<void> => {
+  const { isFollowing, user, target, mutate } = params;
+  if (isFollowing) {
+    const onFilter = user.following.filter((item) => item != target.id);
+    const onFollowerFilter = target.followers.filter(
+      (item) => item != user?.id
+    );
+    try {
+      const payload = [
+        { ...user!, following: onFilter },
+        { ...target!, followers: onFollowerFilter! },
+      ];
+
+      mutate(payload);
+      return;
+    } catch (error: any) {
+      alert(error.error_description || error.message);
+    }
+  } else {
+    const onFollow = [...user.following, target.id];
+    const addFollower = [...target.followers, user.id];
+
+    try {
+      const payload = [
+        { ...user!, following: onFollow },
+        { ...target!, followers: addFollower },
+      ];
+      mutate(payload);
+
+      return;
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
+};

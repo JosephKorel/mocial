@@ -11,12 +11,8 @@ import { handleAvatarUpdate, handleNameEdit } from "./tools";
 
 export const EditAccountHeader = () => {
   const { data } = useUser();
-  if (!data) {
-    return <div></div>;
-  }
-
-  const router = useRouter();
   const user = data as Profile;
+  const router = useRouter();
   const { setError } = useAuthContext();
   const { mutate } = useUserUpdate();
   const [username, setUsername] = useState(user.username);
@@ -186,12 +182,12 @@ export const Description = ({ user }: { user: Profile }) => {
 
 export const SeeAlbums = () => {
   const { data } = useUser();
+  const [search, setSearch] = useState("");
+  const [children, setChildren] = useState(<></>);
   if (!data) {
     return <div></div>;
   }
   const user = data as Profile;
-  const [search, setSearch] = useState("");
-  const [children, setChildren] = useState(<></>);
 
   const albums = search.length
     ? user.albums.filter((item) =>
@@ -225,13 +221,13 @@ export const SeeAlbums = () => {
 };
 
 export const SeeMusics = () => {
+  const [search, setSearch] = useState("");
+  const [children, setChildren] = useState(<></>);
   const { data } = useUser();
   if (!data) {
     return <div></div>;
   }
   const user = data as Profile;
-  const [search, setSearch] = useState("");
-  const [children, setChildren] = useState(<></>);
 
   const musics = search.length
     ? user.musics.filter((item) =>

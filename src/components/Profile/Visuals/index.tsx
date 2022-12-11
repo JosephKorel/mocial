@@ -15,8 +15,17 @@ import {
   Suggestion,
 } from "../../../../models/interfaces";
 import { useQueryData, useUserUpdate } from "../../../../utils/Hooks";
+import { Avatar } from "../../Avatar";
 
-export const RenderAlbums = ({ album }: { album: Albums }) => {
+export const RenderAlbums = ({
+  album,
+  last,
+}: {
+  album: Albums;
+  last?: boolean;
+}) => {
+  const router = useRouter();
+  const visiting = router.pathname != "/profile";
   return (
     <li className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
       <figure className="">
@@ -36,6 +45,21 @@ export const RenderAlbums = ({ album }: { album: Albums }) => {
           ))}
         </p>
       </div>
+      {last ? (
+        <button className="py-1 px-3 bg-dark-600 text-gray-300 rounded-md absolute top-0 right-0">
+          Ver todos
+        </button>
+      ) : (
+        <button
+          className={` ${
+            visiting
+              ? "p-2 text-lg bg-dark-600 text-primary rounded-md absolute top-0 right-0"
+              : "hidden"
+          }`}
+        >
+          <MdOutlineLibraryAdd />
+        </button>
+      )}
     </li>
   );
 };
@@ -190,33 +214,11 @@ interface HeaderProps {
 
 export const ProfileHeader = ({ props }: { props: HeaderProps }) => {
   const { user, setSeeing, followers, following, setChildren } = props;
-  const { user: currentUser } = useQueryData(["user"]);
-  const visiting = currentUser.id != user.id;
 
   return (
     <div>
       <div className="flex justify-center z-10">
-        <div
-          className={`${
-            user.avatar_url ? "avatar" : "avatar placeholder"
-          } relative z-10`}
-        >
-          <div
-            className={`w-20 rounded-full border-4 border-danube ${
-              user.avatar_url ? "" : "bg-dark"
-            }`}
-          >
-            {user.avatar_url ? (
-              <img
-                src={user.avatar_url}
-                alt={user.username}
-                referrerPolicy="no-referrer"
-              ></img>
-            ) : (
-              <span>{user.username.slice(0, 1)}</span>
-            )}
-          </div>
-        </div>
+        <Avatar user={user} className="border-4 border-danube w-20" />
       </div>
       <div className="bg-dark-600 relative z-10">
         <div className="flex flex-col items-center gap-0">
@@ -259,23 +261,16 @@ export const ProfileHeader = ({ props }: { props: HeaderProps }) => {
             </li>
           </ul>
         </article>
-        <div className="h-24">
-          <Description user={user} setChildren={setChildren!} />
+        <div className={`${user.description ? "h-24" : "h-10"}`}>
+          <Description user={user} />
         </div>
       </div>
     </div>
   );
 };
 
-export const Description = ({
-  user,
-  setChildren,
-}: {
-  user: Profile;
-  setChildren: (data: JSX.Element) => void;
-}) => {
+export const Description = ({ user }: { user: Profile }) => {
   const { user: currentUser } = useQueryData(["user"]);
-  const visiting = currentUser.id != user.id;
 
   return (
     <article className="w-11/12 m-auto py-2 px-4 shadow-md shadow-black rounded-md">

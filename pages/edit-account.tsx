@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { AiOutlineRight } from "react-icons/ai";
 import { MdArrowBackIos } from "react-icons/md";
@@ -13,12 +12,12 @@ import { useUser } from "../utils/Hooks";
 
 const EditAccount = () => {
   const { data } = useUser();
+  const [page, setPage] = useState<JSX.Element | null>(null);
   if (!data) {
     return <div></div>;
   }
 
   const user = data as Profile;
-  const [page, setPage] = useState<JSX.Element | null>(null);
 
   const showPage = (option: number) => {
     switch (option) {

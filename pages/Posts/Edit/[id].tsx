@@ -1,18 +1,26 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MdArrowBackIos } from "react-icons/md";
+import { Post } from "../../../models/interfaces";
 import { useAuthContext } from "../../../src/context";
-import { useMutatePost, useQueryData } from "../../../utils/Hooks";
+import { useMutatePost, usePosts } from "../../../utils/Hooks";
 
 const EditPost = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
-  const { posts } = useQueryData(["posts"]);
-  const post = posts.filter((item) => item.id == Number(id))[0];
-  const [content, setContent] = useState(post.content);
-  const [title, setTitle] = useState(post.title);
+  const { data } = usePosts();
+  const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
   const { mutate } = useMutatePost("update");
   const { setError } = useAuthContext();
+  useEffect(() => {
+    setContent(post.content);
+    setTitle(post.title);
+  }, []);
+
+  if (!data) return <div></div>;
+  const posts = data as Post[];
+  const post = posts.filter((item) => item.id == Number(id))[0];
   const subject = post.subject;
 
   const handleEdit = () => {

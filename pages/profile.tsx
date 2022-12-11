@@ -20,6 +20,7 @@ import { RenderSuggestions } from "../src/components/Profile/Suggestion";
 import ProtectedRoute from "../src/components/Protector";
 import { getFollowers, getFollowing } from "../src/components/Profile/Visit";
 import { queryClient } from "./_app";
+import { BsFillGridFill } from "react-icons/bs";
 
 const Account: NextPage = () => {
   const [open, setOpen] = useState(false);
@@ -65,7 +66,11 @@ const Account: NextPage = () => {
       >
         <header className="relative pt-24 pb-2 backdrop-blur-sm">
           <ProfileOptions props={{ handleLogout, setOpen }} />
-          <div className="w-full h-16 bg-dark-600 absolute top-[38%] -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
+          <div
+            className={`w-full h-16 bg-dark-600 absolute ${
+              user.description ? "top-[38%]" : "top-[45%]"
+            } -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube`}
+          ></div>
           <ProfileHeader props={headerProps} />
         </header>
         <main className="px-1 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 pb-14 mt-5">
@@ -92,8 +97,12 @@ const Account: NextPage = () => {
               <ul className="carousel gap-4">
                 {option == 1 ? (
                   <>
-                    {user.albums.map((album, index) => (
-                      <RenderAlbums album={album} key={index} />
+                    {user.albums.map((album, index, arr) => (
+                      <RenderAlbums
+                        album={album}
+                        key={index}
+                        last={index == arr.length - 1}
+                      />
                     ))}
                   </>
                 ) : (
@@ -106,23 +115,25 @@ const Account: NextPage = () => {
               </ul>
             </article>
           </section>
-          <section className="mt-10 px-1">
-            <h1 className="text-2xl text-danube font-thin indent-4">
-              SUGESTÕES
-            </h1>
-            <article>
-              <ul className="h-60 overflow-auto">
-                {user.suggestions.map((item, index) => (
-                  <RenderSuggestions
-                    result={item}
-                    key={index}
-                    setSuggestion={setSuggestion}
-                    setChildren={setChildren}
-                  />
-                ))}
-              </ul>
-            </article>
-          </section>
+          {user.suggestions.length > 0 && (
+            <section className="mt-10 px-1">
+              <h1 className="text-2xl text-danube font-thin indent-4">
+                SUGESTÕES
+              </h1>
+              <article>
+                <ul className="h-60 overflow-auto">
+                  {user.suggestions.map((item, index) => (
+                    <RenderSuggestions
+                      result={item}
+                      key={index}
+                      setSuggestion={setSuggestion}
+                      setChildren={setChildren}
+                    />
+                  ))}
+                </ul>
+              </article>
+            </section>
+          )}
         </main>
         <BackgroundModal bgProps={{ open, setOpen }} />
         <FollowerFollowing

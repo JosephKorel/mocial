@@ -16,12 +16,13 @@ import { getDate } from "../../utils/Tools";
 const Posts = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
-  const { posts } = useQueryData(["posts"]);
-  const post = posts.filter((item) => item.id == Number(id))[0];
-  const { user } = useQueryData(["user"]);
+  const { posts, user } = useQueryData(["posts", "user"]);
   const [content, setContent] = useState("");
+  const [children, setChildren] = useState(<></>);
   const { mutate } = useUpdatePost();
   const { setError } = useAuthContext();
+  if (!posts) return <div></div>;
+  const post = posts.filter((item) => item.id == Number(id))[0];
   const author = post.profiles!;
   const subject = post.subject;
   const created_at = getDate(post.created_at!);
@@ -114,7 +115,6 @@ const Posts = () => {
             </div>
           </div>
         </div>
-
         <div className="text-left rounded-md py-3">
           <p className="text-lg">Comentários</p>
           <div className="flex flex-col gap-2">
@@ -139,7 +139,12 @@ const Posts = () => {
           <div className="w-full p-[1px] bg-gray-300 rounded-md mt-4 mb-2"></div>
           <div className="flex flex-col gap-2">
             {comments.map((comment, index) => (
-              <RenderComment key={index} comment={comment} post={post} />
+              <RenderComment
+                key={index}
+                comment={comment}
+                post={post}
+                setChildren={setChildren}
+              />
             ))}
           </div>
         </div>

@@ -20,6 +20,7 @@ import {
   getProfile,
 } from "../../../../utils/Tools";
 import { useAuthContext } from "../../../context";
+import { Avatar } from "../../Avatar";
 import { Modal } from "../../Profile/Modal";
 import { CommentFooterProps } from "./models";
 import { handleComment, handleCommentLike, handleLike } from "./tools";
@@ -74,7 +75,7 @@ export const Posts = ({ post }: { post: Post }) => {
           {subject.name}
         </p>
       </div>
-      <div className="p-[1px] mt-1 mb-4 w-11/12 mx-auto rounded-md bg-gray-200"></div>
+      <div className="p-[1px] mt-1 mb-4 w-11/12 mx-auto rounded-md bg-danube"></div>
       <div className="flex flex-col justify-center p-2 px-3 bg-dark shadow-md border border-danube shadow-black rounded-md my-2 text-gray-100 relative">
         <h1 className="text-lg italic text-left">{post.title}</h1>
         <p className="text-sm font-thin text-justify py-2">{post.content}</p>
@@ -101,15 +102,7 @@ export const Posts = ({ post }: { post: Post }) => {
       </div>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <div className="avatar">
-            <div className="w-8 rounded-full border border-gray-100">
-              <img
-                src={author.avatar_url}
-                alt={author.username}
-                referrerPolicy="no-referrer"
-              ></img>
-            </div>
-          </div>
+          <Avatar user={author} className="w-8 border border-gray-100" />
           <p
             className="text-sm italic underline text-gray-100"
             onClick={() => goToProfile(author.id)}
@@ -206,13 +199,7 @@ export const RenderComment = ({
   return (
     <article className="rounded-md flex items-start gap-3 mt-4 p-2 shadow-md shadow-black">
       <div className="avatar">
-        <div className="w-12 rounded-full border border-gray-100">
-          <img
-            src={author.avatar_url}
-            alt={author.username}
-            referrerPolicy="no-referrer"
-          ></img>
-        </div>
+        <Avatar user={author} className="w-12 border border-gray-100" />
       </div>
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-start text-sm">

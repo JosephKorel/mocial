@@ -15,7 +15,11 @@ import {
   RenderMusics,
 } from "../src/components/Profile/Visuals";
 import ProtectedRoute from "../src/components/Protector";
-import { getFollowers, getFollowing } from "../src/components/Profile/Visit";
+import {
+  getFollowers,
+  getFollowing,
+  handleFollow,
+} from "../src/components/Profile/Visit";
 
 const Profile: NextPage = () => {
   const [seeing, setSeeing] = useState("");
@@ -37,41 +41,7 @@ const Profile: NextPage = () => {
 
   const followers = getFollowers(target, profiles);
   const following = getFollowing(target, profiles);
-
-  const handleFollow = async (): Promise<void> => {
-    if (isFollowing) {
-      const onFilter = user.following.filter((item) => item != target.id);
-      const onFollowerFilter = target.followers.filter(
-        (item) => item != user?.id
-      );
-      try {
-        const payload = [
-          { ...user!, following: onFilter },
-          { ...target!, followers: onFollowerFilter! },
-        ];
-
-        mutate(payload);
-        return;
-      } catch (error: any) {
-        alert(error.error_description || error.message);
-      }
-    } else {
-      const onFollow = [...user.following, target.id];
-      const addFollower = [...target.followers, user.id];
-
-      try {
-        const payload = [
-          { ...user!, following: onFollow },
-          { ...target!, followers: addFollower },
-        ];
-        mutate(payload);
-
-        return;
-      } catch (error: any) {
-        console.log(error);
-      }
-    }
-  };
+  const handleFollowParams = { isFollowing, user, target, mutate };
 
   const headerProps = { user: target, followers, following, setSeeing };
 
@@ -92,7 +62,7 @@ const Profile: NextPage = () => {
             </button>
             <button
               className="text-sm py-1 px-3 rounded-md font-semibold bg-dark text-danube flex items-center gap-2"
-              onClick={handleFollow}
+              onClick={() => handleFollow(handleFollowParams)}
             >
               <BsArrowLeftRight />
               <span>{isFollowing ? "SEGUINDO" : "SEGUIR"}</span>
@@ -101,7 +71,7 @@ const Profile: NextPage = () => {
           <div className="w-full h-16 bg-dark-600 absolute top-[38%] -translate-y-2 rounded-t-2xl backdrop-blur border-t-2 border-danube"></div>
           <ProfileHeader props={headerProps} />
         </header>
-        <main className="px-2 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 pb-14 mt-4">
+        <main className="px-2 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 pb-20 mt-4">
           <section>
             <div className="flex justify-between items-center">
               <div className="tabs">

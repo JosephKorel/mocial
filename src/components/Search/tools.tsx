@@ -7,9 +7,13 @@ export const handleSearch = (
   search: string
 ) => {
   const reference = (item: Post | Profile) => {
+    /* eslint-disable no-eval */
+
     return typeof item.id == "number"
-      ? (item.title as keyof Post)
-      : (item.username as keyof Profile);
+      ? //@ts-ignore
+        (item.title as keyof Post)
+      : //@ts-ignore
+        (item.username as keyof Profile);
   };
 
   let results: (Post | Profile)[] = [];
