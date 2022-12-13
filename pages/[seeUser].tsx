@@ -7,6 +7,7 @@ import {
   FollowerFollowing,
   Modal,
   SuggestModal,
+  TransparentModal,
 } from "../src/components/Profile/Modal";
 import { BsArrowLeftRight, BsChevronRight } from "react-icons/bs";
 import {
@@ -20,6 +21,9 @@ import {
   ProfileHeader,
   RenderAlbums,
   RenderMusics,
+  SeeAlbums,
+  SeeMusics,
+  ShowAll,
 } from "../src/components/Profile/Visuals";
 import ProtectedRoute from "../src/components/Protector";
 import {
@@ -32,8 +36,9 @@ import { useAuthContext } from "../src/context";
 const Profile: NextPage = () => {
   const [seeing, setSeeing] = useState("");
   const [option, setOption] = useState(1);
+  const [children, setChildren] = useState(<></>);
   const { mutate } = useProfileMutation();
-  const { element } = useAuthContext();
+  const { element, setElement } = useAuthContext();
   const router = useRouter();
   const { data, isLoading } = useProfiles();
   const { data: userData } = useUser();
@@ -52,7 +57,22 @@ const Profile: NextPage = () => {
   const following = getFollowing(target, profiles);
   const handleFollowParams = { isFollowing, user, target, mutate };
 
-  const headerProps = { user: target, followers, following, setSeeing };
+  const headerProps = {
+    user: target,
+    followers,
+    following,
+    setSeeing,
+    setChildren: setElement,
+  };
+
+  const handleShowAll = () => {
+    if (option == 1) {
+      setElement(<ShowAll component={<SeeAlbums user={target} />} />);
+      return;
+    }
+
+    setElement(<ShowAll component={<SeeMusics />} />);
+  };
 
   return (
     <ProtectedRoute>
@@ -119,7 +139,11 @@ const Profile: NextPage = () => {
                 )}
                 <li className="p-2 text-danube flex flex-col justify-center">
                   <div className="w-32 flex items-center gap-2 justify-center">
-                    <label className="text-lg" htmlFor="general-modal">
+                    <label
+                      className="text-lg"
+                      htmlFor="general-modal"
+                      onClick={handleShowAll}
+                    >
                       Ver todos
                     </label>
                     <BsChevronRight />
@@ -138,7 +162,8 @@ const Profile: NextPage = () => {
           visiting
         />
         <SuggestModal option={option} targetId={target.id} />
-        <Modal>{element}</Modal>
+        <Modal className="py-4 px-2">{element}</Modal>
+        <TransparentModal children={element} />
       </div>
     </ProtectedRoute>
   );

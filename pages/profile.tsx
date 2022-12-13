@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { supabase } from "../utils/supabaseClient";
 import { useState } from "react";
-import { Profile, Suggestion } from "../models/interfaces";
+import { ListenLater, Profile, Suggestion } from "../models/interfaces";
 import {
   BackgroundModal,
   ConfirmModal,
@@ -24,6 +24,8 @@ import ProtectedRoute from "../src/components/Protector";
 import { getFollowers, getFollowing } from "../src/components/Profile/Visit";
 import { queryClient } from "./_app";
 import { BsChevronRight } from "react-icons/bs";
+import { cardTitle } from "../utils/Tools";
+import { ListenLaterSection } from "../src/components/Profile/ListenLater";
 
 const Account: NextPage = () => {
   const [open, setOpen] = useState(false);
@@ -34,7 +36,7 @@ const Account: NextPage = () => {
   const { data, isLoading } = useUser();
   const { data: profileData } = useProfiles();
   const router = useRouter();
-  if (isLoading) return <div></div>;
+  if (!data || !profileData) return <div></div>;
   const user = data as Profile;
   const profiles = profileData as Profile[];
 
@@ -61,7 +63,7 @@ const Account: NextPage = () => {
 
   const handleShowAll = () => {
     if (option == 1) {
-      setChildren(<ShowAll component={<SeeAlbums />} />);
+      setChildren(<ShowAll component={<SeeAlbums user={user} />} />);
       return;
     }
 
@@ -83,7 +85,7 @@ const Account: NextPage = () => {
           ></div>
           <ProfileHeader props={headerProps} />
         </header>
-        <main className="px-1 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 pb-14 mt-5">
+        <main className="px-1 pt-4 lg:mt-10 lg:px-5 w-full bg-dark-600 pb-16 mt-5">
           <section>
             <div className="tabs">
               <a
@@ -107,13 +109,13 @@ const Account: NextPage = () => {
               <ul className="carousel gap-4">
                 {option == 1 ? (
                   <>
-                    {user.albums.map((album, index) => (
+                    {user.albums.slice(0, 5).map((album, index) => (
                       <RenderAlbums album={album} key={index} />
                     ))}
                   </>
                 ) : (
                   <>
-                    {user.musics.map((music, index) => (
+                    {user.musics.slice(0, 5).map((music, index) => (
                       <RenderMusics music={music} key={index} />
                     ))}
                   </>
@@ -132,6 +134,9 @@ const Account: NextPage = () => {
                 </li>
               </ul>
             </article>
+          </section>
+          <section className="mt-10 px-1">
+            <ListenLaterSection />
           </section>
           {user.suggestions.length > 0 && (
             <section className="mt-10 px-1">

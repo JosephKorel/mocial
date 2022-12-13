@@ -119,3 +119,17 @@ export const getSimilarity = (first: string, second: string) => {
 export const cardTitle = (name: string) => {
   return name.length > 16 ? name.slice(0, 14) + "..." : name;
 };
+
+export const artistName = (group: string[]) => {
+  const letters = /^[A-Za-z]+$/;
+  let artists = "";
+  group.forEach((item, index, arr) => {
+    index == arr.length - 1 ? (artists += item) : (artists += item + ", ");
+  });
+
+  if (!artists.match(letters)) {
+    return artists.length > 12 ? artists.slice(0, 8) + "..." : artists;
+  }
+
+  return artists.length > 18 ? artists.slice(0, 12) + "..." : artists;
+};

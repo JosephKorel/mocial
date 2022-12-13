@@ -13,6 +13,7 @@ export interface Profile {
   albums: Albums[];
   following: string[];
   followers: string[];
+  listen_later: ListenLater[];
   updated_at: Date;
   background: string;
   suggestions: Suggestion[];
@@ -23,6 +24,7 @@ export interface Music {
   name: string;
   artist: string[];
   cover: CoverImg;
+  type?: string;
 }
 
 export interface Albums {
@@ -30,6 +32,7 @@ export interface Albums {
   name: string;
   artist: string[];
   cover: CoverImg;
+  type?: string;
 }
 
 export interface Suggestion {
@@ -41,6 +44,16 @@ export interface Suggestion {
   sent_by?: string;
   sent_at?: Date;
   rate?: number;
+}
+
+export interface ListenLater {
+  id: string;
+  name: string;
+  artist: string[];
+  cover: CoverImg;
+  type: string;
+  added_at: number;
+  listened: boolean;
 }
 
 export interface CoverImg {

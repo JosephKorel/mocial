@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import React from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdClear } from "react-icons/md";
@@ -14,13 +15,17 @@ export const PostStep = ({ step, chooseProps, postProps }: StepProps) => {
   return <CreatePost props={postProps} />;
 };
 
-export const PostHeader = () => {
-  return <div></div>;
-};
-
 export const ResultList = ({ props }: ResultProps) => {
   const { result, selected, setSelected } = props;
   const isSelected = selected?.id == result.id;
+  const artistName = (group: string[]) => {
+    let artists = "";
+    group.forEach((item, index, arr) => {
+      index == arr.length - 1 ? (artists += item) : (artists += item + ", ");
+    });
+
+    return artists.length > 48 ? artists.slice(0, 38) + "..." : artists;
+  };
   return (
     <li
       className={`w-full m-auto relative z-10 border bg-dark-600 cursor-pointer flex justify-between items-center ${
@@ -42,9 +47,7 @@ export const ResultList = ({ props }: ResultProps) => {
             {result.name}
           </p>
           <p className="font-thin text-gray-400 text-sm">
-            {result.artist.map((obj, i, arr) => {
-              return i == arr.length - 1 ? obj : obj + ", ";
-            })}
+            {artistName(result.artist)}
           </p>
         </div>
       </div>
@@ -134,10 +137,9 @@ export const ChooseSubject = ({ props }: ChooseProps) => {
             </div>
             <div className="text-right mt-4">
               <button
-                className={`btn btn-sm btn-primary ${
-                  !selected && "btn-outline"
-                }`}
+                className="btn btn-sm btn-primary btn-outline"
                 onClick={handleNextStep}
+                disabled={selected == null}
               >
                 Avançar
               </button>
@@ -155,6 +157,7 @@ export const CreatePost = ({ props }: CreateProps) => {
   const { mutate } = useMutatePost("create");
   const { user } = useQueryData(["user"]);
   const { setError, setSuccess } = useAuthContext();
+  const router = useRouter();
 
   const handleCreate = async () => {
     if (title.length < 8) {
@@ -167,6 +170,8 @@ export const CreatePost = ({ props }: CreateProps) => {
       return;
     }
 
+    const subject = { ...selected!, type: option == 1 ? "track" : "album" };
+
     const body = {
       author: user.id,
       title,
@@ -174,7 +179,7 @@ export const CreatePost = ({ props }: CreateProps) => {
       type: option == 1 ? "track" : "album",
       created_at: new Date().getTime(),
       updated_at: new Date().getTime(),
-      subject: selected!,
+      subject,
       liked_by: [],
       comments: [],
     };
@@ -188,6 +193,7 @@ export const CreatePost = ({ props }: CreateProps) => {
     try {
       mutate(payload);
       setSuccess("Publicado");
+      router.push("/home");
     } catch (error) {
       setError("Houve algum erro, tente novamente");
       console.log(error);
@@ -203,13 +209,16 @@ export const CreatePost = ({ props }: CreateProps) => {
             className="rounded-lg"
           ></img>
           <div className="text-center">
-            <h1 className="text-xl text-warning font-light">
-              <span className="font-medium">{getArtist(selected!.artist)}</span>{" "}
-              - {selected?.name}
+            <h1 className="text-xl text-gray-300 font-semibold">
+              {selected?.name}
             </h1>
+            <span className="text-lg text-gray-400 font-light italic">
+              {getArtist(selected!.artist)}
+            </span>
           </div>
         </div>
       </header>
+      <div className="w-5/6 m-auto rounded-md p-[2px] bg-danube my-2"></div>
       <section className="p-2 px-3">
         <div className="flex flex-col gap-1">
           <input
@@ -223,7 +232,7 @@ export const CreatePost = ({ props }: CreateProps) => {
           placeholder="Sobre o que você quer falar?"
           value={content}
           onChange={(e) => setContent(e.currentTarget.value)}
-          className="bg-inherit font-light relative block h-[22rem] mt-4 rounded-md w-full p-3 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+          className="bg-inherit font-light relative block h-[19rem] mt-4 rounded-md w-full p-3 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
         />
         <div className="flex justify-between mt-6">
           <button className="btn btn-outline btn-sm" onClick={() => setStep(1)}>
@@ -232,6 +241,7 @@ export const CreatePost = ({ props }: CreateProps) => {
           <button
             className="btn btn-primary btn-outline btn-sm"
             onClick={handleCreate}
+            disabled={title.length < 8 || content.length < 16}
           >
             Publicar
           </button>

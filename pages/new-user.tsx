@@ -154,6 +154,7 @@ export default function NewUser({ token }: { token: string }) {
         albums: selectedAlbums,
         following: [],
         followers: [],
+        listen_later: [],
         suggestions: [],
         updated_at: new Date(),
       };

@@ -262,9 +262,11 @@ export const SeeMusics = () => {
 export const AlbumGrid = ({
   album,
   setChildren,
+  visiting,
 }: {
   album: Albums;
   setChildren: (data: JSX.Element) => void;
+  visiting?: boolean;
 }) => {
   return (
     <li className="bg-dark-600 h-48 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
@@ -279,16 +281,20 @@ export const AlbumGrid = ({
         <h2 className={`text-gray-100 `}>{cardTitle(album.name)}</h2>
         <p className="text-sm text-gray-400">{getArtist(album.artist)}</p>
       </div>
-      <button
-        className="absolute top-1 right-1 p-1 text-lg rounded-md text-error bg-dark-600"
-        onClick={() =>
-          setChildren(<ConfirmDelete media={album} type="album" />)
-        }
-      >
-        <label htmlFor="spare-modal">
-          <RiDeleteBin6Fill />
-        </label>
-      </button>
+      {!visiting ? (
+        <button
+          className="absolute top-1 right-1 p-1 text-lg rounded-md text-error bg-dark-600"
+          onClick={() =>
+            setChildren(<ConfirmDelete media={album} type="album" />)
+          }
+        >
+          <label htmlFor="spare-modal">
+            <RiDeleteBin6Fill />
+          </label>
+        </button>
+      ) : (
+        <></>
+      )}
     </li>
   );
 };

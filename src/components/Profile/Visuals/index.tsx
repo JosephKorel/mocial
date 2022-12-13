@@ -11,21 +11,26 @@ import { VscSignOut } from "react-icons/vsc";
 import {
   Albums,
   Music,
+  Post,
   Profile,
   Suggestion,
 } from "../../../../models/interfaces";
-import { useQueryData, useUser, useUserUpdate } from "../../../../utils/Hooks";
+import {
+  usePosts,
+  useQueryData,
+  useUser,
+  useUserUpdate,
+} from "../../../../utils/Hooks";
 import { Avatar } from "../../Avatar";
 import { cardTitle } from "../../../../utils/Tools";
 import { AiOutlineCheck, AiOutlineSearch } from "react-icons/ai";
 import { AlbumGrid, MusicGrid } from "../../EditAccount";
 import { SpareModal } from "../Modal";
 import { useAuthContext } from "../../../context";
-import { AddToMyLibrary } from "../Visit";
+import { AddOptions, MediaOptions } from "../../Media";
 
 export const RenderAlbums = ({ album }: { album: Albums }) => {
   const { user } = useQueryData(["user"]);
-  const { setElement } = useAuthContext();
   const router = useRouter();
   const visiting = router.pathname != "/profile";
   const sameMedia = user.albums.filter((item) => item.id == album.id).length
@@ -49,23 +54,7 @@ export const RenderAlbums = ({ album }: { album: Albums }) => {
         </p>
       </div>
       {visiting && (
-        <>
-          {sameMedia ? (
-            <button className="text-gray-200 text-xl p-1 absolute top-0 right-0 rounded-md bg-dark-600">
-              <AiOutlineCheck />
-            </button>
-          ) : (
-            <label
-              htmlFor="general-modal"
-              onClick={() =>
-                setElement(<AddToMyLibrary type="album" media={album} />)
-              }
-              className="text-secondary text-xl p-1 absolute top-0 right-0 rounded-md bg-dark-600"
-            >
-              <MdOutlineLibraryAdd />
-            </label>
-          )}
-        </>
+        <MediaOptions media={album} common={sameMedia} type="album" />
       )}
     </li>
   );
@@ -73,7 +62,6 @@ export const RenderAlbums = ({ album }: { album: Albums }) => {
 
 export const RenderMusics = ({ music }: { music: Music }) => {
   const { user } = useQueryData(["user"]);
-  const { setElement } = useAuthContext();
   const router = useRouter();
   const visiting = router.pathname != "/profile";
   const sameMedia = user.musics.filter((item) => item.id == music.id).length
@@ -101,23 +89,7 @@ export const RenderMusics = ({ music }: { music: Music }) => {
         </p>
       </div>
       {visiting && (
-        <>
-          {sameMedia ? (
-            <button className="text-gray-200 text-xl p-1 absolute top-0 right-0 rounded-md bg-dark-600">
-              <AiOutlineCheck />
-            </button>
-          ) : (
-            <label
-              htmlFor="general-modal"
-              onClick={() =>
-                setElement(<AddToMyLibrary type="music" media={music} />)
-              }
-              className="text-secondary text-xl p-1 absolute top-0 right-0 rounded-md bg-dark-600"
-            >
-              <MdOutlineLibraryAdd />
-            </label>
-          )}
-        </>
+        <MediaOptions media={music} common={sameMedia} type="music" />
       )}
     </li>
   );
@@ -245,6 +217,9 @@ interface HeaderProps {
 
 export const ProfileHeader = ({ props }: { props: HeaderProps }) => {
   const { user, setSeeing, followers, following, setChildren } = props;
+  const { data } = usePosts();
+  const posts = data ? (data as Post[]) : [];
+  const userPosts = posts.filter((item) => item.author == user.id);
 
   return (
     <div>
@@ -269,8 +244,13 @@ export const ProfileHeader = ({ props }: { props: HeaderProps }) => {
         <article className="w-2/3 m-auto mt-2">
           <ul className="flex justify-between items-center">
             <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
-              <span className="font-normal text-base">0</span>
-              <label htmlFor="friend-modal">POSTS</label>
+              <span className="font-normal text-base">{userPosts.length}</span>
+              <label
+                htmlFor="general-modal"
+                onClick={() => setChildren!(<ShowPosts user={user} />)}
+              >
+                POSTS
+              </label>
             </li>
             <li className="w-fit font-thin text-sm rounded-md flex flex-col gap-0 items-center">
               <span className="font-normal text-base">{followers.length}</span>
@@ -301,8 +281,6 @@ export const ProfileHeader = ({ props }: { props: HeaderProps }) => {
 };
 
 export const Description = ({ user }: { user: Profile }) => {
-  const { user: currentUser } = useQueryData(["user"]);
-
   return (
     <article className="w-11/12 m-auto py-2 px-4 shadow-md shadow-black rounded-md">
       <p className="text-justify text-sm">{user.description}</p>
@@ -377,20 +355,18 @@ export const ShowAll = ({ component }: { component: JSX.Element }) => {
   );
 };
 
-export const SeeAlbums = () => {
-  const { data } = useUser();
+export const SeeAlbums = ({ user }: { user: Profile }) => {
   const [search, setSearch] = useState("");
   const [children, setChildren] = useState(<></>);
-  if (!data) {
-    return <div></div>;
-  }
-  const user = data as Profile;
+  const { user: currentUser } = useQueryData(["user"]);
 
   const albums = search.length
     ? user.albums.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase())
       )
     : user.albums;
+
+  const visiting = currentUser.id != user.id;
 
   return (
     <div className="bg-dark p-2 rounded-md h-[30rem] overflow-y-auto">
@@ -409,7 +385,12 @@ export const SeeAlbums = () => {
       </div>
       <ul className="grid grid-cols-2 auto-rows-max place-items-center gap-2 rounded-md mt-2">
         {albums.map((album, index) => (
-          <AlbumGrid album={album} key={index} setChildren={setChildren} />
+          <AlbumGrid
+            album={album}
+            key={index}
+            setChildren={setChildren}
+            visiting={visiting}
+          />
         ))}
       </ul>
       <SpareModal>{children}</SpareModal>
@@ -454,5 +435,60 @@ export const SeeMusics = () => {
       </ul>
       <SpareModal>{children}</SpareModal>
     </div>
+  );
+};
+
+export const ShowPosts = ({ user }: { user: Profile }) => {
+  const { posts } = useQueryData(["posts"]);
+  const userPosts = posts.filter((item) => item.author == user.id);
+  const myPosts = userPosts.sort((a, b) => b.created_at - a.created_at);
+  return (
+    <div className="px-2">
+      <h1 className="text-xl text-left text-gray-200">Suas postagens</h1>
+      <div>
+        <ul className="h-[26rem] mt-4 flex flex-col justify-start gap-2">
+          {myPosts.map((post, index) => (
+            <PostList post={post} key={index} />
+          ))}
+        </ul>
+      </div>
+      <div className="modal-action flex justify-between items-center">
+        <label
+          className="btn btn-sm btn-outline btn-error"
+          htmlFor="general-modal"
+          id="closeModal"
+        >
+          Fechar
+        </label>
+      </div>
+    </div>
+  );
+};
+
+export const PostList = ({ post }: { post: Post }) => {
+  const router = useRouter();
+  const subject = post.subject;
+
+  const handleNavigate = () => {
+    router.push({
+      pathname: "Posts/[id]",
+      query: { id: post.id },
+    });
+  };
+  return (
+    <li
+      onClick={handleNavigate}
+      className="flex items-center gap-2 bg-dark border border-dark-400 rounded-md py-1 px-2"
+    >
+      <div className="avatar">
+        <div className="w-10 rounded-full">
+          <img src={subject.cover.sm}></img>
+        </div>
+      </div>
+      <div className="flex-1">
+        <h1 className=" text-gray-200 leading-4">{post.title}</h1>
+        <span className="text-sm text-gray-400 leading-3">{subject.name}</span>
+      </div>
+    </li>
   );
 };

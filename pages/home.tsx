@@ -18,10 +18,15 @@ const Home: NextPage<HomePageProps> = () => {
   }, []);
 
   if (!profiles || !data) {
-    return <div></div>;
+    return (
+      <div className="h-[28rem] flex flex-col items-center justify-center">
+        <h1 className="text-xl">Carregando</h1>
+        <div className="p-3 border border-danube animate-spin"></div>
+      </div>
+    );
   }
-
-  const posts = data as Post[];
+  const allPosts = data as Post[];
+  const posts = allPosts.sort((a, b) => b.created_at - a.created_at);
 
   return (
     <ProtectedRoute>

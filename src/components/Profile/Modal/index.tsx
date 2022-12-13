@@ -418,3 +418,27 @@ export const SpareModal = ({
     </div>
   );
 };
+
+export const TransparentModal = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <div>
+      <input type="checkbox" id="transparent-modal" className="modal-toggle" />
+      <label
+        htmlFor="transparent-modal"
+        className="modal cursor-pointer bg-transparent backdrop-blur-md"
+      >
+        <label
+          className={`modal-box relative shadow-none bg-transparent backdrop-blur-md ${className}`}
+        >
+          {children}
+        </label>
+      </label>
+    </div>
+  );
+};
