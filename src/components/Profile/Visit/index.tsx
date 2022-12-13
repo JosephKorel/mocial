@@ -1,4 +1,6 @@
-import { Profile } from "../../../../models/interfaces";
+import { Music, Profile } from "../../../../models/interfaces";
+import { useQueryData, useUserUpdate } from "../../../../utils/Hooks";
+import { useAuthContext } from "../../../context";
 
 export const getFollowers = (
   target: Profile,
@@ -71,4 +73,72 @@ export const handleFollow = async (params: HandleFollow): Promise<void> => {
       console.log(error);
     }
   }
+};
+
+export const AddToMyLibrary = ({
+  type,
+  media,
+}: {
+  type: string;
+  media: Music;
+}) => {
+  const { user } = useQueryData(["user"]);
+  const { mutate } = useUserUpdate();
+  const { setError } = useAuthContext();
+
+  const handleAdd = () => {
+    const closeBtn = document.getElementById("closeModal");
+    if (type == "album") {
+      const addAlbum = [...user.albums, media];
+      const payload = {
+        id: user.id,
+        body: { albums: addAlbum },
+      };
+      try {
+        mutate(payload);
+        closeBtn?.click();
+      } catch (error) {
+        setError("Houve algum erro, tente novamente");
+      }
+      return;
+    }
+    const addMusic = [...user.musics, media];
+    const payload = {
+      id: user.id,
+      body: { musics: addMusic },
+    };
+    try {
+      mutate(payload);
+      closeBtn?.click();
+    } catch (error) {
+      setError("Houve algum erro, tente novamente");
+    }
+  };
+
+  return (
+    <div>
+      <h1 className="text-xl text-left text-gray-200">
+        Adicionar {type == "music" ? "música" : "álbum"}
+      </h1>
+      <p className="text-sm text-gray-300 text-left mt-2 mb-6">
+        Deseja adicionar {type == "music" ? "esta música" : "este álbum"} à sua
+        biblioteca?
+      </p>
+      <div className="modal-action flex justify-between items-center">
+        <label
+          className="btn btn-sm btn-outline btn-error"
+          htmlFor="general-modal"
+          id="closeModal"
+        >
+          Cancelar
+        </label>
+        <button
+          className="btn btn-sm btn-primary btn-outline"
+          onClick={handleAdd}
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  );
 };

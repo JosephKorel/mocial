@@ -3,14 +3,12 @@ import { ContextType } from "../../models/context-type";
 import { Profile } from "../../models/interfaces";
 
 const ContextDefaultValues = {
-  user: null,
-  setUser: () => {},
-  profiles: [],
-  setProfiles: () => {},
   success: "",
   setSuccess: () => {},
   error: "",
   setError: () => {},
+  element: <></>,
+  setElement: () => {},
 };
 
 const AuthContext = createContext<ContextType>(ContextDefaultValues);
@@ -20,16 +18,13 @@ export function useAuthContext() {
 }
 
 const ContextProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<Profile | null>(null);
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [element, setElement] = useState(<></>);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
   const value: ContextType = {
-    user,
-    setUser,
-    profiles,
-    setProfiles,
+    element,
+    setElement,
     success,
     setSuccess,
     error,

@@ -385,12 +385,35 @@ export const ConfirmModal = ({
   );
 };
 
-export const Modal = ({ children }: { children: React.ReactNode }) => {
+export const Modal = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
   return (
     <div>
       <input type="checkbox" id="general-modal" className="modal-toggle" />
       <div className="modal">
-        <div className="modal-box">{children}</div>
+        <div className={`modal-box ${className}`}>{children}</div>
+      </div>
+    </div>
+  );
+};
+
+export const SpareModal = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <div>
+      <input type="checkbox" id="spare-modal" className="modal-toggle" />
+      <div className="modal">
+        <div className={`modal-box ${className}`}>{children}</div>
       </div>
     </div>
   );

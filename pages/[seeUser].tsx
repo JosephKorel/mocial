@@ -2,13 +2,20 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { MdArrowBackIos, MdRecommend } from "react-icons/md";
-import { Profile } from "../models/interfaces";
+import { Music, Profile } from "../models/interfaces";
 import {
   FollowerFollowing,
+  Modal,
   SuggestModal,
 } from "../src/components/Profile/Modal";
-import { BsArrowLeftRight } from "react-icons/bs";
-import { useProfileMutation, useProfiles, useUser } from "../utils/Hooks";
+import { BsArrowLeftRight, BsChevronRight } from "react-icons/bs";
+import {
+  useProfileMutation,
+  useProfiles,
+  useQueryData,
+  useUser,
+  useUserUpdate,
+} from "../utils/Hooks";
 import {
   ProfileHeader,
   RenderAlbums,
@@ -20,11 +27,13 @@ import {
   getFollowing,
   handleFollow,
 } from "../src/components/Profile/Visit";
+import { useAuthContext } from "../src/context";
 
 const Profile: NextPage = () => {
   const [seeing, setSeeing] = useState("");
   const [option, setOption] = useState(1);
   const { mutate } = useProfileMutation();
+  const { element } = useAuthContext();
   const router = useRouter();
   const { data, isLoading } = useProfiles();
   const { data: userData } = useUser();
@@ -77,7 +86,7 @@ const Profile: NextPage = () => {
               <div className="tabs">
                 <a
                   className={`tab font-thin text-xl duration-100 ${
-                    option == 1 && "text-danube text-2xl tab-active"
+                    option == 1 && "text-gray-200 text-2xl tab-active"
                   }`}
                   onClick={() => setOption(1)}
                 >
@@ -85,20 +94,13 @@ const Profile: NextPage = () => {
                 </a>
                 <a
                   className={`tab font-thin text-xl duration-100 ${
-                    option == 2 && "text-danube tab-active text-2xl"
+                    option == 2 && "text-gray-200 tab-active text-2xl"
                   }`}
                   onClick={() => setOption(2)}
                 >
                   MÚSICAS
                 </a>
               </div>
-              <label
-                className="btn btn-xs btn-primary btn-outline gap-1"
-                htmlFor="suggest-modal"
-              >
-                SUGERIR {option == 1 ? "ALBUM" : "MÚSICA"}
-                <MdRecommend />
-              </label>
             </div>
             <article className="p-2 lg:py-7 lg:px-5 bg-dark rounded-md w-full">
               <ul className="carousel gap-4">
@@ -115,6 +117,18 @@ const Profile: NextPage = () => {
                     ))}
                   </>
                 )}
+                <li className="p-2 text-danube flex flex-col justify-center">
+                  <div className="w-32 flex items-center gap-2 justify-center">
+                    <label className="text-lg" htmlFor="general-modal">
+                      Ver todos
+                    </label>
+                    <BsChevronRight />
+                  </div>
+                  <div className="divider"></div>
+                  <label className="text-lg" htmlFor="suggest-modal">
+                    Sugerir {option == 1 ? "Álbum" : "Música"}
+                  </label>
+                </li>
               </ul>
             </article>
           </section>
@@ -124,6 +138,7 @@ const Profile: NextPage = () => {
           visiting
         />
         <SuggestModal option={option} targetId={target.id} />
+        <Modal>{element}</Modal>
       </div>
     </ProtectedRoute>
   );

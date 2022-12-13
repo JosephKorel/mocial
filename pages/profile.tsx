@@ -9,18 +9,21 @@ import {
   FollowerFollowing,
   Modal,
 } from "../src/components/Profile/Modal";
-import { useProfiles, useQueryData, useUser } from "../utils/Hooks";
+import { useProfiles, useUser } from "../utils/Hooks";
 import {
   ProfileHeader,
   ProfileOptions,
   RenderAlbums,
   RenderMusics,
+  SeeAlbums,
+  SeeMusics,
+  ShowAll,
 } from "../src/components/Profile/Visuals";
 import { RenderSuggestions } from "../src/components/Profile/Suggestion";
 import ProtectedRoute from "../src/components/Protector";
 import { getFollowers, getFollowing } from "../src/components/Profile/Visit";
 import { queryClient } from "./_app";
-import { BsFillGridFill } from "react-icons/bs";
+import { BsChevronRight } from "react-icons/bs";
 
 const Account: NextPage = () => {
   const [open, setOpen] = useState(false);
@@ -39,8 +42,6 @@ const Account: NextPage = () => {
     ? user.background
     : user.albums[0].cover.lg;
 
-  console.log(user.background);
-
   const followers = getFollowers(user, profiles);
   const following = getFollowing(user, profiles);
 
@@ -56,6 +57,15 @@ const Account: NextPage = () => {
     supabase.auth.signOut();
     router.push("/login");
     queryClient.cancelQueries(["user"]);
+  };
+
+  const handleShowAll = () => {
+    if (option == 1) {
+      setChildren(<ShowAll component={<SeeAlbums />} />);
+      return;
+    }
+
+    setChildren(<ShowAll component={<SeeMusics />} />);
   };
 
   return (
@@ -78,7 +88,7 @@ const Account: NextPage = () => {
             <div className="tabs">
               <a
                 className={`tab font-thin text-xl duration-100 ${
-                  option == 1 && "text-danube text-2xl tab-active"
+                  option == 1 && "text-gray-200 text-2xl tab-active"
                 }`}
                 onClick={() => setOption(1)}
               >
@@ -86,7 +96,7 @@ const Account: NextPage = () => {
               </a>
               <a
                 className={`tab font-thin text-xl duration-100 ${
-                  option == 2 && "text-danube tab-active text-2xl"
+                  option == 2 && "text-gray-200 tab-active text-2xl"
                 }`}
                 onClick={() => setOption(2)}
               >
@@ -97,12 +107,8 @@ const Account: NextPage = () => {
               <ul className="carousel gap-4">
                 {option == 1 ? (
                   <>
-                    {user.albums.map((album, index, arr) => (
-                      <RenderAlbums
-                        album={album}
-                        key={index}
-                        last={index == arr.length - 1}
-                      />
+                    {user.albums.map((album, index) => (
+                      <RenderAlbums album={album} key={index} />
                     ))}
                   </>
                 ) : (
@@ -112,6 +118,18 @@ const Account: NextPage = () => {
                     ))}
                   </>
                 )}
+                <li className="p-2 text-danube flex flex-col items-center justify-center">
+                  <div className="w-24 flex flex-col items-center justify-center ">
+                    <label
+                      className="text-xl"
+                      htmlFor="general-modal"
+                      onClick={handleShowAll}
+                    >
+                      Ver todos
+                    </label>
+                    <BsChevronRight />
+                  </div>
+                </li>
               </ul>
             </article>
           </section>
@@ -141,7 +159,7 @@ const Account: NextPage = () => {
           visiting={false}
         />
         <ConfirmModal suggestion={suggestion} />
-        <Modal>{children}</Modal>
+        <Modal className="py-4 px-2">{children}</Modal>
       </div>
     </ProtectedRoute>
   );

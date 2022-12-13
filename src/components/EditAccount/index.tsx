@@ -5,7 +5,9 @@ import { MdArrowBackIos } from "react-icons/md";
 import { RiDeleteBin6Fill, RiEdit2Line } from "react-icons/ri";
 import { Albums, Music, Profile } from "../../../models/interfaces";
 import { useQueryData, useUser, useUserUpdate } from "../../../utils/Hooks";
+import { cardTitle, getArtist } from "../../../utils/Tools";
 import { useAuthContext } from "../../context";
+import { Avatar } from "../Avatar";
 import { Modal } from "../Profile/Modal";
 import { handleAvatarUpdate, handleNameEdit } from "./tools";
 
@@ -49,17 +51,11 @@ export const EditAccountHeader = () => {
           <span className="text-sm font-thin">VOLTAR</span>
         </button>
         <div className="flex flex-col items-center gap-4">
-          <div className="avatar relative">
-            <div className="w-20 rounded-full border-4 border-danube">
-              <img
-                src={user.avatar_url}
-                alt={user.username}
-                referrerPolicy="no-referrer"
-              ></img>
-            </div>
+          <div className="relative">
+            <Avatar user={user} className="w-20" />
             <button
               onClick={handleInput}
-              className="absolute top-1 right-0 translate-x-2 p-1 rounded-full bg-dark text-danube"
+              className="absolute top-1 z-10 right-0 translate-x-2 p-1 rounded-full bg-dark text-danube"
             >
               <AiFillCamera />
             </button>
@@ -144,12 +140,15 @@ export const Description = ({ user }: { user: Profile }) => {
       >
         <textarea
           maxLength={120}
+          placeholder="Fale sobre você"
           value={description}
           disabled={!editDescription}
           ref={(input) => input && input.focus()}
           onFocus={(e) => setFocus(e)}
           onChange={(e) => setDescription(e.currentTarget.value)}
-          className="bg-inherit text-sm text-justify rounded-md w-full placeholder-gray-400 text-gray-300 focus:outline-none "
+          className={`bg-inherit text-sm text-justify rounded-md w-full placeholder-gray-400 text-gray-300 focus:outline-none ${
+            user.description ? "h-auto" : "h-4"
+          }`}
         />
         {!editDescription && (
           <button
@@ -196,11 +195,11 @@ export const SeeAlbums = () => {
     : user.albums;
 
   return (
-    <div className="bg-dark p-2">
+    <div className="bg-dark p-2 rounded-md">
       <div className="rounded-lg flex justify-between items-center relative px-2">
         <input
           placeholder="Procurar álbum"
-          className="bg-inherit relative block rounded-md text-sm w-full px-3 pl-8 py-1 border border-gray-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+          className="bg-inherit relative block rounded-md text-sm w-full px-3 pl-8 py-1 border border-dark-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -268,7 +267,7 @@ export const AlbumGrid = ({
   setChildren: (data: JSX.Element) => void;
 }) => {
   return (
-    <li className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
+    <li className="bg-dark-600 h-48 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
       <figure className="">
         <img
           src={album.cover.md}
@@ -276,15 +275,9 @@ export const AlbumGrid = ({
           className="h-32 lg:h-52 rounded-md"
         ></img>
       </figure>
-      <div className="self-start">
-        <h2 className={`text-gray-100 ${album.name.length > 20 && "text-xs"}`}>
-          {album.name}
-        </h2>
-        <p className="text-sm text-gray-400">
-          {album.artist.map((artist, index) => (
-            <span key={index}>{artist}</span>
-          ))}
-        </p>
+      <div className="self-start overflow-y-auto">
+        <h2 className={`text-gray-100 `}>{cardTitle(album.name)}</h2>
+        <p className="text-sm text-gray-400">{getArtist(album.artist)}</p>
       </div>
       <button
         className="absolute top-1 right-1 p-1 text-lg rounded-md text-error bg-dark-600"
@@ -292,7 +285,7 @@ export const AlbumGrid = ({
           setChildren(<ConfirmDelete media={album} type="album" />)
         }
       >
-        <label htmlFor="general-modal">
+        <label htmlFor="spare-modal">
           <RiDeleteBin6Fill />
         </label>
       </button>
@@ -317,9 +310,7 @@ export const MusicGrid = ({
         ></img>
       </figure>
       <div className="self-start">
-        <h2 className={`text-gray-100 ${music.name.length > 20 && "text-xs"}`}>
-          {music.name}
-        </h2>
+        <h2 className="text-gray-100">{cardTitle(music.name)}</h2>
         <p
           className={`text-sm text-gray-400 ${
             music.artist.length > 1 && "text-xs"
@@ -336,7 +327,7 @@ export const MusicGrid = ({
           setChildren(<ConfirmDelete media={music} type="music" />)
         }
       >
-        <label htmlFor="general-modal">
+        <label htmlFor="spare-modal">
           <RiDeleteBin6Fill />
         </label>
       </button>
@@ -390,7 +381,7 @@ export const ConfirmDelete = ({
       <div className="modal-action flex justify-between items-center">
         <label
           className="btn btn-sm btn-outline"
-          htmlFor="general-modal"
+          htmlFor="spare-modal"
           id="closeModal"
         >
           Cancelar

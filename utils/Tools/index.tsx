@@ -115,3 +115,7 @@ export const getSimilarity = (first: string, second: string) => {
   const similarity = stringSimilarity(first, second);
   return similarity;
 };
+
+export const cardTitle = (name: string) => {
+  return name.length > 16 ? name.slice(0, 14) + "..." : name;
+};

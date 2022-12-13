@@ -14,20 +14,25 @@ import {
   Profile,
   Suggestion,
 } from "../../../../models/interfaces";
-import { useQueryData, useUserUpdate } from "../../../../utils/Hooks";
+import { useQueryData, useUser, useUserUpdate } from "../../../../utils/Hooks";
 import { Avatar } from "../../Avatar";
+import { cardTitle } from "../../../../utils/Tools";
+import { AiOutlineCheck, AiOutlineSearch } from "react-icons/ai";
+import { AlbumGrid, MusicGrid } from "../../EditAccount";
+import { SpareModal } from "../Modal";
+import { useAuthContext } from "../../../context";
+import { AddToMyLibrary } from "../Visit";
 
-export const RenderAlbums = ({
-  album,
-  last,
-}: {
-  album: Albums;
-  last?: boolean;
-}) => {
+export const RenderAlbums = ({ album }: { album: Albums }) => {
+  const { user } = useQueryData(["user"]);
+  const { setElement } = useAuthContext();
   const router = useRouter();
   const visiting = router.pathname != "/profile";
+  const sameMedia = user.albums.filter((item) => item.id == album.id).length
+    ? true
+    : false;
   return (
-    <li className="bg-dark-600 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
+    <li className="bg-dark-600 h-44 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
       <figure className="">
         <img
           src={album.cover.md}
@@ -36,37 +41,46 @@ export const RenderAlbums = ({
         ></img>
       </figure>
       <div className="self-start">
-        <h2 className={`text-gray-100 ${album.name.length > 20 && "text-xs"}`}>
-          {album.name}
-        </h2>
+        <h2 className="text-gray-100">{cardTitle(album.name)}</h2>
         <p className="text-sm text-gray-400">
           {album.artist.map((artist, index) => (
             <span key={index}>{artist}</span>
           ))}
         </p>
       </div>
-      {last ? (
-        <button className="py-1 px-3 bg-dark-600 text-gray-300 rounded-md absolute top-0 right-0">
-          Ver todos
-        </button>
-      ) : (
-        <button
-          className={` ${
-            visiting
-              ? "p-2 text-lg bg-dark-600 text-primary rounded-md absolute top-0 right-0"
-              : "hidden"
-          }`}
-        >
-          <MdOutlineLibraryAdd />
-        </button>
+      {visiting && (
+        <>
+          {sameMedia ? (
+            <button className="text-gray-200 text-xl p-1 absolute top-0 right-0 rounded-md bg-dark-600">
+              <AiOutlineCheck />
+            </button>
+          ) : (
+            <label
+              htmlFor="general-modal"
+              onClick={() =>
+                setElement(<AddToMyLibrary type="album" media={album} />)
+              }
+              className="text-secondary text-xl p-1 absolute top-0 right-0 rounded-md bg-dark-600"
+            >
+              <MdOutlineLibraryAdd />
+            </label>
+          )}
+        </>
       )}
     </li>
   );
 };
 
 export const RenderMusics = ({ music }: { music: Music }) => {
+  const { user } = useQueryData(["user"]);
+  const { setElement } = useAuthContext();
+  const router = useRouter();
+  const visiting = router.pathname != "/profile";
+  const sameMedia = user.musics.filter((item) => item.id == music.id).length
+    ? true
+    : false;
   return (
-    <li className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32">
+    <li className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
       <figure>
         <img
           src={music.cover.md}
@@ -75,9 +89,7 @@ export const RenderMusics = ({ music }: { music: Music }) => {
         ></img>
       </figure>
       <div className="self-start">
-        <h2 className={`text-gray-100 ${music.name.length > 20 && "text-xs"}`}>
-          {music.name}
-        </h2>
+        <h2 className="text-gray-100">{cardTitle(music.name)}</h2>
         <p
           className={`text-sm text-gray-400 ${
             music.artist.length > 1 && "text-xs"
@@ -88,6 +100,25 @@ export const RenderMusics = ({ music }: { music: Music }) => {
           ))}
         </p>
       </div>
+      {visiting && (
+        <>
+          {sameMedia ? (
+            <button className="text-gray-200 text-xl p-1 absolute top-0 right-0 rounded-md bg-dark-600">
+              <AiOutlineCheck />
+            </button>
+          ) : (
+            <label
+              htmlFor="general-modal"
+              onClick={() =>
+                setElement(<AddToMyLibrary type="music" media={music} />)
+              }
+              className="text-secondary text-xl p-1 absolute top-0 right-0 rounded-md bg-dark-600"
+            >
+              <MdOutlineLibraryAdd />
+            </label>
+          )}
+        </>
+      )}
     </li>
   );
 };
@@ -325,6 +356,103 @@ export const EditDescription = () => {
           Confirmar
         </button>
       </div>
+    </div>
+  );
+};
+
+export const ShowAll = ({ component }: { component: JSX.Element }) => {
+  return (
+    <div>
+      {component}
+      <div className="modal-action flex justify-between items-center">
+        <label
+          className="btn btn-sm btn-outline btn-error"
+          htmlFor="general-modal"
+          id="closeModal"
+        >
+          Fechar
+        </label>
+      </div>
+    </div>
+  );
+};
+
+export const SeeAlbums = () => {
+  const { data } = useUser();
+  const [search, setSearch] = useState("");
+  const [children, setChildren] = useState(<></>);
+  if (!data) {
+    return <div></div>;
+  }
+  const user = data as Profile;
+
+  const albums = search.length
+    ? user.albums.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      )
+    : user.albums;
+
+  return (
+    <div className="bg-dark p-2 rounded-md h-[30rem] overflow-y-auto">
+      <div className="rounded-lg flex justify-between items-center relative px-2">
+        <input
+          placeholder="Procurar álbum"
+          className="bg-inherit relative block rounded-md text-sm w-full px-3 pl-8 py-1 border border-dark-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <AiOutlineSearch
+          className={`absolute left-4 text-lg ${
+            search.length ? "text-danube" : "text-gray-400"
+          }`}
+        />
+      </div>
+      <ul className="grid grid-cols-2 auto-rows-max place-items-center gap-2 rounded-md mt-2">
+        {albums.map((album, index) => (
+          <AlbumGrid album={album} key={index} setChildren={setChildren} />
+        ))}
+      </ul>
+      <SpareModal>{children}</SpareModal>
+    </div>
+  );
+};
+
+export const SeeMusics = () => {
+  const [search, setSearch] = useState("");
+  const [children, setChildren] = useState(<></>);
+  const { data } = useUser();
+  if (!data) {
+    return <div></div>;
+  }
+  const user = data as Profile;
+
+  const musics = search.length
+    ? user.musics.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      )
+    : user.musics;
+
+  return (
+    <div className="bg-dark p-2">
+      <div className="rounded-lg flex justify-between items-center relative px-2">
+        <input
+          placeholder="Procurar música"
+          className="bg-inherit relative block rounded-md text-sm w-full px-3 pl-8 py-1 border border-gray-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <AiOutlineSearch
+          className={`absolute left-4 text-lg ${
+            search.length ? "text-danube" : "text-gray-400"
+          }`}
+        />
+      </div>
+      <ul className="grid grid-cols-2 auto-rows-max place-items-center gap-2 rounded-md">
+        {musics.map((music, index) => (
+          <MusicGrid music={music} key={index} setChildren={setChildren} />
+        ))}
+      </ul>
+      <SpareModal>{children}</SpareModal>
     </div>
   );
 };

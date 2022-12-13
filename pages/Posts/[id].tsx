@@ -9,6 +9,7 @@ import {
   handleComment,
   handleLike,
 } from "../../src/components/Posts/Show/tools";
+import { Modal } from "../../src/components/Profile/Modal";
 import { useAuthContext } from "../../src/context";
 import { useQueryData, useUpdatePost } from "../../utils/Hooks";
 import { getDate } from "../../utils/Tools";
@@ -17,12 +18,12 @@ const Posts = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const { posts, user } = useQueryData(["posts", "user"]);
+  const post = posts?.filter((item) => item.id == Number(id))[0];
   const [content, setContent] = useState("");
   const [children, setChildren] = useState(<></>);
   const { mutate } = useUpdatePost();
   const { setError } = useAuthContext();
   if (!posts) return <div></div>;
-  const post = posts.filter((item) => item.id == Number(id))[0];
   const author = post.profiles!;
   const subject = post.subject;
   const created_at = getDate(post.created_at!);
@@ -130,8 +131,9 @@ const Posts = () => {
               className="bg-inherit text-sm font-light relative block h-20 mt-4 rounded-md w-full p-3 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
             />
             <button
-              className="btn btn-xs btn-primary self-end gap-1"
+              className="btn btn-xs btn-outline self-end gap-1 btn-primary"
               onClick={() => handleComment(commentParams)}
+              disabled={content.length < 3}
             >
               Enviar <RiSendPlaneFill />
             </button>
@@ -149,6 +151,7 @@ const Posts = () => {
           </div>
         </div>
       </article>
+      <Modal>{children}</Modal>
     </div>
   );
 };
