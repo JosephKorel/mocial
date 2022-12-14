@@ -5,7 +5,7 @@ import { MdArrowBackIos } from "react-icons/md";
 import { RiDeleteBin6Fill, RiEdit2Line } from "react-icons/ri";
 import { Albums, Music, Profile } from "../../../models/interfaces";
 import { useQueryData, useUser, useUserUpdate } from "../../../utils/Hooks";
-import { cardTitle, getArtist } from "../../../utils/Tools";
+import { artistName, cardTitle, getArtist } from "../../../utils/Tools";
 import { useAuthContext } from "../../context";
 import { Avatar } from "../Avatar";
 import { Modal } from "../Profile/Modal";
@@ -317,15 +317,7 @@ export const MusicGrid = ({
       </figure>
       <div className="self-start">
         <h2 className="text-gray-100">{cardTitle(music.name)}</h2>
-        <p
-          className={`text-sm text-gray-400 ${
-            music.artist.length > 1 && "text-xs"
-          }`}
-        >
-          {music.artist.map((artist, index) => (
-            <span key={index}>{artist}</span>
-          ))}
-        </p>
+        <p className={`text-sm text-gray-400`}>{artistName(music.artist)}</p>
       </div>
       <button
         className="absolute top-1 right-1 p-1 text-lg rounded-md text-error bg-dark-600"

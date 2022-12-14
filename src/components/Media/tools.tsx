@@ -7,10 +7,12 @@ interface AddParams {
   media: Music;
   setError: (data: string) => void;
   setSuccess: (data: string) => void;
+  setElement: (data: JSX.Element | null) => void;
 }
 
 export const handleAdd = (params: AddParams) => {
-  const { type, user, mutate, setError, media, setSuccess } = params;
+  const { type, user, mutate, setError, media, setSuccess, setElement } =
+    params;
   const closeBtn = document.getElementById("closeModal");
   if (type == "album") {
     const isCommon = user.albums.filter((item) => item.id == media.id);
@@ -29,6 +31,7 @@ export const handleAdd = (params: AddParams) => {
       mutate(payload);
       closeBtn?.click();
       setSuccess("Álbum adicionado");
+      setElement!(null);
     } catch (error) {
       setError("Houve algum erro, tente novamente");
     }
@@ -43,13 +46,15 @@ export const handleAdd = (params: AddParams) => {
     mutate(payload);
     closeBtn?.click();
     setSuccess("Música adicionada");
+    setElement!(null);
   } catch (error) {
     setError("Houve algum erro, tente novamente");
   }
 };
 
 export const addToListenLater = (params: AddParams) => {
-  const { type, user, mutate, setError, media, setSuccess } = params;
+  const { type, user, mutate, setError, media, setSuccess, setElement } =
+    params;
   const closeBtn = document.getElementById("closeModal");
   const hasAdded = user.listen_later.filter((item) => item.id == media.id);
   if (hasAdded.length) {
@@ -76,6 +81,7 @@ export const addToListenLater = (params: AddParams) => {
     mutate(payload);
     closeBtn?.click();
     setSuccess("Adicionado");
+    setElement!(null);
   } catch (error) {
     setError("Houve algum erro, tente novamente");
   }

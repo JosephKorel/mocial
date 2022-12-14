@@ -1,53 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { useUser } from "../../../utils/Hooks";
+import React, { useEffect } from "react";
+import { AiOutlineClose } from "react-icons/ai";
+import { useAuthContext } from "../../context";
 
-export const TopNotification: React.FC = () => {
-  const { data } = useUser();
-  const [width, setWidth] = useState(100);
-  const [trigger, setTrigger] = useState(false);
-  const divWidth = `${String(width)}%`;
+export const TopNotification = ({
+  children,
+}: {
+  children: JSX.Element | null;
+}) => {
+  const { notification, setNotification } = useAuthContext();
 
-  const onTimeOut = (stop: boolean) => {
-    const interval = setInterval(() => {
-      setWidth((prev) => prev - 10);
-    }, 1000);
-
-    if (stop) {
-      clearInterval(interval);
+  useEffect(() => {
+    if (notification) {
+      setTimeout(() => {
+        setNotification(null);
+      }, 8000);
     }
-  };
-
-  /*  setTimeout(() => {
-    const interval = setInterval(() => {
-      setWidth((prev) => prev - 10);
-    }, 1000);
-  }, 10000); */
-
-  /*   useEffect(() => {
-    if (trigger) {
-      onTimeOut();
-    } else {
-      clearInterval(interval);
-      setWidth(100);
-    }
-  }, [trigger]); */
-
-  console.log(width);
+  }, [notification]);
 
   return (
-    <div className={`fixed top-8 w-full z-10 text-center`}>
-      <div className="p-4 rounded-md w-5/6 m-auto text-gray-300 bg-dark-600 border border-danube">
-        <div className="relative">
-          <div
-            className={`rounded-md bg-danube p-1 absolute`}
-            style={{ width: divWidth }}
-          ></div>
-          <div className="w-full rounded-md bg-led p-1"></div>
+    <div
+      className={`fixed top-2 right-2 w-5/6 z-[999] text-center font-kanit ${
+        notification ? "slideleft" : "slideright"
+      }`}
+    >
+      <div className="rounded-md bg-dark shadow-lg shadow-black">
+        <div className="flex justify-end pr-1 pt-1">
+          <AiOutlineClose
+            className="text-lg text-gray-300"
+            onClick={() => setNotification(null)}
+          />
         </div>
-        <p>fixed bottomfixed bottomfixed bottomfixed bottomfixed bottom</p>
-        <button className="btn btn-sm" onClick={() => setTrigger(!trigger)}>
-          Trigger
-        </button>
+        <div className="p-1">{children}</div>
       </div>
     </div>
   );

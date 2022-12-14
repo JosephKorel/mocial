@@ -15,7 +15,7 @@ export const Alert: React.FC = () => {
     <div
       className={
         success.length || error.length
-          ? "absolute bottom-10 w-full z-[999] text-center fadein"
+          ? "fixed bottom-10 w-full z-[999] text-center fadein"
           : "hidden"
       }
     >

@@ -5,6 +5,8 @@ export type ContextType = {
   setSuccess: (data: string) => void;
   error: string;
   setError: (data: string) => void;
-  element: JSX.Element;
-  setElement: (data: JSX.Element) => void;
+  element: JSX.Element | null;
+  setElement: (data: JSX.Element | null) => void;
+  notification: JSX.Element | null;
+  setNotification: (data: JSX.Element | null) => void;
 };

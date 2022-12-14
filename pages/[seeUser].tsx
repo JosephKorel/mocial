@@ -36,7 +36,6 @@ import { useAuthContext } from "../src/context";
 const Profile: NextPage = () => {
   const [seeing, setSeeing] = useState("");
   const [option, setOption] = useState(1);
-  const [children, setChildren] = useState(<></>);
   const { mutate } = useProfileMutation();
   const { element, setElement } = useAuthContext();
   const router = useRouter();
@@ -163,7 +162,7 @@ const Profile: NextPage = () => {
         />
         <SuggestModal option={option} targetId={target.id} />
         <Modal className="py-4 px-2">{element}</Modal>
-        <TransparentModal children={element} />
+        <TransparentModal>{element}</TransparentModal>
       </div>
     </ProtectedRoute>
   );

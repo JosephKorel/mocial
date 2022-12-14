@@ -2,12 +2,13 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { supabase } from "../utils/supabaseClient";
 import { useState } from "react";
-import { ListenLater, Profile, Suggestion } from "../models/interfaces";
+import { Profile, Suggestion } from "../models/interfaces";
 import {
   BackgroundModal,
   ConfirmModal,
   FollowerFollowing,
   Modal,
+  TransparentModal,
 } from "../src/components/Profile/Modal";
 import { useProfiles, useUser } from "../utils/Hooks";
 import {
@@ -24,8 +25,9 @@ import ProtectedRoute from "../src/components/Protector";
 import { getFollowers, getFollowing } from "../src/components/Profile/Visit";
 import { queryClient } from "./_app";
 import { BsChevronRight } from "react-icons/bs";
-import { cardTitle } from "../utils/Tools";
 import { ListenLaterSection } from "../src/components/Profile/ListenLater";
+import { TopNotification } from "../src/components/Notification";
+import { useAuthContext } from "../src/context";
 
 const Account: NextPage = () => {
   const [open, setOpen] = useState(false);
@@ -35,6 +37,7 @@ const Account: NextPage = () => {
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const { data, isLoading } = useUser();
   const { data: profileData } = useProfiles();
+  const { element, notification } = useAuthContext();
   const router = useRouter();
   if (!data || !profileData) return <div></div>;
   const user = data as Profile;
@@ -165,6 +168,8 @@ const Account: NextPage = () => {
         />
         <ConfirmModal suggestion={suggestion} />
         <Modal className="py-4 px-2">{children}</Modal>
+        <TransparentModal>{element}</TransparentModal>
+        <TopNotification>{notification}</TopNotification>
       </div>
     </ProtectedRoute>
   );

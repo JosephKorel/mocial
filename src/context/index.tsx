@@ -9,6 +9,8 @@ const ContextDefaultValues = {
   setError: () => {},
   element: <></>,
   setElement: () => {},
+  notification: null,
+  setNotification: () => {},
 };
 
 const AuthContext = createContext<ContextType>(ContextDefaultValues);
@@ -18,9 +20,10 @@ export function useAuthContext() {
 }
 
 const ContextProvider = ({ children }: { children: ReactNode }) => {
-  const [element, setElement] = useState(<></>);
+  const [element, setElement] = useState<JSX.Element | null>(null);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [notification, setNotification] = useState<JSX.Element | null>(null);
 
   const value: ContextType = {
     element,
@@ -29,6 +32,8 @@ const ContextProvider = ({ children }: { children: ReactNode }) => {
     setSuccess,
     error,
     setError,
+    notification,
+    setNotification,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

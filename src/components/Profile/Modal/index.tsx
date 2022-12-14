@@ -432,6 +432,7 @@ export const TransparentModal = ({
       <label
         htmlFor="transparent-modal"
         className="modal cursor-pointer bg-transparent backdrop-blur-md"
+        id="closeTransparentModal"
       >
         <label
           className={`modal-box relative shadow-none bg-transparent backdrop-blur-md ${className}`}
