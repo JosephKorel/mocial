@@ -2,12 +2,10 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { BsHeart, BsHeartFill, BsThreeDots } from "react-icons/bs";
 import { FaCommentAlt } from "react-icons/fa";
-import { MdOutlineOpenInNew } from "react-icons/md";
 import {
   RiDeleteBackLine,
   RiDeleteBin6Line,
   RiEdit2Line,
-  RiSendPlaneFill,
 } from "react-icons/ri";
 import { Comment, Post } from "../../../../models/interfaces";
 import {
@@ -22,25 +20,22 @@ import {
 } from "../../../../utils/Tools";
 import { useAuthContext } from "../../../context";
 import { Avatar } from "../../Avatar";
+import { About } from "../../Media";
 import { Modal } from "../../Profile/Modal";
 import { CommentFooterProps } from "./models";
-import { handleComment, handleCommentLike, handleLike } from "./tools";
+import { handleCommentLike, handleLike } from "./tools";
 
 export const Posts = ({ post }: { post: Post }) => {
   const router = useRouter();
   const { user } = useQueryData(["user"]);
-  const [content, setContent] = useState("");
-  const [showComments, setShowComments] = useState(false);
   const [children, setChildren] = useState(<div></div>);
   const { mutate } = useUpdatePost();
-  const { setError } = useAuthContext();
+  const { setError, setElement } = useAuthContext();
   const author = post.profiles!;
   const subject = post.subject;
   const created_at = getDate(post.created_at!);
   const hasLiked = post.liked_by.includes(user.id);
-  const comments = post.comments.sort((a, b) => b.created_at - a.created_at);
   const postLikeParams = { post, user, mutate, setError };
-  const commentParams = { content, user, post, mutate, setError, setContent };
 
   const goToProfile = (id: string) => {
     if (id == user.id) {
@@ -74,11 +69,14 @@ export const Posts = ({ post }: { post: Post }) => {
         <></>
       )}
       <div className="flex flex-col items-center justify-center">
-        <img
-          src={subject.cover.sm}
-          alt={subject.name}
-          className={`rounded-full w-14 border-2 border-danube`}
-        ></img>
+        <label htmlFor="general-modal">
+          <img
+            src={subject.cover.sm}
+            alt={subject.name}
+            className={`rounded-full w-14 border-2 border-danube`}
+            onClick={() => setElement(<About media={subject} />)}
+          ></img>
+        </label>
         <p className="text-xl font-extralight italic text-gray-100">
           {subject.name}
         </p>
@@ -88,10 +86,7 @@ export const Posts = ({ post }: { post: Post }) => {
         <h1 className="text-lg italic text-left">{post.title}</h1>
         <p className="text-sm font-thin text-justify py-2">{post.content}</p>
         <div className="flex items-center justify-end gap-4">
-          <div
-            className="flex items-center gap-1"
-            onClick={() => setShowComments(!showComments)}
-          >
+          <div className="flex items-center gap-1" onClick={navigateToPost}>
             <FaCommentAlt className="text-gray-300" />
             <span className="text-sm">{post.comments.length}</span>
           </div>
@@ -120,51 +115,6 @@ export const Posts = ({ post }: { post: Post }) => {
         </div>
         <p className="font-light italic text-xs text-gray-400">{created_at}</p>
       </div>
-      {showComments ? (
-        <div className="text-left rounded-md py-1">
-          <p className="text-lg">Comentários</p>
-          <div className="flex flex-col gap-2">
-            <textarea
-              placeholder={
-                post.comments.length
-                  ? "Escreva seu comentário"
-                  : "Seja o primeiro a comentar"
-              }
-              value={content}
-              maxLength={165}
-              onChange={(e) => setContent(e.currentTarget.value)}
-              className="bg-inherit text-sm font-light relative block h-20 mt-4 rounded-md w-full p-3 border border-dark-200 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
-            />
-            <button
-              className="btn btn-xs btn-outline btn-primary self-end gap-1"
-              onClick={() => handleComment(commentParams)}
-            >
-              Enviar <RiSendPlaneFill />
-            </button>
-          </div>
-          <div className="w-full p-[1px] bg-gray-300 rounded-md mt-4 mb-2"></div>
-          <div className="flex flex-col gap-2 py-2 pb-4">
-            {comments.slice(0, 1).map((comment, index) => (
-              <RenderComment
-                key={index}
-                comment={comment}
-                post={post}
-                setChildren={setChildren}
-              />
-            ))}
-            <button
-              className="btn btn-primary btn-outline btn-sm gap-4 mt-2"
-              onClick={navigateToPost}
-            >
-              Ver todos
-              <MdOutlineOpenInNew />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <></>
-      )}
-      <Modal>{children}</Modal>
     </article>
   );
 };
@@ -243,9 +193,11 @@ export const PostOptions = ({
   setChildren: (data: JSX.Element) => void;
 }) => {
   const router = useRouter();
+  const { element, setElement } = useAuthContext();
   const editPost = (id: number) => {
     router.push({ pathname: "/Posts/Edit/[id]", query: { id } });
   };
+  console.log(id);
   return (
     <div className="dropdown dropdown-end absolute top-2 right-2">
       <button tabIndex={0} className="p-1 px-2 rounded-md">
@@ -264,7 +216,7 @@ export const PostOptions = ({
         <li>
           <label
             htmlFor="general-modal"
-            onClick={() => setChildren(<ConfirmDelete id={id} />)}
+            onClick={() => setElement(<ConfirmDelete id={id} />)}
           >
             <RiDeleteBackLine /> Excluir
           </label>
@@ -398,7 +350,7 @@ export const EditComment = ({ id, post }: { id: number; post: Post }) => {
           Cancelar
         </label>
         <button
-          className="btn btn-sm btn-error btn-outline"
+          className="btn btn-sm btn-primary btn-outline"
           onClick={handleEdit}
         >
           Confirmar

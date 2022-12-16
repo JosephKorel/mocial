@@ -5,11 +5,14 @@ import { HomePageProps, Post } from "../models/interfaces";
 import ProtectedRoute from "../src/components/Protector";
 import { usePosts, useQueryData } from "../utils/Hooks";
 import { Posts } from "../src/components/Posts/Show";
+import { Modal } from "../src/components/Profile/Modal";
+import { useAuthContext } from "../src/context";
 
 const Home: NextPage<HomePageProps> = () => {
   const router = useRouter();
   const { data } = usePosts();
   const { profiles } = useQueryData(["user", "profiles"]);
+  const { element } = useAuthContext();
 
   useEffect(() => {
     if (!profiles) {
@@ -30,15 +33,18 @@ const Home: NextPage<HomePageProps> = () => {
 
   return (
     <ProtectedRoute>
-      <div className="font-kanit pb-16">
-        <main className="mt-2">
-          <section className="flex flex-col gap-10 p-2 py-3">
-            {posts.map((post, index) => (
-              <Posts post={post} key={index} />
-            ))}
-          </section>
-        </main>
-      </div>
+      <>
+        <div className="font-kanit pb-16">
+          <main className="mt-2">
+            <section className="flex flex-col gap-10 p-2 py-3">
+              {posts.map((post, index) => (
+                <Posts post={post} key={index} />
+              ))}
+            </section>
+          </main>
+        </div>
+        <Modal className="py-4 px-2">{element}</Modal>
+      </>
     </ProtectedRoute>
   );
 };

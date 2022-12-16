@@ -27,24 +27,36 @@ import { AiOutlineCheck, AiOutlineSearch } from "react-icons/ai";
 import { AlbumGrid, MusicGrid } from "../../EditAccount";
 import { SpareModal } from "../Modal";
 import { useAuthContext } from "../../../context";
-import { AddOptions, MediaOptions } from "../../Media";
+import { About, AddOptions, MediaOptions } from "../../Media";
 
-export const RenderAlbums = ({ album }: { album: Albums }) => {
+export const RenderAlbums = ({
+  album,
+  setChildren,
+}: {
+  album: Albums;
+  setChildren: (data: JSX.Element | null) => void;
+}) => {
   const { user } = useQueryData(["user"]);
+
   const router = useRouter();
   const visiting = router.pathname != "/profile";
   const sameMedia = user.albums.filter((item) => item.id == album.id).length
     ? true
     : false;
   return (
-    <li className="bg-dark-600 h-44 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
-      <figure className="">
-        <img
-          src={album.cover.md}
-          alt={album.name}
-          className="h-32 lg:h-52 rounded-md"
-        ></img>
-      </figure>
+    <li
+      className="bg-dark-600 h-44 carousel-item shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative"
+      onClick={() => setChildren(<About media={{ ...album, type: "album" }} />)}
+    >
+      <label htmlFor="general-modal">
+        <figure className="">
+          <img
+            src={album.cover.md}
+            alt={album.name}
+            className="h-32 lg:h-52 rounded-md"
+          ></img>
+        </figure>
+      </label>
       <div className="self-start">
         <h2 className="text-gray-100">{cardTitle(album.name)}</h2>
         <p className="text-sm text-gray-400">
@@ -60,7 +72,13 @@ export const RenderAlbums = ({ album }: { album: Albums }) => {
   );
 };
 
-export const RenderMusics = ({ music }: { music: Music }) => {
+export const RenderMusics = ({
+  music,
+  setChildren,
+}: {
+  music: Music;
+  setChildren: (data: JSX.Element | null) => void;
+}) => {
   const { user } = useQueryData(["user"]);
   const router = useRouter();
   const visiting = router.pathname != "/profile";
@@ -68,29 +86,34 @@ export const RenderMusics = ({ music }: { music: Music }) => {
     ? true
     : false;
   return (
-    <li className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
-      <figure>
-        <img
-          src={music.cover.md}
-          alt={music.name}
-          className="h-32 lg:h-52 rounded-md"
-        ></img>
-      </figure>
-      <div className="self-start">
-        <h2 className="text-gray-100">{cardTitle(music.name)}</h2>
-        <p
-          className={`text-sm text-gray-400 ${
-            music.artist.length > 1 && "text-xs"
-          }`}
-        >
-          {music.artist.map((artist, index) => (
-            <span key={index}>{artist}</span>
-          ))}
-        </p>
-      </div>
-      {visiting && (
-        <MediaOptions media={music} common={sameMedia} type="music" />
-      )}
+    <li
+      className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative"
+      onClick={() => setChildren(<About media={{ ...music, type: "track" }} />)}
+    >
+      <label htmlFor="general-modal">
+        <figure>
+          <img
+            src={music.cover.md}
+            alt={music.name}
+            className="h-32 lg:h-52 rounded-md"
+          ></img>
+        </figure>
+        <div className="self-start">
+          <h2 className="text-gray-100">{cardTitle(music.name)}</h2>
+          <p
+            className={`text-sm text-gray-400 ${
+              music.artist.length > 1 && "text-xs"
+            }`}
+          >
+            {music.artist.map((artist, index) => (
+              <span key={index}>{artist}</span>
+            ))}
+          </p>
+        </div>
+        {visiting && (
+          <MediaOptions media={music} common={sameMedia} type="music" />
+        )}
+      </label>
     </li>
   );
 };
@@ -369,11 +392,11 @@ export const SeeAlbums = ({ user }: { user: Profile }) => {
   const visiting = currentUser.id != user.id;
 
   return (
-    <div className="bg-dark p-2 rounded-md h-[30rem] overflow-y-auto">
+    <div>
       <div className="rounded-lg flex justify-between items-center relative px-2">
         <input
           placeholder="Procurar álbum"
-          className="bg-inherit relative block rounded-md text-sm w-full px-3 pl-8 py-1 border border-dark-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+          className="bg-inherit relative block rounded-md text-sm w-full px-3 pl-8 py-2 border border-dark-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -383,29 +406,26 @@ export const SeeAlbums = ({ user }: { user: Profile }) => {
           }`}
         />
       </div>
-      <ul className="grid grid-cols-2 auto-rows-max place-items-center gap-2 rounded-md mt-2">
-        {albums.map((album, index) => (
-          <AlbumGrid
-            album={album}
-            key={index}
-            setChildren={setChildren}
-            visiting={visiting}
-          />
-        ))}
-      </ul>
+      <div className="bg-dark p-2 rounded-md h-[28rem] overflow-y-auto mt-2">
+        <ul className="grid grid-cols-2 auto-rows-max place-items-center gap-2 rounded-md">
+          {albums.map((album, index) => (
+            <AlbumGrid
+              album={album}
+              key={index}
+              setChildren={setChildren}
+              visiting={visiting}
+            />
+          ))}
+        </ul>
+      </div>
       <SpareModal>{children}</SpareModal>
     </div>
   );
 };
 
-export const SeeMusics = () => {
+export const SeeMusics = ({ user }: { user: Profile }) => {
   const [search, setSearch] = useState("");
   const [children, setChildren] = useState(<></>);
-  const { data } = useUser();
-  if (!data) {
-    return <div></div>;
-  }
-  const user = data as Profile;
 
   const musics = search.length
     ? user.musics.filter((item) =>
@@ -414,11 +434,11 @@ export const SeeMusics = () => {
     : user.musics;
 
   return (
-    <div className="bg-dark p-2">
+    <div className="">
       <div className="rounded-lg flex justify-between items-center relative px-2">
         <input
           placeholder="Procurar música"
-          className="bg-inherit relative block rounded-md text-sm w-full px-3 pl-8 py-1 border border-gray-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
+          className="bg-inherit relative block rounded-md text-sm w-full px-3 pl-8 py-2 border border-gray-400 placeholder-gray-400 text-gray-100 focus:outline-none focus:ring-danube focus:border-danube"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -428,11 +448,13 @@ export const SeeMusics = () => {
           }`}
         />
       </div>
-      <ul className="grid grid-cols-2 auto-rows-max place-items-center gap-2 rounded-md">
-        {musics.map((music, index) => (
-          <MusicGrid music={music} key={index} setChildren={setChildren} />
-        ))}
-      </ul>
+      <div className="bg-dark p-2 rounded-md h-[28rem] overflow-y-auto mt-2">
+        <ul className="grid grid-cols-2 auto-rows-max place-items-center gap-2 rounded-md">
+          {musics.map((music, index) => (
+            <MusicGrid music={music} key={index} setChildren={setChildren} />
+          ))}
+        </ul>
+      </div>
       <SpareModal>{children}</SpareModal>
     </div>
   );

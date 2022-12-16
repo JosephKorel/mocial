@@ -181,3 +181,30 @@ export const handlePostMutation = async (payload: MutationPayload) => {
       break;
   }
 };
+
+export const getInfo = async (type: string, id: string, token: string) => {
+  const parameters = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  };
+
+  const onFetch = await fetch(
+    `https://api.spotify.com/v1/${type}/${id}`,
+    parameters
+  );
+
+  try {
+    if (onFetch.status != 200) {
+      throw new Error();
+    }
+    const data = await onFetch.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw new Error();
+  }
+};

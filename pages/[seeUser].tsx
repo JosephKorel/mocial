@@ -1,8 +1,8 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { MdArrowBackIos, MdRecommend } from "react-icons/md";
-import { Music, Profile } from "../models/interfaces";
+import { MdArrowBackIos } from "react-icons/md";
+import { Profile } from "../models/interfaces";
 import {
   FollowerFollowing,
   Modal,
@@ -10,13 +10,7 @@ import {
   TransparentModal,
 } from "../src/components/Profile/Modal";
 import { BsArrowLeftRight, BsChevronRight } from "react-icons/bs";
-import {
-  useProfileMutation,
-  useProfiles,
-  useQueryData,
-  useUser,
-  useUserUpdate,
-} from "../utils/Hooks";
+import { useProfileMutation, useProfiles, useUser } from "../utils/Hooks";
 import {
   ProfileHeader,
   RenderAlbums,
@@ -70,7 +64,7 @@ const Profile: NextPage = () => {
       return;
     }
 
-    setElement(<ShowAll component={<SeeMusics />} />);
+    setElement(<ShowAll component={<SeeMusics user={target} />} />);
   };
 
   return (
@@ -126,13 +120,21 @@ const Profile: NextPage = () => {
                 {option == 1 ? (
                   <>
                     {target.albums.map((album, index) => (
-                      <RenderAlbums album={album} key={index} />
+                      <RenderAlbums
+                        album={album}
+                        key={index}
+                        setChildren={setElement}
+                      />
                     ))}
                   </>
                 ) : (
                   <>
                     {target.musics.map((music, index) => (
-                      <RenderMusics music={music} key={index} />
+                      <RenderMusics
+                        music={music}
+                        key={index}
+                        setChildren={setElement}
+                      />
                     ))}
                   </>
                 )}

@@ -279,7 +279,7 @@ export const AlbumGrid = ({
       </figure>
       <div className="self-start overflow-y-auto">
         <h2 className={`text-gray-100 `}>{cardTitle(album.name)}</h2>
-        <p className="text-sm text-gray-400">{getArtist(album.artist)}</p>
+        <p className="text-sm text-gray-400">{artistName(album.artist)}</p>
       </div>
       {!visiting ? (
         <button
@@ -307,7 +307,7 @@ export const MusicGrid = ({
   setChildren: (data: JSX.Element) => void;
 }) => {
   return (
-    <li className="carousel-item bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
+    <li className="carousel-item h-48 bg-dark-600 shadow-md shadow-dark-600 p-2 lg:p-4 rounded-md flex flex-col items-center w-32 relative">
       <figure>
         <img
           src={music.cover.md}

@@ -10,7 +10,7 @@ import {
   Modal,
   TransparentModal,
 } from "../src/components/Profile/Modal";
-import { useProfiles, useUser } from "../utils/Hooks";
+import { useProfiles, useToken, useUser } from "../utils/Hooks";
 import {
   ProfileHeader,
   ProfileOptions,
@@ -38,6 +38,7 @@ const Account: NextPage = () => {
   const { data, isLoading } = useUser();
   const { data: profileData } = useProfiles();
   const { element, notification } = useAuthContext();
+  const token = useToken();
   const router = useRouter();
   if (!data || !profileData) return <div></div>;
   const user = data as Profile;
@@ -70,7 +71,7 @@ const Account: NextPage = () => {
       return;
     }
 
-    setChildren(<ShowAll component={<SeeMusics />} />);
+    setChildren(<ShowAll component={<SeeMusics user={user} />} />);
   };
 
   return (
@@ -113,13 +114,21 @@ const Account: NextPage = () => {
                 {option == 1 ? (
                   <>
                     {user.albums.slice(0, 5).map((album, index) => (
-                      <RenderAlbums album={album} key={index} />
+                      <RenderAlbums
+                        album={album}
+                        key={index}
+                        setChildren={setChildren}
+                      />
                     ))}
                   </>
                 ) : (
                   <>
                     {user.musics.slice(0, 5).map((music, index) => (
-                      <RenderMusics music={music} key={index} />
+                      <RenderMusics
+                        music={music}
+                        key={index}
+                        setChildren={setChildren}
+                      />
                     ))}
                   </>
                 )}

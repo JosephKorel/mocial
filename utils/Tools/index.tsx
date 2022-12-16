@@ -126,10 +126,11 @@ export const artistName = (group: string[]) => {
   group.forEach((item, index, arr) => {
     index == arr.length - 1 ? (artists += item) : (artists += item + ", ");
   });
+  const plainName = artists.replace(/\s/g, "");
 
-  if (!artists.match(letters)) {
+  if (!plainName.match(letters)) {
     return artists.length > 12 ? artists.slice(0, 8) + "..." : artists;
   }
 
-  return artists.length > 18 ? artists.slice(0, 12) + "..." : artists;
+  return artists.length > 24 ? artists.slice(0, 18) + "..." : artists;
 };

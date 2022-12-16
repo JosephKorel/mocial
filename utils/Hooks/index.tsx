@@ -14,6 +14,7 @@ import {
   createPost,
   updatePost,
   deletePost,
+  getInfo,
 } from "../../pages/api/query-tools";
 import { queryClient } from "../../pages/_app";
 
@@ -77,6 +78,10 @@ export const useAlbums = (text: string, token: string) => {
   return useQuery(["albums", text], () => getAlbums(text, token), {
     keepPreviousData: true,
   });
+};
+
+export const useAbout = (type: string, id: string, token: string) => {
+  return useQuery(["about", id], () => getInfo(type, id, token));
 };
 
 export const useProfiles = () => {

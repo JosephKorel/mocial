@@ -1,4 +1,10 @@
-import { ListenLater, Music, Profile } from "../../../models/interfaces";
+import moment from "moment";
+import {
+  Albums,
+  ListenLater,
+  Music,
+  Profile,
+} from "../../../models/interfaces";
 
 interface AddParams {
   type: string;
@@ -13,7 +19,7 @@ interface AddParams {
 export const handleAdd = (params: AddParams) => {
   const { type, user, mutate, setError, media, setSuccess, setElement } =
     params;
-  const closeBtn = document.getElementById("closeModal");
+  const closeBtn = document.getElementById("closeTransparentModal");
   if (type == "album") {
     const isCommon = user.albums.filter((item) => item.id == media.id);
 
@@ -31,7 +37,7 @@ export const handleAdd = (params: AddParams) => {
       mutate(payload);
       closeBtn?.click();
       setSuccess("Álbum adicionado");
-      setElement!(null);
+      /* setElement!(null); */
     } catch (error) {
       setError("Houve algum erro, tente novamente");
     }
@@ -46,7 +52,7 @@ export const handleAdd = (params: AddParams) => {
     mutate(payload);
     closeBtn?.click();
     setSuccess("Música adicionada");
-    setElement!(null);
+    /* setElement!(null); */
   } catch (error) {
     setError("Houve algum erro, tente novamente");
   }
@@ -85,4 +91,75 @@ export const addToListenLater = (params: AddParams) => {
   } catch (error) {
     setError("Houve algum erro, tente novamente");
   }
+};
+
+export const getTotalDuration = (type: string, data: any) => {
+  if (type == "album") {
+    let duration_ms = 0;
+    const tracks: any[] = data.tracks.items;
+    tracks.forEach((track) => (duration_ms += track.duration_ms));
+    const duration_s = duration_ms / 1000;
+    const duration_min = duration_s / 60;
+    if (duration_min < 60) {
+      return `${Math.round(duration_min)} minutos`;
+    }
+
+    const duration_hr = Math.round(duration_min / 60);
+    const minutes = Math.round((duration_min / 60 - duration_hr) * 60);
+    return `${duration_hr} ${duration_hr > 1 ? "horas" : "hora"} e ${minutes} ${
+      minutes > 1 ? "minutos" : "minuto"
+    }`;
+  }
+
+  const duration_min = data.duration_ms / 1000 / 60;
+  const duration_s = data.duration_ms / 1000;
+  if (duration_min < 1) {
+    const seconds = data.duration_ms / 1000;
+    return `${seconds} segundos`;
+  }
+
+  const minutes = Math.floor(duration_min);
+  const seconds = Math.floor(duration_s % 60);
+
+  return `${minutes < 10 ? "0" + minutes : minutes}:${
+    seconds < 10 ? "0" + seconds : seconds
+  }`;
+};
+
+export const getInfo = (data: any, media: Albums) => {
+  if (!data) {
+    return { release_date: "", duration_min: "", link: "", total_tracks: "" };
+  }
+
+  const link = data.href;
+
+  if (media.type == "album") {
+    const release_date = moment(data.release_date, "YYYY-MM-DD").format(
+      "DD/MM/YYYY"
+    );
+    const total_tracks = data.total_tracks;
+    const duration_min = getTotalDuration("album", data);
+
+    const additionalInfo = {
+      release_date,
+      total_tracks,
+      duration_min,
+      link,
+    };
+    return additionalInfo;
+  }
+
+  const release_date = moment(data.album.release_date, "YYYY-MM-DD").format(
+    "DD/MM/YYYY"
+  );
+
+  const duration_min = getTotalDuration("music", data);
+
+  const additionalInfo = {
+    release_date,
+    duration_min,
+    total_tracks: "",
+    link,
+  };
+  return additionalInfo;
 };

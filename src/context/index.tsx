@@ -1,13 +1,12 @@
 import React, { useState, ReactNode, useContext, createContext } from "react";
 import { ContextType } from "../../models/context-type";
-import { Profile } from "../../models/interfaces";
 
 const ContextDefaultValues = {
   success: "",
   setSuccess: () => {},
   error: "",
   setError: () => {},
-  element: <></>,
+  element: null,
   setElement: () => {},
   notification: null,
   setNotification: () => {},
