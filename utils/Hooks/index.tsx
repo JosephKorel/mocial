@@ -15,6 +15,8 @@ import {
   updatePost,
   deletePost,
   getInfo,
+  getNotifications,
+  sendNotification,
 } from "../../pages/api/query-tools";
 import { queryClient } from "../../pages/_app";
 
@@ -90,6 +92,17 @@ export const useProfiles = () => {
 
 export const useUser = () => {
   return useQuery(["user"], getUser);
+};
+
+export const useNotifications = (id: string | undefined) => {
+  return useQuery(["notifications"], () => getNotifications(id));
+};
+
+export const useNotificationMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation((payload: any) => sendNotification(payload), {
+    onSuccess: () => queryClient.invalidateQueries(["notifications"]),
+  });
 };
 
 export const useUserMutation = () => {

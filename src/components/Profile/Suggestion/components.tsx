@@ -1,6 +1,10 @@
 import { TiThumbsOk, TiThumbsUp, TiThumbsDown } from "react-icons/ti";
 import { Suggestion } from "../../../../models/interfaces";
-import { useQueryData, useUserUpdate } from "../../../../utils/Hooks";
+import {
+  useNotificationMutation,
+  useQueryData,
+  useUserUpdate,
+} from "../../../../utils/Hooks";
 import { useState } from "react";
 import { useAuthContext } from "../../../context";
 import { rateSuggestion } from "./tools";
@@ -74,6 +78,7 @@ export const RateSuggestion = ({ result }: { result: Suggestion }) => {
   const { setError, setSuccess } = useAuthContext();
   const { user } = useQueryData(["user"]);
   const { mutate } = useUserUpdate();
+  const sendNotification = useNotificationMutation();
   const [selected, setSelected] = useState(0);
   const [step, setStep] = useState(1);
 
@@ -86,6 +91,7 @@ export const RateSuggestion = ({ result }: { result: Suggestion }) => {
     user,
     setStep,
     setSuccess,
+    sendNotification,
   };
 
   return (

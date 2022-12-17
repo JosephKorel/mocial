@@ -182,6 +182,37 @@ export const handlePostMutation = async (payload: MutationPayload) => {
   }
 };
 
+export const getNotifications = async (id: string | undefined) => {
+  if (!id) return;
+  try {
+    const { error, data } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("sent_to", id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export const sendNotification = async (payload: any) => {
+  try {
+    const { error, data } = await supabase
+      .from("notifications")
+      .insert(payload);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
 export const getInfo = async (type: string, id: string, token: string) => {
   const parameters = {
     method: "GET",

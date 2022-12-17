@@ -2,10 +2,10 @@ import type { GetServerSideProps, NextPage } from "next";
 import { useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/router";
-import { HomePageProps } from "../models/interfaces";
+import { HomePageProps, Profile } from "../models/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { getProfiles, getUser } from "./api/query-tools";
-import { usePosts, useUser } from "../utils/Hooks";
+import { useNotifications, usePosts, useUser } from "../utils/Hooks";
 
 const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
   const router = useRouter();
@@ -14,8 +14,10 @@ const InitialPage: NextPage<HomePageProps> = ({ profiles }) => {
     queryFn: getProfiles,
     initialData: profiles,
   });
-  const {} = useUser();
+  const { data: currentUser, isLoading } = useUser();
+  const user = currentUser as Profile;
   const {} = usePosts();
+  const {} = useNotifications(isLoading ? undefined : user.id);
 
   useEffect(() => {
     let mounted = true;
@@ -54,6 +56,7 @@ export default InitialPage;
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const profiles = await getProfiles();
+  const id = await supabase.auth.getUser();
 
   return {
     props: { profiles },

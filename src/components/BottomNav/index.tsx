@@ -3,6 +3,7 @@ import { GoHome, GoSearch } from "react-icons/go";
 import { MdOutlinePersonPin } from "react-icons/md";
 import { useUser } from "../../../utils/Hooks";
 import { IoCreateOutline } from "react-icons/io5";
+import { IoMdNotificationsOutline } from "react-icons/io";
 
 export const BottomNav: React.FC = () => {
   const router = useRouter();
@@ -26,6 +27,11 @@ export const BottomNav: React.FC = () => {
         <li className="">
           <a onClick={() => router.push("/Posts")}>
             <IoCreateOutline className="text-lg" />
+          </a>
+        </li>
+        <li className="">
+          <a onClick={() => router.push("notifications")}>
+            <IoMdNotificationsOutline className="text-lg" />
           </a>
         </li>
         <li className="">

@@ -15,6 +15,7 @@ interface SuggestionTools {
     step: number;
     result: Suggestion;
     mutate: (data: any) => void;
+    sendNotification: any;
   };
 
   add?: {
@@ -89,6 +90,7 @@ export const rateSuggestion = ({ rate }: SuggestionTools) => {
     user,
     setStep,
     setSuccess,
+    sendNotification,
   } = rate!;
   if (!selected) {
     setError("Você deve selecionar uma das opções");
@@ -108,7 +110,17 @@ export const rateSuggestion = ({ rate }: SuggestionTools) => {
         body: { suggestions: userSuggestions },
       };
 
+      const notificationPayload = {
+        sent_to: result.sent_by,
+        sent_by: user.id,
+        seen: false,
+        content: "Avaliou sua sugestão",
+        created_at: new Date().getTime(),
+        type: "suggestion",
+      };
+
       mutate(payload);
+      sendNotification.mutate(notificationPayload);
     } catch (error) {
       setError("Houve algum erro, tente novamente");
       return;
